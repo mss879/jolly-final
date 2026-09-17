@@ -1,6 +1,7 @@
 /* Central content store for Jolly's Creamery.
-   Flavour copy, venue list and contact details are sourced from
-   jollyscreamery.com (Mar 2024 / Jun 2025 content). */
+   Venue list and contact details are sourced from jollyscreamery.com
+   (Mar 2024 / Jun 2025 content). The cart line-up and the flavour list follow
+   the client's "Jolly's on Wheels" brochure (Sept 2026). */
 
 export const CONTACT = {
   phone: "+94 707 222 511",
@@ -18,10 +19,11 @@ export type Flavor = {
   name: string;
   description: string;
   image: string;
-  category: "Sorbet" | "Chocolate" | "Fruity" | "Classic";
+  category: "Sorbet" | "Chocolate" | "Fruity" | "Classic" | "Seasonal";
   dairyFree?: boolean;
 };
 
+/* Brochure order — the first three also lead the Home flavour preview. */
 export const FLAVORS: Flavor[] = [
   {
     slug: "passion-fruit-sorbet",
@@ -33,12 +35,27 @@ export const FLAVORS: Flavor[] = [
     dairyFree: true,
   },
   {
-    slug: "mandarin-sorbet",
-    name: "Mandarin Creamy Sorbet",
-    description: "Bright, zesty mandarin in a creamy dairy-free sorbet — clean and refreshing.",
-    image: "/images/flavors/mandarin-sorbet.png",
-    category: "Sorbet",
-    dairyFree: true,
+    slug: "cookies-and-cream",
+    name: "Cookies & Cream",
+    description: "Silky vanilla with crunchy cookie pieces — indulgence in every bite.",
+    image: "/images/flavors/cookies-and-cream.png",
+    category: "Classic",
+  },
+  {
+    slug: "flavour-of-the-month",
+    name: "Flavour of the Month",
+    description:
+      "A playful twist on rare, unexpected ingredients — a one-of-a-kind scoop that changes every month.",
+    image: "/images/flavors/flavour-of-the-month.png",
+    category: "Seasonal",
+  },
+  {
+    slug: "salted-caramel-peanuts",
+    name: "Salted Caramel & Peanuts",
+    description:
+      "Burnt-sugar caramel, roasted peanuts and a hint of salt — the grown-ups' favourite.",
+    image: "/images/flavors/salted-caramel-peanuts.png",
+    category: "Classic",
   },
   {
     slug: "strawberry-cheesecake",
@@ -49,6 +66,21 @@ export const FLAVORS: Flavor[] = [
     category: "Classic",
   },
   {
+    slug: "double-chocolate",
+    name: "Double Chocolate",
+    description: "Deep cocoa, twice over — rich, smooth and unhurried.",
+    image: "/images/flavors/double-chocolate.png",
+    category: "Chocolate",
+  },
+  {
+    slug: "swiss-chocolate",
+    name: "Swiss Chocolate",
+    description:
+      "Swiss-style chocolate with African cocoa and sweet cream.",
+    image: "/images/flavors/swiss-chocolate.png",
+    category: "Chocolate",
+  },
+  {
     slug: "coconut",
     name: "Coconut",
     description:
@@ -57,58 +89,11 @@ export const FLAVORS: Flavor[] = [
     category: "Classic",
   },
   {
-    slug: "jaffna-mango",
-    name: "Jaffna Mango",
-    description:
-      "Jaffna's Karutha Columban mango — floral, tart and sweet. The island in a scoop.",
-    image: "/images/flavors/jaffna-mango.png",
-    category: "Fruity",
-  },
-  {
-    slug: "mint-chocolate",
-    name: "Mint Chocolate",
-    description:
-      "Fresh mint, light and cool, with dark chocolate chips — made for after dinner.",
-    image: "/images/flavors/mint-chocolate.png",
-    category: "Chocolate",
-  },
-  {
-    slug: "double-chocolate",
-    name: "Double Chocolate",
-    description: "Deep cocoa, twice over — rich, smooth and unhurried.",
-    image: "/images/flavors/double-chocolate.png",
-    category: "Chocolate",
-  },
-  {
-    slug: "bubblegum-blues",
-    name: "Bubblegum Blues",
-    description:
-      "Blue, sweet and nostalgic — the flavour that makes grown-ups feel seven again.",
-    image: "/images/flavors/bubblegum-blues.png",
-    category: "Classic",
-  },
-  {
-    slug: "strawberry",
-    name: "Strawberry",
-    description:
-      "Island strawberries, tangy and bright, in fresh cream.",
-    image: "/images/flavors/strawberry.png",
-    category: "Fruity",
-  },
-  {
     slug: "french-vanilla",
     name: "French Vanilla",
     description:
       "Floral vanilla and crème anglaise — extra creamy, yet light.",
     image: "/images/flavors/french-vanilla.png",
-    category: "Classic",
-  },
-  {
-    slug: "salted-caramel-peanuts",
-    name: "Salted Caramel & Peanuts",
-    description:
-      "Burnt-sugar caramel, roasted peanuts and a hint of salt — the grown-ups' favourite.",
-    image: "/images/flavors/salted-caramel-peanuts.png",
     category: "Classic",
   },
   {
@@ -120,27 +105,19 @@ export const FLAVORS: Flavor[] = [
     category: "Fruity",
   },
   {
-    slug: "butterscotch",
-    name: "Butterscotch",
+    slug: "jaffna-mango",
+    name: "Jaffna Mango",
     description:
-      "Brown sugar and butter, delicate and warm.",
-    image: "/images/flavors/butterscotch.png",
-    category: "Classic",
+      "Jaffna's Karutha Columban mango — floral, tart and sweet. The island in a scoop.",
+    image: "/images/flavors/jaffna-mango.png",
+    category: "Fruity",
   },
   {
-    slug: "swiss-chocolate",
-    name: "Swiss Chocolate",
+    slug: "bubblegum-blue",
+    name: "Bubblegum Blue",
     description:
-      "Swiss-style chocolate with African cocoa and sweet cream.",
-    image: "/images/flavors/swiss-chocolate.png",
-    category: "Chocolate",
-  },
-  {
-    slug: "milk-toffee",
-    name: "Milk Toffee",
-    description:
-      "Traditional Sri Lankan milk toffee — buttery, caramelised and nostalgic.",
-    image: "/images/flavors/milk-toffee.png",
+      "Blue, sweet and nostalgic — the flavour that makes grown-ups feel seven again.",
+    image: "/images/flavors/bubblegum-blue.png",
     category: "Classic",
   },
 ];
@@ -280,7 +257,7 @@ export const SERVICES: Service[] = [
     title: "Weddings",
     blurb: "The moment guests talk about on the way home.",
     description:
-      "Your cart arrives styled to your palette — Ivory, Crimson or Blue — and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
+      "Your cart arrives styled to your palette — Cream, Bubblegum Blue or Ferrari Red — and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
     // Real photo from the client's Instagram (16 Jun 2026) — see public/images/social/CREDITS.md
     image: "/images/social/ig-bride-cart.jpg",
     imagePortrait: true,
@@ -380,45 +357,44 @@ export const IG_QUOTE = {
 
 /* ─── Carts ───────────────────────────────────────────────────── */
 
-export type CartKey = "ivory" | "crimson" | "blue";
+export type CartKey = "cream" | "bubblegum-blue" | "ferrari-red";
 export type Cart = {
   key: CartKey;
   name: string;
-  colour: string;
   swatch: string; // hex for the colour picker
   image: string;
   alt: string;
   copy: string;
 };
 
-// CLIENT: cart names to be confirmed. Order = order on the site and in the form.
+/* Names and photos from the client's brochure. Order = order on the site and
+   in the booking form (the first is preselected). The photos are AI renders
+   with the generator's corner mark cropped out — swap in real shoots when
+   the client has them. */
 export const CARTS: Cart[] = [
   {
-    key: "ivory",
-    name: "The Ivory Classic",
-    colour: "Ivory",
-    swatch: "#F1E8D2",
-    image: "/images/carts/cart-lobby-cream.jpeg",
-    alt: "Ivory and gold Jolly's cart in a five-star hotel lobby",
-    copy: "Cream, gold and glowing pendant lights — at home in five-star lobbies and wedding halls.",
+    key: "cream",
+    name: "Cream",
+    swatch: "#F1E6C4",
+    image: "/images/carts/cart-cream.jpg",
+    alt: "Cream Jolly's cart with a vintage bicycle, parasol and glowing lights in an evening garden",
+    copy: "Cream and gold under glowing lights — at home in wedding halls, gardens and five-star lobbies.",
   },
   {
-    key: "crimson",
-    name: "The Crimson Jewel",
-    colour: "Crimson",
-    swatch: "#A8192B",
-    image: "/images/carts/cart-lobby-crimson.jpeg",
-    alt: "Crimson Jolly's cart with gold trim in a hotel lobby",
-    copy: "A rich statement piece for galas, festive seasons and grand celebrations.",
+    key: "bubblegum-blue",
+    name: "Bubblegum Blue",
+    swatch: "#5CB8C9",
+    image: "/images/carts/cart-bubblegum-blue.jpg",
+    alt: "Bubblegum Blue Jolly's cart with its host under string lights on a terrace",
+    copy: "A playful blue with a vintage bicycle — made for garden parties, terraces and relaxed celebrations.",
   },
   {
-    key: "blue",
-    name: "The Coastal Cruiser",
-    colour: "Blue",
-    swatch: "#3DB5C9",
-    image: "/images/carts/cart-beach.jpeg",
-    alt: "Blue Jolly's cart under a thatched beach cabana",
-    copy: "Ocean-blue charm for beach weddings, garden parties and corporate terraces.",
+    key: "ferrari-red",
+    name: "Ferrari Red",
+    swatch: "#C0141F",
+    image: "/images/carts/cart-ferrari-red.jpg",
+    alt: "Ferrari Red Jolly's cart with a red bicycle on a garden lawn",
+    copy: "A bold statement piece for galas, festive seasons and grand celebrations.",
   },
 ];
 
@@ -453,7 +429,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     cta2: { href: "/services", label: "Explore Services" },
     // CLIENT PHOTO: replace with the Ramada Women's Day 2025 cart photo (real cart, human element)
     image: "/images/scenes/hero-cart-banner.jpg",
-    alt: "Jolly's Creamery ivory and gold cart in a palatial hotel lobby",
+    alt: "Jolly's Creamery cream and gold cart in a palatial hotel lobby",
     objectPos: "object-[72%_center]",
   },
   {
@@ -496,7 +472,7 @@ export const REASONS = [
   {
     n: "02",
     t: "Themed to your décor",
-    c: "Ivory, Crimson or Blue — a cart colour that sits naturally with your palette, florals and venue.",
+    c: "Cream, Bubblegum Blue or Ferrari Red — a cart colour that sits naturally with your palette, florals and venue.",
   },
   {
     n: "03",

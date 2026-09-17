@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type FocusEvent, type FormEvent } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
@@ -12,23 +12,38 @@ import {
   type CartKey,
   type EventType,
 } from "@/lib/data";
+import { isBookingField, type BookingFieldKey } from "@/lib/booking-fields";
+import {
+  BookingTracker,
+  bookingSessionId,
+  endBookingSession,
+  trackingContext,
+} from "@/lib/booking-tracker";
 
 /* Reserve-your-event form — the long, interactive one (/reserve).
-   Cart colour swaps a live preview, flavour chips are optional, and the
-   enquiry can go by WhatsApp (fastest reply) or email.
+   Cart colour swaps a live preview and flavour chips are optional.
+   Every field is saved as the visitor goes (src/lib/booking-tracker.ts), so a
+   half-finished form still reaches /admin/bookings as an incomplete booking,
+   and the focus/blur timings feed the booking-form analytics.
+   Sending moves the booking to "awaiting confirmation". If the save fails,
+   the same enquiry can go by WhatsApp or email instead.
    The short general enquiry form lives in ContactForm.tsx (/contact).
-   No backend is wired yet — both paths compose a pre-filled message.
-   Swap for a form endpoint (Formspree/Resend/API route) when ready.
    CLIENT: replace/extend the fields with their booking-format questions
-   once received. */
+   once received — keep src/lib/booking-fields.ts and the migration in step. */
 
 const labelCls = "mb-1.5 block text-[0.7rem] font-semibold tracking-[0.16em] text-ink-700 uppercase";
 const inputCls =
   "w-full rounded-btn border border-gold-200 bg-cream-50 px-4 py-3 text-sm text-ink-900 placeholder:text-ink-500/60 outline-none transition-all focus:border-gold-400 focus:ring-2 focus:ring-gold-300/40";
 
+const chipCls =
+  "cursor-pointer rounded-btn border border-gold-300 bg-cream-50 px-3 py-1.5 text-[0.66rem] font-semibold tracking-[0.12em] text-ink-700 uppercase transition-colors hover:border-gold-500 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-900 has-checked:text-cream-100";
+
+// Picked rather than typed: saved on change, not on blur.
+const CHOICE_FIELDS = new Set<BookingFieldKey>(["event_type", "cart", "flavours"]);
+
 function EventTypeSelect({ initial = "Wedding" }: { initial?: EventType }) {
   return (
-    <select id="eventType" name="eventType" required className={inputCls} defaultValue={initial}>
+    <select id="event_type" name="event_type" required className={inputCls} defaultValue={initial}>
       {EVENT_TYPES.map((t) => (
         <option key={t}>{t}</option>
       ))}
@@ -44,78 +59,284 @@ function EventTypeFromUrl() {
   return <EventTypeSelect initial={(type && EVENT_TYPE_PARAM[type]) || "Wedding"} />;
 }
 
-function buildEnquiry(f: FormData) {
-  const eventType = String(f.get("eventType") ?? "");
-  const date = String(f.get("date") ?? "");
-  const flavours = f.getAll("flavours").map(String);
-  const subject = `Event enquiry — ${eventType} · ${date || "date TBC"}`;
-  const body = [
-    `Name: ${f.get("name")}`,
-    `Phone: ${f.get("phone")}`,
-    `Email: ${f.get("email")}`,
-    `Event type: ${eventType}`,
-    `Event date: ${date || "-"}`,
-    `Venue / location: ${f.get("venue") || "-"}`,
-    `Estimated guests: ${f.get("guests") || "-"}`,
-    `Cart colour: ${f.get("cart") || "-"}`,
-    `Flavour preferences: ${flavours.length ? flavours.join(", ") : "-"}`,
-    "",
-    `${f.get("message") || ""}`,
-  ].join("\n");
-  return { subject, body };
+function fieldName(target: EventTarget | null) {
+  const el = target as { name?: unknown } | null;
+  return isBookingField(el?.name) ? el.name : null;
 }
 
-function openHref(href: string, newTab = false) {
-  const a = document.createElement("a");
-  a.href = href;
-  if (newTab) {
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-  }
-  a.click();
+function fieldValue(form: HTMLFormElement, field: BookingFieldKey) {
+  const data = new FormData(form);
+  return field === "flavours" ? data.getAll("flavours").map(String) : String(data.get(field) ?? "");
 }
+
+function readFields(f: FormData) {
+  const get = (key: string) => String(f.get(key) ?? "");
+  return {
+    name: get("name"),
+    phone: get("phone"),
+    email: get("email"),
+    event_type: get("event_type"),
+    event_date: get("event_date"),
+    guests: get("guests"),
+    venue: get("venue"),
+    cart: get("cart"),
+    flavours: f.getAll("flavours").map(String),
+    custom_flavour: get("custom_flavour"),
+    message: get("message"),
+  };
+}
+
+function buildEnquiry(f: FormData) {
+  const v = readFields(f);
+  const subject = `Event enquiry — ${v.event_type} · ${v.event_date || "date TBC"}`;
+  const body = [
+    `Name: ${v.name}`,
+    `Phone: ${v.phone}`,
+    `Email: ${v.email}`,
+    `Event type: ${v.event_type}`,
+    `Event date: ${v.event_date || "-"}`,
+    `Venue / location: ${v.venue || "-"}`,
+    `Estimated guests: ${v.guests || "-"}`,
+    `Cart colour: ${v.cart || "-"}`,
+    `Flavour preferences: ${v.flavours.length ? v.flavours.join(", ") : "-"}`,
+    `Custom flavour: ${v.custom_flavour || "-"}`,
+    "",
+    v.message,
+  ].join("\n");
+  return {
+    whatsapp: `${CONTACT.whatsappHref}?text=${encodeURIComponent(`${subject}\n\n${body}`)}`,
+    email: `${CONTACT.emailHref}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+  };
+}
+
+type Outcome =
+  | { status: "idle" | "sending" }
+  | { status: "sent"; whatsapp: string }
+  | { status: "invalid"; message: string }
+  | { status: "failed"; whatsapp: string; email: string };
 
 export default function ReserveForm() {
-  const [sent, setSent] = useState<"email" | "whatsapp" | null>(null);
-  const [cart, setCart] = useState<CartKey>("ivory");
+  const [cart, setCart] = useState<CartKey>("cream");
+  const [customFlavour, setCustomFlavour] = useState(false);
+  const customFlavourRef = useRef<HTMLInputElement>(null);
+  const [outcome, setOutcome] = useState<Outcome>({ status: "idle" });
   const selected = CARTS.find((c) => c.key === cart) ?? CARTS[0];
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    const via = submitter?.value === "whatsapp" ? "whatsapp" : "email";
-    const { subject, body } = buildEnquiry(f);
-    if (via === "whatsapp") {
-      openHref(`${CONTACT.whatsappHref}?text=${encodeURIComponent(`${subject}\n\n${body}`)}`, true);
-    } else {
-      openHref(`${CONTACT.emailHref}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  const tracker = useRef<BookingTracker | null>(null);
+  const started = useRef(false);
+  const lastFocused = useRef<BookingFieldKey | null>(null);
+  const focusedAt = useRef<Partial<Record<BookingFieldKey, number>>>({});
+  const savedValues = useRef<Partial<Record<BookingFieldKey, string>>>({});
+  const hadValue = useRef<Partial<Record<BookingFieldKey, boolean>>>({});
+  const thanksRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const t = new BookingTracker(bookingSessionId(), trackingContext());
+    tracker.current = t;
+    t.event({ type: "view" }, 0);
+
+    const leave = () => t.flush(true);
+    const onVisibility = () => document.visibilityState === "hidden" && leave();
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", leave);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", leave);
+      leave();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (outcome.status === "sent") thanksRef.current?.focus();
+  }, [outcome.status]);
+
+  useEffect(() => {
+    if (customFlavour) customFlavourRef.current?.focus();
+  }, [customFlavour]);
+
+  // Closing the custom flavour box clears what was typed in it.
+  function toggleCustomFlavour(on: boolean) {
+    setCustomFlavour(on);
+    if (on || !hadValue.current.custom_flavour) return;
+    hadValue.current.custom_flavour = false;
+    save("custom_flavour", "", 300);
+    tracker.current?.event({ type: "clear", field: "custom_flavour" });
+  }
+
+  // Queue a field's value if it changed since it was last queued.
+  function save(field: BookingFieldKey, value: string | string[], delay?: number) {
+    const serialised = JSON.stringify(value);
+    if (savedValues.current[field] === serialised) return;
+    savedValues.current[field] = serialised;
+    tracker.current?.save(field, value, delay);
+  }
+
+  function onFocus(e: FocusEvent<HTMLFormElement>) {
+    const field = fieldName(e.target);
+    if (!field || !tracker.current) return;
+
+    if (!started.current) {
+      // First touch: keep the preselected choices with the draft too.
+      started.current = true;
+      save("event_type", fieldValue(e.currentTarget, "event_type"), 400);
+      save("cart", fieldValue(e.currentTarget, "cart"), 400);
     }
-    setSent(via);
+    if (lastFocused.current !== field) {
+      lastFocused.current = field;
+      focusedAt.current[field] = performance.now();
+      tracker.current.event({ type: "focus", field });
+    }
+  }
+
+  function onBlur(e: FocusEvent<HTMLFormElement>) {
+    const field = fieldName(e.target);
+    if (!field || CHOICE_FIELDS.has(field) || !tracker.current) return;
+
+    const value = fieldValue(e.currentTarget, field) as string;
+    const filled = value.trim() !== "";
+    const since = focusedAt.current[field];
+    save(field, value, 300);
+    if (filled) {
+      tracker.current.event({
+        type: "complete",
+        field,
+        duration_ms: since === undefined ? undefined : Math.round(performance.now() - since),
+      });
+    } else if (hadValue.current[field]) {
+      tracker.current.event({ type: "clear", field });
+    }
+    hadValue.current[field] = filled;
+    // Leaving the form entirely (not just moving between fields) resets focus tracking.
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) lastFocused.current = null;
+  }
+
+  function onChange(e: FormEvent<HTMLFormElement>) {
+    const field = fieldName(e.target);
+    if (!field || !tracker.current) return;
+
+    const value = fieldValue(e.currentTarget, field);
+    if (!CHOICE_FIELDS.has(field)) {
+      save(field, value); // typing: saved every moment or so, even without leaving the field
+      return;
+    }
+    save(field, value, field === "flavours" ? 800 : 400);
+    const filled = Array.isArray(value) ? value.length > 0 : value !== "";
+    tracker.current.event({ type: filled ? "complete" : "clear", field });
+  }
+
+  function onInvalid(e: FormEvent<HTMLFormElement>) {
+    const field = fieldName(e.target);
+    if (field) tracker.current?.event({ type: "error", field });
+  }
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const enquiry = buildEnquiry(data);
+    const t = tracker.current;
+    t?.flush();
+    setOutcome({ status: "sending" });
+
+    try {
+      const res = await fetch("/api/booking/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session: t?.session ?? bookingSessionId(),
+          fields: readFields(data),
+          context: trackingContext(),
+          website: data.get("website"),
+        }),
+      });
+      if (res.ok) {
+        t?.stop();
+        endBookingSession();
+        setOutcome({ status: "sent", whatsapp: enquiry.whatsapp });
+        return;
+      }
+      const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+      if (res.status === 400 && payload?.error) {
+        setOutcome({ status: "invalid", message: payload.error });
+      } else {
+        setOutcome({ status: "failed", ...enquiry });
+      }
+    } catch {
+      setOutcome({ status: "failed", ...enquiry });
+    }
+  }
+
+  if (outcome.status === "sent") {
+    return (
+      <div
+        ref={thanksRef}
+        tabIndex={-1}
+        role="status"
+        className="border border-gold-200 bg-cream-100 px-6 py-8 text-center outline-none sm:px-10"
+      >
+        <p className="kicker">Request received</p>
+        <h3 className="mt-3 font-display text-2xl font-semibold text-plum-900 sm:text-3xl">
+          Your request is with us
+        </h3>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-700">
+          We&apos;ll be in touch within one working day with availability and a styled cart proposal.
+        </p>
+        <a
+          href={outcome.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-plum-900 underline decoration-gold-400 underline-offset-4"
+        >
+          Prefer to chat now? Message us on WhatsApp
+        </a>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
+    <form
+      onSubmit={onSubmit}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onChange={onChange}
+      onInvalidCapture={onInvalid}
+      className="grid gap-4 sm:grid-cols-2"
+    >
       <div>
         <label htmlFor="name" className={labelCls}>
           Full name *
         </label>
-        <input id="name" name="name" required placeholder="Your name" className={inputCls} />
+        <input id="name" name="name" required autoComplete="name" placeholder="Your name" className={inputCls} />
       </div>
       <div>
         <label htmlFor="phone" className={labelCls}>
           Phone / WhatsApp *
         </label>
-        <input id="phone" name="phone" required placeholder="+94 ..." className={inputCls} />
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          required
+          autoComplete="tel"
+          placeholder="+94 ..."
+          className={inputCls}
+        />
       </div>
       <div>
         <label htmlFor="email" className={labelCls}>
           Email *
         </label>
-        <input id="email" name="email" type="email" required placeholder="you@example.com" className={inputCls} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+          className={inputCls}
+        />
       </div>
       <div>
-        <label htmlFor="eventType" className={labelCls}>
+        <label htmlFor="event_type" className={labelCls}>
           Event type *
         </label>
         <Suspense fallback={<EventTypeSelect />}>
@@ -123,10 +344,10 @@ export default function ReserveForm() {
         </Suspense>
       </div>
       <div>
-        <label htmlFor="date" className={labelCls}>
+        <label htmlFor="event_date" className={labelCls}>
           Event date
         </label>
-        <input id="date" name="date" type="date" className={inputCls} />
+        <input id="event_date" name="event_date" type="date" className={inputCls} />
       </div>
       <div>
         <label htmlFor="guests" className={labelCls}>
@@ -158,7 +379,7 @@ export default function ReserveForm() {
                   <input
                     type="radio"
                     name="cart"
-                    value={`${c.colour} — ${c.name}`}
+                    value={c.name}
                     className="sr-only"
                     checked={on}
                     onChange={() => setCart(c.key)}
@@ -168,10 +389,7 @@ export default function ReserveForm() {
                     className="h-6 w-6 shrink-0 rounded-full ring-1 ring-gold-400/80 ring-offset-2 ring-offset-cream-50"
                     style={{ backgroundColor: c.swatch }}
                   />
-                  <span className="flex-1 text-sm leading-tight text-ink-900">
-                    <span className="font-semibold text-plum-900">{c.colour}</span>
-                    <span className="hidden text-ink-500 sm:inline"> · {c.name}</span>
-                  </span>
+                  <span className="flex-1 text-sm leading-tight font-semibold text-plum-900">{c.name}</span>
                   <span className={`h-2 w-2 shrink-0 rounded-full transition-colors ${on ? "bg-plum-900" : "bg-gold-200"}`} />
                 </label>
               );
@@ -199,19 +417,42 @@ export default function ReserveForm() {
       <div className="sm:col-span-2">
         <p className={labelCls}>
           Flavour preferences{" "}
-          <span className="font-normal tracking-normal text-ink-500 normal-case">(optional — pick any)</span>
+          <span className="font-normal tracking-normal text-ink-500 normal-case">
+            (optional — pick any, or add your own)
+          </span>
         </p>
         <div className="flex flex-wrap gap-2">
           {FLAVORS.map((f) => (
-            <label
-              key={f.slug}
-              className="cursor-pointer rounded-btn border border-gold-300 bg-cream-50 px-3 py-1.5 text-[0.66rem] font-semibold tracking-[0.12em] text-ink-700 uppercase transition-colors hover:border-gold-500 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-900 has-checked:text-cream-100"
-            >
+            <label key={f.slug} className={chipCls}>
               <input type="checkbox" name="flavours" value={f.name} className="sr-only" />
               {f.name}
             </label>
           ))}
+          <label className={chipCls}>
+            <input
+              type="checkbox"
+              className="sr-only"
+              checked={customFlavour}
+              onChange={(e) => toggleCustomFlavour(e.target.checked)}
+            />
+            + Custom
+          </label>
         </div>
+        {customFlavour && (
+          <div className="mt-3">
+            <label htmlFor="custom_flavour" className="sr-only">
+              Your custom flavour
+            </label>
+            <input
+              ref={customFlavourRef}
+              id="custom_flavour"
+              name="custom_flavour"
+              maxLength={200}
+              placeholder="Tell us the flavour you have in mind"
+              className={inputCls}
+            />
+          </div>
+        )}
       </div>
 
       <div className="sm:col-span-2">
@@ -227,44 +468,52 @@ export default function ReserveForm() {
         />
       </div>
 
+      {/* Hidden from people; bots that fill it in are ignored */}
+      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label>
+          Leave this empty
+          <input name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+
       <div className="sm:col-span-2">
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            name="via"
-            value="whatsapp"
-            className="inline-flex items-center gap-2.5 rounded-btn bg-plum-900 px-8 py-4 text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
-              <path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3zm0 1.7a7.3 7.3 0 1 1-3.9 13.5l-.3-.2-2.8.7.8-2.7-.2-.3A7.3 7.3 0 0 1 12 4.7zm-2.6 3.2c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.1.9 2.6.7 3 .7.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.5-.3-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.5-.7-2.3-1.4-.6-.6-1-1.2-1.3-1.8-.1-.2 0-.4.1-.5l.6-.7c.1-.2.1-.4 0-.6L9.9 8.3c-.1-.3-.3-.4-.5-.4z" />
-            </svg>
-            Send via WhatsApp
-          </button>
-          <button
-            type="submit"
-            name="via"
-            value="email"
-            className="rounded-btn border border-gold-500 px-8 py-4 text-[0.8rem] font-semibold tracking-[0.18em] text-plum-900 uppercase transition-all duration-300 hover:border-plum-900 hover:bg-plum-900 hover:text-cream-100"
-          >
-            Send by Email
-          </button>
-        </div>
-        {sent && (
-          <p className="mt-4 text-sm text-ink-700">
-            {sent === "whatsapp"
-              ? "WhatsApp should now be open with your enquiry — press send, and we'll be in touch within one working day."
-              : "Your email app should now be open with the enquiry — press send, and we'll be in touch within one working day."}{" "}
-            Prefer the other route?{" "}
-            <a
-              href={sent === "whatsapp" ? CONTACT.emailHref : CONTACT.whatsappHref}
-              target={sent === "whatsapp" ? undefined : "_blank"}
-              rel={sent === "whatsapp" ? undefined : "noopener noreferrer"}
-              className="font-semibold text-plum-900 underline decoration-gold-400 underline-offset-4"
-            >
-              {sent === "whatsapp" ? "Email us instead" : "Message us on WhatsApp"}
-            </a>
-            .
+        <button
+          type="submit"
+          disabled={outcome.status === "sending"}
+          className="inline-flex items-center gap-2.5 rounded-btn bg-plum-900 px-8 py-4 text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold disabled:cursor-wait disabled:opacity-70"
+        >
+          {outcome.status === "sending" ? "Sending…" : "Request Your Date"}
+        </button>
+        <p className="mt-3 text-[0.75rem] text-ink-500">We save your details as you type, so nothing is lost.</p>
+
+        {outcome.status === "invalid" && (
+          <p role="alert" className="mt-4 text-sm font-medium text-plum-900">
+            {outcome.message}.
           </p>
+        )}
+        {outcome.status === "failed" && (
+          <div role="alert" className="mt-5 border border-gold-300 bg-cream-100 p-5">
+            <p className="text-sm text-ink-900">
+              We couldn&apos;t send that just now. Your details are still here — send them another way and
+              we&apos;ll reply within one working day.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href={outcome.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-btn bg-plum-900 px-6 py-3 text-[0.72rem] font-semibold tracking-[0.16em] text-cream-100 uppercase transition-colors hover:bg-plum-800"
+              >
+                Send via WhatsApp
+              </a>
+              <a
+                href={outcome.email}
+                className="rounded-btn border border-gold-500 px-6 py-3 text-[0.72rem] font-semibold tracking-[0.16em] text-plum-900 uppercase transition-colors hover:border-plum-900 hover:bg-plum-900 hover:text-cream-100"
+              >
+                Send by Email
+              </a>
+            </div>
+          </div>
         )}
       </div>
     </form>

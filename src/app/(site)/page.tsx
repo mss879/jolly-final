@@ -170,7 +170,7 @@ export default function HomePage() {
                 <span className="italic text-gold-600"> one for your theme</span>
               </>
             }
-            copy="Ivory for lobbies and ballrooms, Crimson for galas and festive seasons, Blue for beaches and gardens — or tell us your palette."
+            copy="Cream for weddings and ballrooms, Bubblegum Blue for gardens and parties, Ferrari Red for galas and grand celebrations — or tell us your palette."
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {CARTS.map((c, i) => (
@@ -187,8 +187,7 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-plum-950/70 via-plum-950/10 to-transparent" />
                   </div>
                   <figcaption className="absolute inset-x-0 bottom-0 p-6">
-                    <p className="text-[0.62rem] font-semibold tracking-[0.2em] text-gold-300 uppercase">{c.colour}</p>
-                    <p className="mt-1 font-display text-xl font-semibold text-cream-100">{c.name}</p>
+                    <p className="font-display text-xl font-semibold text-cream-100">{c.name}</p>
                     <p className="mt-1.5 text-[0.8rem] leading-relaxed text-cream-100/85">{c.copy}</p>
                   </figcaption>
                 </figure>
@@ -309,10 +308,10 @@ export default function HomePage() {
         />
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { src: "/images/carts/cart-beach.jpeg", alt: "Blue cart on a beachfront deck" },
-            { src: "/images/social/ig-bride-cart.jpg", alt: "Bride at the ivory cart under pendant lights" },
+            { src: "/images/carts/cart-beach.jpeg", alt: "Bubblegum Blue cart on a beachfront deck" },
+            { src: "/images/social/ig-bride-cart.jpg", alt: "Bride at the Cream cart under pendant lights" },
             { src: "/images/social/ig-couple-bw.jpg", alt: "Couple laughing with ice cream cups at a wedding" },
-            { src: "/images/carts/cart-lobby-crimson.jpeg", alt: "Crimson cart in a hotel lobby" },
+            { src: "/images/carts/cart-lobby-crimson.jpeg", alt: "Ferrari Red cart in a hotel lobby" },
           ].map((t, i) => (
             <Reveal key={t.src} delay={i * 90}>
               <a

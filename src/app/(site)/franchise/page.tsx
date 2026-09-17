@@ -40,7 +40,7 @@ export default function FranchisePage() {
               <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden shadow-soft">
                 <Image
                   src="/images/carts/cart-lobby-crimson.jpeg"
-                  alt="Crimson Jolly's cart placed in a hotel lobby"
+                  alt="Ferrari Red Jolly's cart placed in a hotel lobby"
                   fill
                   sizes="(min-width: 1024px) 46vw, 92vw"
                   className="scale-110 object-cover"

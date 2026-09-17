@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jolly's Creamery
 
-## Getting Started
+The Jolly's Creamery website (Next.js 16, React 19, Tailwind 4) and its admin area at `/admin`, backed by Supabase.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
+cp .env.example .env.local   # then fill in the two Supabase values
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site is at http://localhost:3000 and the admin at http://localhost:3000/admin.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase setup (once per project)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Environment variables.** Copy `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` from Supabase → Project Settings → API Keys into `.env.local`, and add the same two to the hosting provider (e.g. Vercel). No secret or service-role key is needed.
+2. **Run the migration.** Open `supabase/migrations/20260917120000_admin_backend.sql`, paste it into the Supabase SQL editor and run it (or `supabase db push` with a linked CLI). Running it twice is harmless.
+3. **Create an admin login.** Supabase → Authentication → Users → Add user → Create new user (tick *Auto confirm*). Then allow that account into the admin in the SQL editor:
 
-## Learn More
+   ```sql
+   insert into public.admin_users (user_id, email)
+   select id, email from auth.users where email = 'you@example.com';
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Turn off public sign-ups.** Authentication → Sign In / Providers → switch off *Allow new users to sign up*. Only accounts in `admin_users` can see any data either way, but nobody else needs an account.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## The admin area
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Page | What it does |
+| --- | --- |
+| Dashboard | What needs attention (unread inquiries, bookings awaiting confirmation, unfinished bookings), 30-day numbers with the previous 30 days for comparison, enquiries per day, upcoming events, the pipeline and the booking-form funnel. |
+| Inquiries | Contact-form messages. Opening one marks it read; archive, delete or **Move to CRM** (it lands in New Leads). |
+| CRM | Kanban pipeline. Drag cards between stages (touch: press and hold; keyboard: Space, arrows, Space). **New Leads** is fixed; every other stage can be renamed, moved, added or deleted — a deleted stage's cards move to New Leads. |
+| Bookings | Requests from the reserve form: *Awaiting confirmation*, *Confirmed*, *Incomplete* (left part-way, with contact details), *Declined & cancelled*. Each booking can be confirmed (with a date and time), declined, cancelled, reopened, noted or added to the CRM. The **Analytics** tab shows where visitors drop out of the form. |
+| Calendar | Confirmed bookings only, by month. Requests appear once they are confirmed. |
 
-## Deploy on Vercel
+## How the booking form is saved and measured
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Each visit to `/reserve` gets a session id (kept for the browser tab). Field values are saved within about a second while the visitor types, and again when they leave a field; anything still queued is sent when the page is closed.
+- A booking row appears on the first interaction as *Incomplete*. Sending it makes it *Awaiting confirmation*; after that the visitor can no longer change it.
+- Interaction events (form opened, field entered, field left filled or emptied, field that blocked a send) feed the analytics. A visit counts as **abandoned** after 30 minutes without activity; the **dropout rate** is abandoned ÷ started, and **left here** is the last field an abandoned visitor touched.
+- The form tells visitors their details save as they type. Mention it in the privacy policy too.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security model
+
+- The public site never reads or writes tables directly. The anonymous key can only call `submit_inquiry`, `track_booking` and `submit_booking`, which validate and cap every value in the database.
+- All admin data sits behind Row Level Security and the `admin_users` allowlist. Admin pages and server actions check the signed-in user again on every request.
+
+## Changing the booking form
+
+The field list lives in three places that must stay in step: `src/components/ReserveForm.tsx`, `src/lib/booking-fields.ts` (order drives the analytics funnel) and the database — add a new migration that updates the `bookings` columns, `private.booking_form_fields()`, `track_booking` and `submit_booking`. Update `src/lib/supabase/database.types.ts` to match (or regenerate it with `supabase gen types typescript`).

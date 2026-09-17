@@ -109,7 +109,7 @@ export default function AboutPage() {
               <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden shadow-soft">
                 <Image
                   src="/images/social/ig-cart-dusk.jpg"
-                  alt="Jolly's ivory cart at dusk under string lights, the host serving a guest"
+                  alt="Jolly's Cream cart at dusk under string lights, the host serving a guest"
                   fill
                   sizes="(min-width: 1024px) 46vw, 92vw"
                   className="scale-110 object-cover"

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Poppins } from "next/font/google";
 import "./globals.css";
-import Preloader from "@/components/Preloader";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -40,12 +37,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${fraunces.variable} ${poppins.variable}`}>
-      <body className="antialiased">
-        <Preloader />
-        <Header />
-        <main>{children}</main>
-        <Footer />
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
