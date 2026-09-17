@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "../auth";
-import type { ActionResult } from "../types";
+import { ACTIVE_WINDOW_MS, type ActionResult } from "../types";
 import { actionError, isDay, isUuid } from "../validate";
 
 /* Confirming puts the booking on the calendar. Also used to reschedule a
@@ -13,6 +13,13 @@ export async function confirmBooking(id: string, day: string, time: string): Pro
   if (!isUuid(id)) return { ok: false, error: "Unknown booking." };
   if (!isDay(day)) return { ok: false, error: "Choose the event date." };
   if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return { ok: false, error: "That time isn't valid." };
+
+  // Converting an unfinished form mid-typing would throw away the visitor's last answers.
+  const { data: current } = await supabase.from("bookings").select("status, last_activity_at").eq("id", id).maybeSingle();
+  if (!current) return { ok: false, error: "That booking no longer exists." };
+  if (current.status === "in_progress" && Date.now() - Date.parse(current.last_activity_at) < ACTIVE_WINDOW_MS) {
+    return { ok: false, error: "This visitor is still filling in the form — try again once they've finished." };
+  }
 
   const { error } = await supabase
     .from("bookings")

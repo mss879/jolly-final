@@ -126,23 +126,30 @@ export async function getNavCounts() {
 
 export type InquiryView = "inbox" | "archived";
 
-export async function getInquiries(view: InquiryView, page: number) {
+/* Counts come first so an out-of-date ?page= lands on the last real page. */
+function clampPage(requested: number, total: number) {
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const page = Math.min(Math.max(1, requested), pages);
+  return { page, pages, from: (page - 1) * PAGE_SIZE };
+}
+
+export async function getInquiries(view: InquiryView, requestedPage: number) {
   const { supabase } = await requireAdmin();
-  const from = (page - 1) * PAGE_SIZE;
+  const [inbox, archived] = await Promise.all([
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).neq("status", "archived"),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "archived"),
+  ]);
+  const counts = { inbox: count(inbox), archived: count(archived) };
+  const { page, pages, from } = clampPage(requestedPage, view === "archived" ? counts.archived : counts.inbox);
 
   let list = supabase
     .from("inquiries")
-    .select(INQUIRY_COLUMNS, { count: "exact" })
+    .select(INQUIRY_COLUMNS)
     .order("created_at", { ascending: false })
     .range(from, from + PAGE_SIZE - 1);
   list = view === "archived" ? list.eq("status", "archived") : list.neq("status", "archived");
 
-  const [result, inbox, archived] = await Promise.all([
-    list,
-    supabase.from("inquiries").select("id", { count: "exact", head: true }).neq("status", "archived"),
-    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "archived"),
-  ]);
-  const rows = must(result);
+  const rows = must(await list);
   const leads = rows.length
     ? must(await supabase.from("crm_leads").select("id, inquiry_id").in("inquiry_id", rows.map((r) => r.id)))
     : [];
@@ -150,9 +157,10 @@ export async function getInquiries(view: InquiryView, page: number) {
 
   return {
     now: Date.now(),
+    page,
+    pages,
+    counts,
     inquiries: rows.map((r) => toInquiry(r, leadFor.get(r.id) ?? null)),
-    pages: Math.max(1, Math.ceil((result.count ?? 0) / PAGE_SIZE)),
-    counts: { inbox: count(inbox), archived: count(archived) },
   };
 }
 
@@ -168,13 +176,30 @@ export async function getInquiry(id: string) {
 
 export async function getBoard() {
   const { supabase } = await requireAdmin();
+  // Supabase returns at most 1,000 rows per request (by default), so page through.
+  const readLeads = async () => {
+    const rows: LeadRow[] = [];
+    for (;;) {
+      const batch = must(
+        await supabase
+          .from("crm_leads")
+          .select("*")
+          .order("position")
+          .order("created_at")
+          .order("id")
+          .range(rows.length, rows.length + 999),
+      );
+      if (!batch.length) return rows;
+      rows.push(...batch);
+    }
+  };
   const [stages, leads] = await Promise.all([
     supabase.from("crm_stages").select("id, name, is_system").order("is_system", { ascending: false }).order("position"),
-    supabase.from("crm_leads").select("*").order("position").order("created_at").limit(2000),
+    readLeads(),
   ]);
   return {
     stages: must(stages).map((s): Stage => ({ id: s.id, name: s.name, isSystem: s.is_system })),
-    leads: must(leads).map(toLead),
+    leads: leads.map(toLead),
   };
 }
 
@@ -182,16 +207,32 @@ export async function getBoard() {
 
 export type BookingView = "pending" | "confirmed" | "incomplete" | "closed" | "all";
 
-export async function getBookings(view: BookingView, page: number) {
+export async function getBookings(view: BookingView, requestedPage: number) {
   const { supabase } = await requireAdmin();
-  const from = (page - 1) * PAGE_SIZE;
   const head = () => supabase.from("bookings").select("id", { count: "exact", head: true });
 
-  let list = supabase.from("bookings").select(BOOKING_COLUMNS, { count: "exact" }).range(from, from + PAGE_SIZE - 1);
-  if (view === "pending") list = list.eq("status", "pending").order("submitted_at", { ascending: false });
+  const [pending, confirmed, incomplete, closed, all] = await Promise.all([
+    head().eq("status", "pending"),
+    head().eq("status", "confirmed"),
+    head().eq("status", "in_progress").or("phone.not.is.null,email.not.is.null"),
+    head().in("status", ["declined", "cancelled"]),
+    head().neq("status", "in_progress"),
+  ]);
+  const counts = {
+    pending: count(pending),
+    confirmed: count(confirmed),
+    incomplete: count(incomplete),
+    closed: count(closed),
+    all: count(all),
+  };
+  const { page, pages, from } = clampPage(requestedPage, counts[view]);
+
+  let list = supabase.from("bookings").select(BOOKING_COLUMNS).range(from, from + PAGE_SIZE - 1);
+  const newestSent = { ascending: false, nullsFirst: false } as const;
+  if (view === "pending") list = list.eq("status", "pending").order("submitted_at", newestSent);
   if (view === "confirmed") list = list.eq("status", "confirmed").order("confirmed_date", { ascending: false });
-  if (view === "closed") list = list.in("status", ["declined", "cancelled"]).order("status_changed_at", { ascending: false });
-  if (view === "all") list = list.neq("status", "in_progress").order("submitted_at", { ascending: false });
+  if (view === "closed") list = list.in("status", ["declined", "cancelled"]).order("status_changed_at", newestSent);
+  if (view === "all") list = list.neq("status", "in_progress").order("submitted_at", newestSent);
   // Incomplete: saved as they typed but never sent — only worth a call if we can reach them.
   if (view === "incomplete") {
     list = list
@@ -200,26 +241,12 @@ export async function getBookings(view: BookingView, page: number) {
       .order("last_activity_at", { ascending: false });
   }
 
-  const [result, pending, confirmed, incomplete, closed, all] = await Promise.all([
-    list,
-    head().eq("status", "pending"),
-    head().eq("status", "confirmed"),
-    head().eq("status", "in_progress").or("phone.not.is.null,email.not.is.null"),
-    head().in("status", ["declined", "cancelled"]),
-    head().neq("status", "in_progress"),
-  ]);
-
   return {
     now: Date.now(),
-    bookings: must(result).map(toBooking),
-    pages: Math.max(1, Math.ceil((result.count ?? 0) / PAGE_SIZE)),
-    counts: {
-      pending: count(pending),
-      confirmed: count(confirmed),
-      incomplete: count(incomplete),
-      closed: count(closed),
-      all: count(all),
-    },
+    page,
+    pages,
+    counts,
+    bookings: must(await list).map(toBooking),
   };
 }
 
@@ -317,9 +344,8 @@ export async function getDashboard() {
     latestInquiries,
     latestRequests,
     stages,
-    leads,
-    inquiryDays,
-    requestDays,
+    pipelineRows,
+    activityRows,
     analytics,
     analyticsPrev,
   ] = await Promise.all([
@@ -334,8 +360,8 @@ export async function getDashboard() {
     inquiries().gte("created_at", d60).lt("created_at", d30),
     bookings().gte("submitted_at", d30),
     bookings().gte("submitted_at", d60).lt("submitted_at", d30),
-    bookings().gte("confirmed_at", d30),
-    bookings().gte("confirmed_at", d60).lt("confirmed_at", d30),
+    bookings().eq("status", "confirmed").gte("confirmed_at", d30),
+    bookings().eq("status", "confirmed").gte("confirmed_at", d60).lt("confirmed_at", d30),
     supabase
       .from("bookings")
       .select(BOOKING_COLUMNS)
@@ -349,12 +375,11 @@ export async function getDashboard() {
       .from("bookings")
       .select(BOOKING_COLUMNS)
       .neq("status", "in_progress")
-      .order("submitted_at", { ascending: false })
+      .order("submitted_at", { ascending: false, nullsFirst: false })
       .limit(5),
     supabase.from("crm_stages").select("id, name, is_system").order("is_system", { ascending: false }).order("position"),
-    supabase.from("crm_leads").select("stage_id, value_lkr").limit(5000),
-    supabase.from("inquiries").select("created_at").gte("created_at", activityFrom).limit(5000),
-    supabase.from("bookings").select("submitted_at").gte("submitted_at", activityFrom).limit(5000),
+    supabase.rpc("crm_pipeline_summary"),
+    supabase.rpc("admin_daily_activity", { p_from: activityFrom, p_days: 30 }),
     supabase.rpc("booking_form_analytics", {
       p_from: analyticsRange.from.toISOString(),
       p_to: analyticsRange.to.toISOString(),
@@ -365,27 +390,14 @@ export async function getDashboard() {
     }),
   ]);
 
-  // Enquiries per Sri Lanka day, oldest first
-  const days = Array.from({ length: 30 }, (_, i) => addDays(today, i - 29));
-  const tally = (stamps: (string | null)[]) => {
-    const map = new Map<string, number>();
-    for (const stamp of stamps) if (stamp) map.set(colomboDay(stamp), (map.get(colomboDay(stamp)) ?? 0) + 1);
-    return map;
-  };
-  const inquiryTally = tally(must(inquiryDays).map((r) => r.created_at));
-  const requestTally = tally(must(requestDays).map((r) => r.submitted_at));
-
-  const leadRows = must(leads);
-  const pipeline = must(stages).map((s) => {
-    const inStage = leadRows.filter((l) => l.stage_id === s.id);
-    return {
-      id: s.id,
-      name: s.name,
-      isSystem: s.is_system,
-      leads: inStage.length,
-      value: inStage.reduce((sum, l) => sum + Number(l.value_lkr ?? 0), 0),
-    };
-  });
+  const summary = new Map(must(pipelineRows).map((r) => [r.stage_id, r]));
+  const pipeline = must(stages).map((s) => ({
+    id: s.id,
+    name: s.name,
+    isSystem: s.is_system,
+    leads: Number(summary.get(s.id)?.leads ?? 0),
+    value: Number(summary.get(s.id)?.value_lkr ?? 0),
+  }));
 
   const form = must(analytics) as unknown as FormAnalytics;
   const formPrev = must(analyticsPrev) as unknown as FormAnalytics;
@@ -413,11 +425,8 @@ export async function getDashboard() {
             : Math.round((conversionNow - conversionPrev) * 100),
       },
     },
-    activity: days.map((day) => ({
-      day,
-      inquiries: inquiryTally.get(day) ?? 0,
-      requests: requestTally.get(day) ?? 0,
-    })),
+    // New enquiries per Sri Lanka day, oldest first
+    activity: must(activityRows).map((r) => ({ day: r.day, inquiries: Number(r.inquiries), requests: Number(r.requests) })),
     upcoming: must(upcoming).map(toBooking),
     latestInquiries: must(latestInquiries).map((r) => toInquiry(r)),
     latestRequests: must(latestRequests).map(toBooking),

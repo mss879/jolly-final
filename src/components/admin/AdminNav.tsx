@@ -20,13 +20,14 @@ const LINKS: { href: string; label: string; icon: IconName; count?: keyof Counts
 function Brand() {
   return (
     <Link href="/admin" className="flex items-center gap-3">
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cream-100">
-        <Image src="/images/brand/logo-purple.png" alt="" width={32} height={32} className="h-7 w-7 object-contain" />
-      </span>
-      <span className="leading-tight">
-        <span className="block font-display text-lg font-semibold text-cream-100">Jolly&apos;s</span>
-        <span className="block text-[0.6rem] font-semibold tracking-[0.24em] text-gold-300 uppercase">Admin</span>
-      </span>
+      <Image
+        src="/images/brand/logo.png"
+        alt="Jolly's Creamery"
+        width={68}
+        height={96}
+        className="h-12 w-auto object-contain brightness-0 invert"
+      />
+      <span className="text-[0.62rem] font-semibold tracking-[0.24em] text-gold-300 uppercase">Admin</span>
     </Link>
   );
 }

@@ -93,6 +93,7 @@ export type Database = {
           started_at: string;
           last_activity_at: string;
           submitted_at: string | null;
+          field_seq: number;
           confirmed_date: string | null;
           confirmed_time: string | null;
           admin_notes: string | null;
@@ -124,6 +125,7 @@ export type Database = {
           started_at?: string;
           last_activity_at?: string;
           submitted_at?: string | null;
+          field_seq?: number;
           confirmed_date?: string | null;
           confirmed_time?: string | null;
           admin_notes?: string | null;
@@ -155,6 +157,7 @@ export type Database = {
           started_at?: string;
           last_activity_at?: string;
           submitted_at?: string | null;
+          field_seq?: number;
           confirmed_date?: string | null;
           confirmed_time?: string | null;
           admin_notes?: string | null;
@@ -346,6 +349,14 @@ export type Database = {
       booking_form_analytics: {
         Args: { p_from: string; p_to: string };
         Returns: Json;
+      };
+      crm_pipeline_summary: {
+        Args: Record<PropertyKey, never>;
+        Returns: { stage_id: string; leads: number; value_lkr: number }[];
+      };
+      admin_daily_activity: {
+        Args: { p_from: string; p_days: number };
+        Returns: { day: string; inquiries: number; requests: number }[];
       };
     };
     Enums: {

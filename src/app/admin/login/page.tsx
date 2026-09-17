@@ -38,11 +38,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Image
-            src="/images/brand/logo-purple.png"
+            src="/images/brand/logo.png"
             alt="Jolly's Creamery"
-            width={72}
-            height={72}
-            className="mx-auto h-16 w-16 object-contain"
+            width={112}
+            height={160}
+            className="mx-auto h-20 w-auto object-contain"
           />
           <h1 className="mt-4 font-display text-3xl font-semibold text-plum-900">Admin</h1>
           <p className="mt-1 text-sm text-ink-500">Inquiries, bookings and the pipeline.</p>

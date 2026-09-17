@@ -3,6 +3,7 @@ import { bookingFieldLabel } from "@/lib/booking-fields";
 import { formatDateTime, formatDay, formatTime, relativeTime } from "@/lib/admin/format";
 import type { BookingDetail } from "@/lib/admin/queries";
 import BookingActions, { BookingNotes } from "./BookingActions";
+import { ACTIVE_WINDOW_MS } from "@/lib/admin/types";
 import { BookingStatusBadge } from "./BookingsView";
 import Icon from "./icons";
 import { Card, ContactLinks, Field } from "./ui";
@@ -65,6 +66,7 @@ export default function BookingDetailView({ detail }: { detail: BookingDetail })
               <BookingActions
                 id={b.id}
                 status={b.status}
+                fillingIn={b.status === "in_progress" && now - Date.parse(b.last_activity_at) < ACTIVE_WINDOW_MS}
                 requestedDate={b.event_date}
                 confirmedDate={b.confirmed_date}
                 confirmedTime={b.confirmed_time}

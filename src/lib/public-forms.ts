@@ -73,5 +73,7 @@ export function bookingContext(value: unknown, request: Request) {
     device,
     source: trafficSource(text(ctx.referrer), landing, host),
     landing_path: landing?.startsWith("/") ? landing.slice(0, 300) : null,
+    // Autosave order (a timestamp); the database ignores older batches.
+    seq: Number.isSafeInteger(ctx.seq) && Number(ctx.seq) > 0 ? String(ctx.seq) : null,
   };
 }

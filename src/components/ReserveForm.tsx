@@ -211,6 +211,10 @@ export default function ReserveForm() {
   }
 
   function onChange(e: FormEvent<HTMLFormElement>) {
+    if ((e.target as { name?: unknown }).name === "website") {
+      tracker.current?.stop(); // only bots fill in the hidden field
+      return;
+    }
     const field = fieldName(e.target);
     if (!field || !tracker.current) return;
 

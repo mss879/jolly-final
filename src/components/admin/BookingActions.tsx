@@ -18,6 +18,7 @@ import { btnGhost, btnPrimary, btnSecondary, inputCls, labelCls } from "./ui";
 type Props = {
   id: string;
   status: BookingStatus;
+  fillingIn: boolean; // an unfinished form the visitor is still typing into
   requestedDate: string | null;
   confirmedDate: string | null;
   confirmedTime: string | null;
@@ -26,7 +27,7 @@ type Props = {
 
 type Pending = "confirm" | "decline" | "cancel" | "delete" | null;
 
-export default function BookingActions({ id, status, requestedDate, confirmedDate, confirmedTime, leadId }: Props) {
+export default function BookingActions({ id, status, fillingIn, requestedDate, confirmedDate, confirmedTime, leadId }: Props) {
   const [open, setOpen] = useState<Pending>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -46,7 +47,7 @@ export default function BookingActions({ id, status, requestedDate, confirmedDat
   return (
     <div>
       <div className="flex flex-wrap gap-2">
-        {!closed && (
+        {!closed && !fillingIn && (
           <button type="button" onClick={() => setOpen("confirm")} className={confirmed ? btnSecondary : btnPrimary}>
             <Icon name={confirmed ? "calendar" : "check"} /> {confirmed ? "Reschedule" : "Confirm booking"}
           </button>
@@ -79,6 +80,11 @@ export default function BookingActions({ id, status, requestedDate, confirmedDat
           <Icon name="trash" /> Delete
         </button>
       </div>
+      {fillingIn && (
+        <p className="mt-3 text-[0.8rem] text-ink-500">
+          The visitor is still filling in the form, so it can&apos;t be confirmed yet.
+        </p>
+      )}
       {error && !open && (
         <p role="alert" className="mt-3 text-sm text-rose-700">
           {error}

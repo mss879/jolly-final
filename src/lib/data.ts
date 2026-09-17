@@ -324,13 +324,11 @@ export const SMILEY = "😊";
 export const CTA = { label: "Reserve Your Event", href: "/reserve" } as const;
 
 /* Location credibility — the client prefers two anchor names plus a count
-   over a full venue list. `short`/`bar` must each fit one line in the
-   announcement bar (mobile / ≥640px). */
+   over a full venue list. (The announcement bar above the header was
+   removed at the client's request, Sept 2026.) */
 export const FIND_US = {
   anchors: ["Shangri-La Colombo", "Hilton Colombo"],
   line: "Find us at Shangri-La Colombo and Hilton Colombo — and at 30+ locations from Colombo down south.",
-  bar: "Find us at Shangri-La Colombo, Hilton Colombo & 30+ locations",
-  short: "Shangri-La · Hilton · 30+ locations",
 } as const;
 
 /* Headline stats — no flavour counts (client: "a very basic way of promoting"). */

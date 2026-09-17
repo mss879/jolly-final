@@ -10,11 +10,11 @@ type SearchParams = Promise<{ view?: string; page?: string; id?: string }>;
 export default async function InquiriesPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const view = params.view === "archived" ? "archived" : "inbox";
-  const page = Math.max(1, Math.floor(Number(params.page)) || 1);
+  const requestedPage = Math.max(1, Math.floor(Number(params.page)) || 1);
   const selectedId = isUuid(params.id) ? params.id : null;
 
-  const [{ inquiries, pages, counts, now }, selected] = await Promise.all([
-    getInquiries(view, page),
+  const [{ inquiries, page, pages, counts, now }, selected] = await Promise.all([
+    getInquiries(view, requestedPage),
     selectedId ? getInquiry(selectedId) : null,
   ]);
 

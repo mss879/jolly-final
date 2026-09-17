@@ -16,13 +16,15 @@ export async function signIn(_prev: SignInState, formData: FormData): Promise<Si
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    return {
-      email,
-      error:
-        error.code === "email_not_confirmed"
-          ? "Confirm your email address first — check your inbox."
-          : "That email and password don't match.",
-    };
+    const message =
+      error.code === "email_not_confirmed"
+        ? "Confirm your email address first — check your inbox."
+        : error.status === 429
+          ? "Too many sign-in attempts — wait a minute and try again."
+          : !error.status || error.status >= 500
+            ? "Sign-in isn't available right now — try again shortly."
+            : "That email and password don't match.";
+    return { email, error: message };
   }
 
   redirect(safeAdminPath(formData.get("next")));

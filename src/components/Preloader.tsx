@@ -51,12 +51,12 @@ export default function Preloader() {
         }}
       >
         <Image
-          src="/images/brand/logo-purple.png"
+          src="/images/brand/logo.png"
           alt=""
-          width={92}
-          height={92}
+          width={152}
+          height={216}
           preload
-          className="h-[72px] w-auto object-contain sm:h-[92px]"
+          className="h-[84px] w-auto object-contain sm:h-[108px]"
         />
       </div>
 

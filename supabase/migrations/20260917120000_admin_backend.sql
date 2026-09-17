@@ -106,6 +106,17 @@ as $$
    where v is not null;
 $$;
 
+/* Stricter than RFC 5322 on purpose: no characters that could smuggle
+   extra headers into a mailto: link in the admin (?, &, =, %). */
+create or replace function private.is_email(p_value text)
+returns boolean
+language sql
+immutable
+set search_path = ''
+as $$
+  select coalesce(p_value ~ '^[A-Za-z0-9._+''-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$', false);
+$$;
+
 create or replace function private.set_updated_at()
 returns trigger
 language plpgsql
@@ -205,6 +216,7 @@ create table if not exists public.bookings (
   started_at timestamptz not null default now(),
   last_activity_at timestamptz not null default now(),
   submitted_at timestamptz,
+  field_seq bigint not null default 0, -- newest autosave applied (see track_booking)
 
   -- Set by the team
   confirmed_date date,
@@ -221,7 +233,11 @@ create table if not exists public.bookings (
     check (status <> 'confirmed' or confirmed_date is not null)
 );
 
+-- Added after the first release; keeps re-runs working on existing projects.
+alter table public.bookings add column if not exists field_seq bigint not null default 0;
+
 create index if not exists bookings_status_submitted_idx on public.bookings (status, submitted_at desc);
+create index if not exists bookings_created_at_idx on public.bookings (created_at);
 create index if not exists bookings_last_activity_idx on public.bookings (last_activity_at desc);
 create index if not exists bookings_confirmed_date_idx on public.bookings (confirmed_date)
   where status = 'confirmed';
@@ -234,6 +250,9 @@ as $$
 begin
   if new.status is distinct from old.status then
     new.status_changed_at := now();
+    if old.status = 'in_progress' then
+      new.submitted_at := coalesce(new.submitted_at, now());
+    end if;
     if new.status = 'confirmed' then
       new.confirmed_at := now();
       new.confirmed_by := auth.uid();
@@ -506,14 +525,17 @@ begin
   if v_name is null or v_email is null or v_message is null then
     raise exception using errcode = 'PT400', message = 'Name, email and message are required';
   end if;
-  if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
+  if not private.is_email(v_email) then
     raise exception using errcode = 'PT400', message = 'Please enter a valid email address';
   end if;
 
-  -- Flood guard: three messages per address per ten minutes.
+  -- Flood guards: three messages per address, and thirty in total, per ten
+  -- minutes — far above real traffic, low enough to blunt a scripted flood.
   if (select count(*) from public.inquiries
        where lower(email) = lower(v_email)
-         and created_at > now() - interval '10 minutes') >= 3 then
+         and created_at > now() - interval '10 minutes') >= 3
+     or (select count(*) from public.inquiries
+          where created_at > now() - interval '10 minutes') >= 30 then
     raise exception using errcode = 'PT429', message = 'Too many messages — please try again shortly';
   end if;
 
@@ -528,10 +550,66 @@ begin
 end;
 $$;
 
-/* Called by the reserve form as the visitor moves through it. Records the
-   interaction events and saves whichever field values were sent. Keys that
-   are present but empty clear the field; absent keys are left alone.
-   A session can only edit its own row, and only until it is submitted. */
+/* Writes the form's field values to a session's booking, creating the row on
+   first use. Keys that are present but empty clear the field; absent keys are
+   left alone. Only 'in_progress' rows change. p_seq orders autosaves: a batch
+   older than the last one applied is ignored, so a slow request can't
+   overwrite newer answers (each autosave carries every answer so far).
+   A null p_seq always applies (the final submit). */
+create or replace function private.save_booking_fields(
+  p_session_id uuid,
+  p_fields jsonb,
+  p_context jsonb,
+  p_last_field text,
+  p_seq bigint
+)
+returns void
+language plpgsql
+set search_path = ''
+as $$
+declare
+  v_device text := case when p_context ->> 'device' in ('mobile', 'tablet', 'desktop') then p_context ->> 'device' end;
+  v_source text := private.clean_text(p_context ->> 'source', 120);
+  v_landing text := private.clean_text(p_context ->> 'landing_path', 300);
+  v_apply boolean;
+begin
+  insert into public.bookings (session_id, device, source, landing_path)
+  values (p_session_id, v_device, v_source, v_landing)
+  on conflict (session_id) do nothing;
+
+  select p_seq is null or p_seq > b.field_seq into v_apply
+    from public.bookings b
+   where b.session_id = p_session_id
+     for update;
+
+  update public.bookings b set
+    name = case when v_apply and p_fields ? 'name' then private.clean_text(p_fields ->> 'name', 120) else b.name end,
+    phone = case when v_apply and p_fields ? 'phone' then private.clean_text(p_fields ->> 'phone', 40) else b.phone end,
+    email = case when v_apply and p_fields ? 'email' then private.clean_text(p_fields ->> 'email', 254) else b.email end,
+    event_type = case when v_apply and p_fields ? 'event_type' then private.clean_text(p_fields ->> 'event_type', 60) else b.event_type end,
+    event_date = case when v_apply and p_fields ? 'event_date' then private.to_event_date(p_fields ->> 'event_date') else b.event_date end,
+    guests = case when v_apply and p_fields ? 'guests' then private.to_int(p_fields ->> 'guests', 1, 100000) else b.guests end,
+    venue = case when v_apply and p_fields ? 'venue' then private.clean_text(p_fields ->> 'venue', 200) else b.venue end,
+    cart = case when v_apply and p_fields ? 'cart' then private.clean_text(p_fields ->> 'cart', 80) else b.cart end,
+    flavours = case when v_apply and p_fields ? 'flavours' then private.to_flavours(p_fields -> 'flavours') else b.flavours end,
+    custom_flavour = case when v_apply and p_fields ? 'custom_flavour' then private.clean_text(p_fields ->> 'custom_flavour', 200) else b.custom_flavour end,
+    message = case when v_apply and p_fields ? 'message' then private.clean_text(p_fields ->> 'message', 5000) else b.message end,
+    field_seq = case when v_apply and p_seq is not null then p_seq else b.field_seq end,
+    last_field = coalesce(p_last_field, b.last_field),
+    device = coalesce(b.device, v_device),
+    source = coalesce(b.source, v_source),
+    landing_path = coalesce(b.landing_path, v_landing),
+    last_activity_at = now()
+  where b.session_id = p_session_id
+    and b.status = 'in_progress';
+end;
+$$;
+
+/* Called by the reserve form as the visitor moves through it: records the
+   interaction events and autosaves the answers so far (p_context.seq orders
+   the autosaves). A session can only edit its own row, and only until it is
+   submitted. Past a generous global rate the call is quietly ignored, so a
+   script can't flood the admin with fake incomplete bookings. */
 create or replace function public.track_booking(
   p_session_id uuid,
   p_events jsonb default '[]'::jsonb,
@@ -547,8 +625,8 @@ declare
   v_fields text[] := private.booking_form_fields();
   v_device text;
   v_source text;
-  v_landing text;
   v_last_field text;
+  v_seq bigint;
 begin
   if p_session_id is null then
     raise exception using errcode = 'PT400', message = 'Missing session';
@@ -568,23 +646,25 @@ begin
 
   v_device := case when p_context ->> 'device' in ('mobile', 'tablet', 'desktop') then p_context ->> 'device' end;
   v_source := private.clean_text(p_context ->> 'source', 120);
-  v_landing := private.clean_text(p_context ->> 'landing_path', 300);
+  v_seq := case when p_context ->> 'seq' ~ '^\d{1,15}$' then (p_context ->> 'seq')::bigint end;
 
   -- 1. Events. Unknown types and fields are dropped; 'submit' only comes
-  --    from submit_booking.
-  insert into public.booking_events (session_id, type, field, duration_ms, device, source)
-  select p_session_id,
-         e ->> 'type',
-         case when e ->> 'type' <> 'view' then e ->> 'field' end,
-         private.to_int(e ->> 'duration_ms', 0, 3600000),
-         case when e ->> 'type' = 'view' then v_device end,
-         case when e ->> 'type' = 'view' then v_source end
-    from jsonb_array_elements(p_events) as e
-   where jsonb_typeof(e) = 'object'
-     and (
-       e ->> 'type' = 'view'
-       or (e ->> 'type' in ('focus', 'complete', 'clear', 'error') and e ->> 'field' = any (v_fields))
-     );
+  --    from submit_booking. Skipped entirely past 1,000 events a minute.
+  if (select count(*) from public.booking_events where created_at > now() - interval '1 minute') < 1000 then
+    insert into public.booking_events (session_id, type, field, duration_ms, device, source)
+    select p_session_id,
+           e ->> 'type',
+           case when e ->> 'type' <> 'view' then e ->> 'field' end,
+           private.to_int(e ->> 'duration_ms', 0, 3600000),
+           case when e ->> 'type' = 'view' then v_device end,
+           case when e ->> 'type' = 'view' then v_source end
+      from jsonb_array_elements(p_events) as e
+     where jsonb_typeof(e) = 'object'
+       and (
+         e ->> 'type' = 'view'
+         or (e ->> 'type' in ('focus', 'complete', 'clear', 'error') and e ->> 'field' = any (v_fields))
+       );
+  end if;
 
   select e ->> 'field' into v_last_field
     from jsonb_array_elements(p_events) with ordinality as t (e, n)
@@ -599,30 +679,14 @@ begin
     return;
   end if;
 
-  -- 2. Field values, saved as they arrive.
-  insert into public.bookings (session_id, device, source, landing_path)
-  values (p_session_id, v_device, v_source, v_landing)
-  on conflict (session_id) do nothing;
+  -- 2. Answers. New incomplete bookings stop being created past 60 in ten
+  --    minutes; visitors already in the form keep saving.
+  if not exists (select 1 from public.bookings where session_id = p_session_id)
+     and (select count(*) from public.bookings where created_at > now() - interval '10 minutes') >= 60 then
+    return;
+  end if;
 
-  update public.bookings b set
-    name = case when p_fields ? 'name' then private.clean_text(p_fields ->> 'name', 120) else b.name end,
-    phone = case when p_fields ? 'phone' then private.clean_text(p_fields ->> 'phone', 40) else b.phone end,
-    email = case when p_fields ? 'email' then private.clean_text(p_fields ->> 'email', 254) else b.email end,
-    event_type = case when p_fields ? 'event_type' then private.clean_text(p_fields ->> 'event_type', 60) else b.event_type end,
-    event_date = case when p_fields ? 'event_date' then private.to_event_date(p_fields ->> 'event_date') else b.event_date end,
-    guests = case when p_fields ? 'guests' then private.to_int(p_fields ->> 'guests', 1, 100000) else b.guests end,
-    venue = case when p_fields ? 'venue' then private.clean_text(p_fields ->> 'venue', 200) else b.venue end,
-    cart = case when p_fields ? 'cart' then private.clean_text(p_fields ->> 'cart', 80) else b.cart end,
-    flavours = case when p_fields ? 'flavours' then private.to_flavours(p_fields -> 'flavours') else b.flavours end,
-    custom_flavour = case when p_fields ? 'custom_flavour' then private.clean_text(p_fields ->> 'custom_flavour', 200) else b.custom_flavour end,
-    message = case when p_fields ? 'message' then private.clean_text(p_fields ->> 'message', 5000) else b.message end,
-    last_field = coalesce(v_last_field, b.last_field),
-    device = coalesce(b.device, v_device),
-    source = coalesce(b.source, v_source),
-    landing_path = coalesce(b.landing_path, v_landing),
-    last_activity_at = now()
-  where b.session_id = p_session_id
-    and b.status = 'in_progress';
+  perform private.save_booking_fields(p_session_id, p_fields, p_context, v_last_field, v_seq);
 end;
 $$;
 
@@ -652,7 +716,7 @@ begin
      or private.clean_text(p_fields ->> 'event_type', 60) is null then
     raise exception using errcode = 'PT400', message = 'Name, phone, email and event type are required';
   end if;
-  if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
+  if not private.is_email(v_email) then
     raise exception using errcode = 'PT400', message = 'Please enter a valid email address';
   end if;
 
@@ -668,11 +732,13 @@ begin
 
   if (select count(*) from public.bookings
        where lower(email) = lower(v_email)
-         and submitted_at > now() - interval '10 minutes') >= 3 then
+         and submitted_at > now() - interval '10 minutes') >= 3
+     or (select count(*) from public.bookings
+          where submitted_at > now() - interval '10 minutes') >= 30 then
     raise exception using errcode = 'PT429', message = 'Too many requests — please try again shortly';
   end if;
 
-  perform public.track_booking(p_session_id, '[]'::jsonb, p_fields, p_context);
+  perform private.save_booking_fields(p_session_id, p_fields, p_context, null, null);
 
   update public.bookings
      set status = 'pending',
@@ -921,6 +987,52 @@ exception when unique_violation then
 end;
 $$;
 
+/* Lead count and estimated value per CRM stage, for the dashboard. */
+create or replace function public.crm_pipeline_summary()
+returns table (stage_id uuid, leads bigint, value_lkr numeric)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select s.id, count(l.id), coalesce(sum(l.value_lkr), 0)
+    from public.crm_stages s
+    left join public.crm_leads l on l.stage_id = s.id
+   group by s.id;
+$$;
+
+/* New inquiries and booking requests per Sri Lanka day, for p_days days
+   starting on the day p_from falls in. */
+create or replace function public.admin_daily_activity(p_from timestamptz, p_days integer)
+returns table (day date, inquiries bigint, requests bigint)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  with days as (
+    select (p_from at time zone 'Asia/Colombo')::date + g as day
+      from generate_series(0, least(greatest(p_days, 1), 366) - 1) as g
+  ),
+  inquiries as (
+    select (created_at at time zone 'Asia/Colombo')::date as day, count(*) as n
+      from public.inquiries
+     where created_at >= p_from
+     group by 1
+  ),
+  requests as (
+    select (submitted_at at time zone 'Asia/Colombo')::date as day, count(*) as n
+      from public.bookings
+     where submitted_at >= p_from
+     group by 1
+  )
+  select d.day, coalesce(i.n, 0), coalesce(r.n, 0)
+    from days d
+    left join inquiries i on i.day = d.day
+    left join requests r on r.day = d.day
+   order by d.day;
+$$;
+
 /* Booking-form analytics for sessions that began in [p_from, p_to).
 
    A session is one visitor's pass through the form. It has
@@ -1098,6 +1210,8 @@ revoke execute on function public.crm_delete_stage(uuid) from public, anon;
 revoke execute on function public.crm_lead_from_inquiry(uuid) from public, anon;
 revoke execute on function public.crm_lead_from_booking(uuid) from public, anon;
 revoke execute on function public.booking_form_analytics(timestamptz, timestamptz) from public, anon;
+revoke execute on function public.crm_pipeline_summary() from public, anon;
+revoke execute on function public.admin_daily_activity(timestamptz, integer) from public, anon;
 
 grant execute on function public.is_admin() to authenticated;
 grant execute on function public.submit_inquiry(text, text, text, text, text, text) to anon, authenticated;
@@ -1109,3 +1223,5 @@ grant execute on function public.crm_delete_stage(uuid) to authenticated;
 grant execute on function public.crm_lead_from_inquiry(uuid) to authenticated;
 grant execute on function public.crm_lead_from_booking(uuid) to authenticated;
 grant execute on function public.booking_form_analytics(timestamptz, timestamptz) to authenticated;
+grant execute on function public.crm_pipeline_summary() to authenticated;
+grant execute on function public.admin_daily_activity(timestamptz, integer) to authenticated;

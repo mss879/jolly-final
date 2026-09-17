@@ -7,8 +7,8 @@ export const metadata: Metadata = { title: "Bookings" };
 export default async function BookingsPage({ searchParams }: { searchParams: Promise<{ view?: string; page?: string }> }) {
   const params = await searchParams;
   const view: BookingView = BOOKING_VIEWS.find((v) => v.view === params.view)?.view ?? "pending";
-  const page = Math.max(1, Math.floor(Number(params.page)) || 1);
-  const { bookings, pages, counts, now } = await getBookings(view, page);
+  const requestedPage = Math.max(1, Math.floor(Number(params.page)) || 1);
+  const { bookings, page, pages, counts, now } = await getBookings(view, requestedPage);
 
   return <BookingsView view={view} page={page} pages={pages} counts={counts} bookings={bookings} now={now} />;
 }

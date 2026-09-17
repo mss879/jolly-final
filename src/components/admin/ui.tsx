@@ -224,6 +224,10 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
   );
 }
 
+/* Only plain addresses become mailto: links — anything with ?, &, = or %
+   could smuggle extra headers into the email. */
+const LINKABLE_EMAIL = /^[A-Za-z0-9._+'-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+
 /* Sri Lankan numbers are often typed locally ("070 …"); WhatsApp wants 94… */
 export function whatsappLink(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -236,7 +240,7 @@ export function ContactLinks({ phone, email }: { phone: string | null; email: st
     <div className="flex flex-col gap-1.5">
       {phone && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <a href={`tel:${phone.replace(/\s/g, "")}`} className={link}>
+          <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className={link}>
             <Icon name="phone" className="h-3.5 w-3.5 text-ink-500" />
             {phone}
           </a>
@@ -245,12 +249,18 @@ export function ContactLinks({ phone, email }: { phone: string | null; email: st
           </a>
         </div>
       )}
-      {email && (
-        <a href={`mailto:${email}`} className={`${link} break-all`}>
-          <Icon name="mail" className="h-3.5 w-3.5 shrink-0 text-ink-500" />
-          {email}
-        </a>
-      )}
+      {email &&
+        (LINKABLE_EMAIL.test(email) ? (
+          <a href={`mailto:${email}`} className={`${link} break-all`}>
+            <Icon name="mail" className="h-3.5 w-3.5 shrink-0 text-ink-500" />
+            {email}
+          </a>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-sm break-all text-ink-700">
+            <Icon name="mail" className="h-3.5 w-3.5 shrink-0 text-ink-500" />
+            {email}
+          </span>
+        ))}
       {!phone && !email && <span className="text-sm text-ink-500">No contact details yet</span>}
     </div>
   );

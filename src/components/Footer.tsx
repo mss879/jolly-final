@@ -70,11 +70,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Image
-              src="/images/brand/logo-purple.png"
+              src="/images/brand/logo.png"
               alt="Jolly's Creamery"
-              width={96}
-              height={96}
-              className="h-16 w-auto object-contain opacity-90 brightness-0 invert"
+              width={102}
+              height={144}
+              className="h-[4.5rem] w-auto object-contain opacity-90 brightness-0 invert"
             />
             <p className="mt-5 font-display text-xl text-cream-100/90 italic">
               {CONTACT.tagline} <span aria-hidden className="not-italic">{SMILEY}</span>

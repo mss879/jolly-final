@@ -46,6 +46,8 @@ The site is at http://localhost:3000 and the admin at http://localhost:3000/admi
 
 - The public site never reads or writes tables directly. The anonymous key can only call `submit_inquiry`, `track_booking` and `submit_booking`, which validate and cap every value in the database.
 - All admin data sits behind Row Level Security and the `admin_users` allowlist. Admin pages and server actions check the signed-in user again on every request.
+- The database also caps how fast new messages, bookings and analytics events can arrive (well above real traffic), so a script can't flood the admin with fake entries. For more protection, add a rate-limit rule for `/api/*` on the hosting provider.
+- Re-running the migration file is safe: it upgrades an earlier install in place.
 
 ## Changing the booking form
 

@@ -13,10 +13,18 @@ export function isDay(value: unknown): value is string {
   return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
 }
 
-/* Where to land after signing in: only admin pages, never another site. */
+/* Where to land after signing in: only admin pages on this site. The URL
+   is parsed first, so tricks like "/admin/..//evil.com" resolve and fail. */
 export function safeAdminPath(value: unknown) {
-  if (typeof value !== "string" || !/^\/admin(\/|\?|$)/.test(value) || value.startsWith("/admin/login")) return "/admin";
-  return value;
+  if (typeof value !== "string") return "/admin";
+  try {
+    const url = new URL(value, "http://this.site");
+    if (url.origin !== "http://this.site") return "/admin";
+    if (!/^\/admin(\/|$)/.test(url.pathname) || url.pathname.startsWith("/admin/login")) return "/admin";
+    return url.pathname + url.search;
+  } catch {
+    return "/admin";
+  }
 }
 
 /* Errors raised with a PT code are written for people in the migration;

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CTA, FIND_US, NAV } from "@/lib/data";
+import { CTA, NAV } from "@/lib/data";
 
 const HOVER_CLOSE_DELAY = 160; // ms of grace before a dropdown closes on mouse-leave
 
@@ -81,27 +81,24 @@ export default function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "border-b border-gold-200/70 bg-cream-100/90 shadow-[0_10px_40px_-20px_rgba(50,0,75,0.25)] backdrop-blur-md"
-          : "bg-transparent"
+        open
+          ? "bg-cream-100"
+          : scrolled
+            ? "border-b border-gold-200/70 bg-cream-100/90 shadow-[0_10px_40px_-20px_rgba(50,0,75,0.25)] backdrop-blur-md"
+            : "bg-transparent"
       }`}
     >
-      {/* Announcement bar — location credibility; `truncate` guarantees a single line */}
-      <div className="bg-plum-900 py-2 text-center">
-        <p className="truncate px-4 text-[0.6rem] font-semibold tracking-[0.22em] text-cream-100 uppercase sm:text-[0.64rem]">
-          <span className="sm:hidden">{FIND_US.short}</span>
-          <span className="hidden sm:inline">{FIND_US.bar}</span>
-        </p>
-      </div>
-      <div className="container-luxe flex items-center justify-between gap-4 py-3 sm:py-4">
+      {/* Stays above the full-screen mobile menu, which lives inside the header */}
+      <div className="container-luxe relative z-50 flex items-center justify-between gap-4 py-3 sm:py-4">
         <Link href="/" aria-label="Jolly's Creamery — home" className="shrink-0">
+          {/* The full logo (dot, wordmark and cone) — never crop it */}
           <Image
-            src="/images/brand/logo-purple.png"
+            src="/images/brand/logo.png"
             alt="Jolly's Creamery"
-            width={64}
-            height={64}
+            width={92}
+            height={130}
             preload
-            className={`w-auto object-contain transition-all duration-500 ${scrolled ? "h-11" : "h-14"}`}
+            className={`w-auto object-contain transition-all duration-500 ${scrolled ? "h-12" : "h-16"}`}
           />
         </Link>
 
@@ -233,11 +230,11 @@ export default function Header() {
       {/* Mobile menu */}
       <div
         aria-hidden={!open}
-        className={`fixed inset-0 top-[100px] z-40 bg-cream-100 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] lg:hidden ${
+        className={`fixed inset-0 z-40 bg-cream-100 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] lg:hidden ${
           open ? "pointer-events-auto visible opacity-100" : "pointer-events-none invisible opacity-0"
         }`}
       >
-        <nav className="container-luxe flex h-full flex-col gap-1 overflow-y-auto pt-8 pb-12" aria-label="Mobile">
+        <nav className="container-luxe flex h-full flex-col gap-1 overflow-y-auto pt-28 pb-12 sm:pt-32" aria-label="Mobile">
           {NAV.map((l, i) => (
             <div
               key={l.href}
