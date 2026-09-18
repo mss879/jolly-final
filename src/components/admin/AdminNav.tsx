@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, use, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,7 +32,32 @@ function Brand() {
   );
 }
 
-export default function AdminNav({ email, counts }: { email: string | null; counts: Counts }) {
+/* The counts are one DB round trip. Reading them inside a boundary keeps the
+   links themselves on screen while that trip is still in the air. */
+function NavCount({ counts, field, hint }: { counts: Promise<Counts>; field: keyof Counts; hint?: string }) {
+  const n = use(counts)[field];
+  if (n <= 0) return null;
+  return (
+    <span
+      className="rounded-btn bg-gold-400 px-1.5 py-px text-[0.68rem] font-bold text-plum-950 tabular-nums"
+      title={`${n} ${hint}`}
+    >
+      {n}
+      <span className="sr-only"> {hint}</span>
+    </span>
+  );
+}
+
+function AccountEmail({ email }: { email: Promise<string | null> }) {
+  const address = use(email);
+  return (
+    <p className="truncate px-3 text-[0.72rem] text-cream-100/60" title={address ?? undefined}>
+      {address}
+    </p>
+  );
+}
+
+export default function AdminNav({ email, counts }: { email: Promise<string | null>; counts: Promise<Counts> }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -47,7 +72,6 @@ export default function AdminNav({ email, counts }: { email: string | null; coun
     <ul className="flex flex-col gap-1">
       {LINKS.map((link) => {
         const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
-        const n = link.count ? counts[link.count] : 0;
         return (
           <li key={link.href}>
             <Link
@@ -59,14 +83,10 @@ export default function AdminNav({ email, counts }: { email: string | null; coun
             >
               <Icon name={link.icon} className="h-[1.1rem] w-[1.1rem]" />
               <span className="flex-1">{link.label}</span>
-              {n > 0 && (
-                <span
-                  className="rounded-btn bg-gold-400 px-1.5 py-px text-[0.68rem] font-bold text-plum-950 tabular-nums"
-                  title={`${n} ${link.hint}`}
-                >
-                  {n}
-                  <span className="sr-only"> {link.hint}</span>
-                </span>
+              {link.count && (
+                <Suspense fallback={null}>
+                  <NavCount counts={counts} field={link.count} hint={link.hint} />
+                </Suspense>
               )}
             </Link>
           </li>
@@ -77,9 +97,9 @@ export default function AdminNav({ email, counts }: { email: string | null; coun
 
   const account = (
     <div className="border-t border-plum-700 pt-4">
-      <p className="truncate px-3 text-[0.72rem] text-cream-100/60" title={email ?? undefined}>
-        {email}
-      </p>
+      <Suspense fallback={<div className="mx-3 h-4 w-32 animate-pulse bg-cream-100/15" aria-hidden="true" />}>
+        <AccountEmail email={email} />
+      </Suspense>
       <div className="mt-2 flex flex-col gap-1">
         <Link
           href="/"

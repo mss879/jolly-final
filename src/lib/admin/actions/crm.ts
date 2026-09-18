@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "../auth";
+import { requireVerifiedAdmin } from "../auth";
 import type { ActionResult } from "../types";
 import { actionError, isDay, isUuid } from "../validate";
 
@@ -14,7 +14,7 @@ function stageName(value: string) {
 }
 
 export async function createStage(value: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   const name = stageName(value);
   if (!name) return { ok: false, error: "Stage names need 1–40 characters." };
 
@@ -32,7 +32,7 @@ export async function createStage(value: string): Promise<ActionResult> {
 }
 
 export async function renameStage(id: string, value: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   const name = stageName(value);
   if (!isUuid(id)) return { ok: false, error: "Unknown stage." };
   if (!name) return { ok: false, error: "Stage names need 1–40 characters." };
@@ -45,7 +45,7 @@ export async function renameStage(id: string, value: string): Promise<ActionResu
 }
 
 export async function deleteStage(id: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown stage." };
 
   const { error } = await supabase.rpc("crm_delete_stage", { p_stage_id: id });
@@ -57,7 +57,7 @@ export async function deleteStage(id: string): Promise<ActionResult> {
 
 /* `ids` is the new left-to-right order of every stage except New Leads. */
 export async function reorderStages(ids: string[]): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!Array.isArray(ids) || !ids.every(isUuid)) return { ok: false, error: "Unknown stage." };
 
   const { error } = await supabase.rpc("crm_reorder_stages", { p_stage_ids: ids });
@@ -69,7 +69,7 @@ export async function reorderStages(ids: string[]): Promise<ActionResult> {
 
 /* Drag and drop: the board already shows the move, so no re-render. */
 export async function moveLead(leadId: string, stageId: string, index: number): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(leadId) || !isUuid(stageId) || !Number.isInteger(index) || index < 0) {
     return { ok: false, error: "That move didn't make sense — refresh and try again." };
   }
@@ -95,7 +95,7 @@ export type LeadInput = {
 const optional = (value: string, max: number) => value.trim().slice(0, max) || null;
 
 export async function saveLead(input: LeadInput): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   const name = input.name.trim();
   if (!name || name.length > 120) return { ok: false, error: "Add a name (up to 120 characters)." };
   if (!isUuid(input.stageId)) return { ok: false, error: "Pick a stage." };
@@ -145,7 +145,7 @@ export async function saveLead(input: LeadInput): Promise<ActionResult> {
 }
 
 export async function deleteLead(id: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown lead." };
 
   const { error } = await supabase.from("crm_leads").delete().eq("id", id);

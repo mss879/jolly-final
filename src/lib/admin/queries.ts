@@ -114,8 +114,9 @@ function toLead(row: LeadRow): Lead {
 /* ─── Navigation badges ─── */
 
 export async function getNavCounts() {
-  const { supabase } = await requireAdmin();
-  const [inquiries, bookings] = await Promise.all([
+  const { supabase, verify } = await requireAdmin();
+  const [, inquiries, bookings] = await Promise.all([
+    verify(),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "new"),
     supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "pending"),
   ]);
@@ -134,22 +135,33 @@ function clampPage(requested: number, total: number) {
 }
 
 export async function getInquiries(view: InquiryView, requestedPage: number) {
-  const { supabase } = await requireAdmin();
-  const [inbox, archived] = await Promise.all([
+  const { supabase, verify } = await requireAdmin();
+
+  /* The rows used to wait on the counts, because the range was worked out
+     from them. They ask for the page that was requested instead, so counts
+     and rows travel together — one round trip rather than two. */
+  const listFrom = (start: number) => {
+    const q = supabase
+      .from("inquiries")
+      .select(INQUIRY_COLUMNS)
+      .order("created_at", { ascending: false })
+      .range(start, start + PAGE_SIZE - 1);
+    return view === "archived" ? q.eq("status", "archived") : q.neq("status", "archived");
+  };
+
+  const asked = Math.max(1, requestedPage);
+  const [, inbox, archived, listed] = await Promise.all([
+    verify(),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).neq("status", "archived"),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "archived"),
+    listFrom((asked - 1) * PAGE_SIZE),
   ]);
+
   const counts = { inbox: count(inbox), archived: count(archived) };
-  const { page, pages, from } = clampPage(requestedPage, view === "archived" ? counts.archived : counts.inbox);
+  const { page, pages, from } = clampPage(asked, view === "archived" ? counts.archived : counts.inbox);
+  // Only when a page number lands past the end — normally never.
+  const rows = must(page === asked ? listed : await listFrom(from));
 
-  let list = supabase
-    .from("inquiries")
-    .select(INQUIRY_COLUMNS)
-    .order("created_at", { ascending: false })
-    .range(from, from + PAGE_SIZE - 1);
-  list = view === "archived" ? list.eq("status", "archived") : list.neq("status", "archived");
-
-  const rows = must(await list);
   const leads = rows.length
     ? must(await supabase.from("crm_leads").select("id, inquiry_id").in("inquiry_id", rows.map((r) => r.id)))
     : [];
@@ -165,17 +177,22 @@ export async function getInquiries(view: InquiryView, requestedPage: number) {
 }
 
 export async function getInquiry(id: string) {
-  const { supabase } = await requireAdmin();
-  const row = maybe(await supabase.from("inquiries").select(INQUIRY_COLUMNS).eq("id", id).maybeSingle());
+  const { supabase, verify } = await requireAdmin();
+  // The lead is keyed by inquiry id, so it can be looked up at the same time.
+  const [, found, lead] = await Promise.all([
+    verify(),
+    supabase.from("inquiries").select(INQUIRY_COLUMNS).eq("id", id).maybeSingle(),
+    supabase.from("crm_leads").select("id").eq("inquiry_id", id).maybeSingle(),
+  ]);
+  const row = maybe(found);
   if (!row) return null;
-  const lead = maybe(await supabase.from("crm_leads").select("id").eq("inquiry_id", id).maybeSingle());
-  return toInquiry(row, lead?.id ?? null);
+  return toInquiry(row, maybe(lead)?.id ?? null);
 }
 
 /* ─── CRM ─── */
 
 export async function getBoard() {
-  const { supabase } = await requireAdmin();
+  const { supabase, verify } = await requireAdmin();
   // Supabase returns at most 1,000 rows per request (by default), so page through.
   const readLeads = async () => {
     const rows: LeadRow[] = [];
@@ -193,7 +210,8 @@ export async function getBoard() {
       rows.push(...batch);
     }
   };
-  const [stages, leads] = await Promise.all([
+  const [, stages, leads] = await Promise.all([
+    verify(),
     supabase.from("crm_stages").select("id, name, is_system").order("is_system", { ascending: false }).order("position"),
     readLeads(),
   ]);
@@ -208,15 +226,38 @@ export async function getBoard() {
 export type BookingView = "pending" | "confirmed" | "incomplete" | "closed" | "all";
 
 export async function getBookings(view: BookingView, requestedPage: number) {
-  const { supabase } = await requireAdmin();
+  const { supabase, verify } = await requireAdmin();
   const head = () => supabase.from("bookings").select("id", { count: "exact", head: true });
 
-  const [pending, confirmed, incomplete, closed, all] = await Promise.all([
+  /* The rows used to wait on the tab counts, because the range was worked
+     out from them. They ask for the page that was requested instead, so
+     counts and rows travel together — one round trip rather than two. */
+  const listFrom = (start: number) => {
+    let list = supabase.from("bookings").select(BOOKING_COLUMNS).range(start, start + PAGE_SIZE - 1);
+    const newestSent = { ascending: false, nullsFirst: false } as const;
+    if (view === "pending") list = list.eq("status", "pending").order("submitted_at", newestSent);
+    if (view === "confirmed") list = list.eq("status", "confirmed").order("confirmed_date", { ascending: false });
+    if (view === "closed") list = list.in("status", ["declined", "cancelled"]).order("status_changed_at", newestSent);
+    if (view === "all") list = list.neq("status", "in_progress").order("submitted_at", newestSent);
+    // Incomplete: saved as they typed but never sent — only worth a call if we can reach them.
+    if (view === "incomplete") {
+      list = list
+        .eq("status", "in_progress")
+        .or("phone.not.is.null,email.not.is.null")
+        .order("last_activity_at", { ascending: false });
+    }
+    return list;
+  };
+
+  const asked = Math.max(1, requestedPage);
+  const [, pending, confirmed, incomplete, closed, all, listed] = await Promise.all([
+    verify(),
     head().eq("status", "pending"),
     head().eq("status", "confirmed"),
     head().eq("status", "in_progress").or("phone.not.is.null,email.not.is.null"),
     head().in("status", ["declined", "cancelled"]),
     head().neq("status", "in_progress"),
+    listFrom((asked - 1) * PAGE_SIZE),
   ]);
   const counts = {
     pending: count(pending),
@@ -225,47 +266,40 @@ export async function getBookings(view: BookingView, requestedPage: number) {
     closed: count(closed),
     all: count(all),
   };
-  const { page, pages, from } = clampPage(requestedPage, counts[view]);
-
-  let list = supabase.from("bookings").select(BOOKING_COLUMNS).range(from, from + PAGE_SIZE - 1);
-  const newestSent = { ascending: false, nullsFirst: false } as const;
-  if (view === "pending") list = list.eq("status", "pending").order("submitted_at", newestSent);
-  if (view === "confirmed") list = list.eq("status", "confirmed").order("confirmed_date", { ascending: false });
-  if (view === "closed") list = list.in("status", ["declined", "cancelled"]).order("status_changed_at", newestSent);
-  if (view === "all") list = list.neq("status", "in_progress").order("submitted_at", newestSent);
-  // Incomplete: saved as they typed but never sent — only worth a call if we can reach them.
-  if (view === "incomplete") {
-    list = list
-      .eq("status", "in_progress")
-      .or("phone.not.is.null,email.not.is.null")
-      .order("last_activity_at", { ascending: false });
-  }
+  const { page, pages, from } = clampPage(asked, counts[view]);
+  // Only when a page number lands past the end — normally never.
+  const rows = must(page === asked ? listed : await listFrom(from));
 
   return {
     now: Date.now(),
     page,
     pages,
     counts,
-    bookings: must(await list).map(toBooking),
+    bookings: rows.map(toBooking),
   };
 }
 
 export async function getBooking(id: string) {
-  const { supabase } = await requireAdmin();
-  const booking = maybe(await supabase.from("bookings").select("*").eq("id", id).maybeSingle());
+  const { supabase, verify } = await requireAdmin();
+  // The lead is keyed by booking id, so it needn't wait for the booking row.
+  const [, found, lead] = await Promise.all([
+    verify(),
+    supabase.from("bookings").select("*").eq("id", id).maybeSingle(),
+    supabase.from("crm_leads").select("id").eq("booking_id", id).maybeSingle(),
+  ]);
+  const booking = maybe(found);
   if (!booking) return null;
 
-  const [lead, confirmer] = await Promise.all([
-    supabase.from("crm_leads").select("id").eq("booking_id", id).maybeSingle(),
-    booking.confirmed_by
-      ? supabase.from("admin_users").select("email").eq("user_id", booking.confirmed_by).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-  ]);
+  // Who confirmed it is only knowable once the row is in hand.
+  const confirmer = booking.confirmed_by
+    ? maybe(await supabase.from("admin_users").select("email").eq("user_id", booking.confirmed_by).maybeSingle())
+    : null;
+
   return {
     now: Date.now(),
     booking,
     leadId: maybe(lead)?.id ?? null,
-    confirmedBy: maybe(confirmer)?.email ?? null,
+    confirmedBy: confirmer?.email ?? null,
   };
 }
 
@@ -278,12 +312,13 @@ function rangeBounds(days: number, endDay = colomboDay()) {
 }
 
 export async function getFormAnalytics(days: AnalyticsRange) {
-  const { supabase } = await requireAdmin();
+  const { supabase, verify } = await requireAdmin();
   const { from, to } = rangeBounds(days);
-  const data = must(
-    await supabase.rpc("booking_form_analytics", { p_from: from.toISOString(), p_to: to.toISOString() }),
-  );
-  return data as unknown as FormAnalytics;
+  const [, result] = await Promise.all([
+    verify(),
+    supabase.rpc("booking_form_analytics", { p_from: from.toISOString(), p_to: to.toISOString() }),
+  ]);
+  return must(result) as unknown as FormAnalytics;
 }
 
 /* ─── Calendar ─── */
@@ -291,14 +326,15 @@ export async function getFormAnalytics(days: AnalyticsRange) {
 /* `month` is "YYYY-MM". The grid runs Monday to Sunday and always shows
    whole weeks, so it can include days from the months either side. */
 export async function getCalendarMonth(month: string) {
-  const { supabase } = await requireAdmin();
+  const { supabase, verify } = await requireAdmin();
   const first = `${month}-01`;
   const next = addDays(first, 32).slice(0, 7);
   const last = addDays(`${next}-01`, -1);
   const gridStart = addDays(first, -weekdayIndex(first));
   const gridEnd = addDays(last, 6 - weekdayIndex(last));
 
-  const [events, pending] = await Promise.all([
+  const [, events, pending] = await Promise.all([
+    verify(),
     supabase
       .from("bookings")
       .select(BOOKING_COLUMNS)
@@ -316,7 +352,7 @@ export async function getCalendarMonth(month: string) {
 /* ─── Dashboard ─── */
 
 export async function getDashboard() {
-  const { supabase } = await requireAdmin();
+  const { supabase, verify } = await requireAdmin();
   const now = Date.now();
   const today = colomboDay();
   const since = (days: number) => new Date(now - days * DAY_MS).toISOString();
@@ -331,6 +367,7 @@ export async function getDashboard() {
   const previousRange = { from: new Date(analyticsRange.from.getTime() - 30 * DAY_MS), to: analyticsRange.from };
 
   const [
+    ,
     newInquiries,
     pending,
     incomplete,
@@ -349,6 +386,7 @@ export async function getDashboard() {
     analytics,
     analyticsPrev,
   ] = await Promise.all([
+    verify(),
     inquiries().eq("status", "new"),
     bookings().eq("status", "pending"),
     bookings()

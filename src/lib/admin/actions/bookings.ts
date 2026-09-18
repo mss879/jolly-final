@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "../auth";
+import { requireVerifiedAdmin } from "../auth";
 import { ACTIVE_WINDOW_MS, type ActionResult } from "../types";
 import { actionError, isDay, isUuid } from "../validate";
 
 /* Confirming puts the booking on the calendar. Also used to reschedule a
    booking that's already confirmed. */
 export async function confirmBooking(id: string, day: string, time: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown booking." };
   if (!isDay(day)) return { ok: false, error: "Choose the event date." };
   if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return { ok: false, error: "That time isn't valid." };
@@ -38,7 +38,7 @@ export async function setBookingStatus(
   id: string,
   status: (typeof MANUAL_STATUSES)[number],
 ): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id) || !MANUAL_STATUSES.includes(status)) return { ok: false, error: "Unknown booking." };
 
   const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
@@ -49,7 +49,7 @@ export async function setBookingStatus(
 }
 
 export async function saveBookingNotes(id: string, notes: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown booking." };
 
   const { error } = await supabase
@@ -63,7 +63,7 @@ export async function saveBookingNotes(id: string, notes: string): Promise<Actio
 }
 
 export async function moveBookingToCrm(id: string): Promise<ActionResult<string>> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown booking." };
 
   const { data, error } = await supabase.rpc("crm_lead_from_booking", { p_booking_id: id });
@@ -74,7 +74,7 @@ export async function moveBookingToCrm(id: string): Promise<ActionResult<string>
 }
 
 export async function deleteBooking(id: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireVerifiedAdmin();
   if (!isUuid(id)) return { ok: false, error: "Unknown booking." };
 
   const { error } = await supabase.from("bookings").delete().eq("id", id);

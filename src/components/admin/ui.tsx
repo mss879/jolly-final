@@ -15,6 +15,11 @@ export const inputCls =
   "w-full rounded-btn border border-gold-200 bg-cream-50 px-3 py-2.5 text-sm text-ink-900 outline-none placeholder:text-ink-500/60 focus:border-gold-400 focus:ring-2 focus:ring-gold-300/40";
 export const labelCls = "mb-1 block text-[0.68rem] font-semibold tracking-[0.12em] text-ink-700 uppercase";
 
+/* Placeholder block for loading.tsx skeletons. Square, like the cards. */
+export function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`animate-pulse bg-cream-300 ${className}`} aria-hidden="true" />;
+}
+
 export function PageHeader({
   title,
   description,
