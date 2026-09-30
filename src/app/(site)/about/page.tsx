@@ -41,7 +41,7 @@ const STORY: { heading: string; paragraphs: string[] }[] = [
     // CLIENT STORY: chapter 1 — how and why Jolly's started
     heading: "Where it began",
     paragraphs: [
-      "Before the carts there was a kitchen after work. Fazir had come home after more than ten years abroad with an idea that would not leave him alone. Ice cream that made people feel good, not just taste good.",
+      "Before the carts there was a kitchen after work. Our founder had come home after more than ten years abroad with an idea that would not leave him alone. Ice cream that made people feel good, not just taste good.",
       "For a year and a half the neighbours were the tasting panel. The flavours were Sri Lankan from the start — cinnamon, cardamom, coconut, Karutha Columban mango, milk toffee. The early tagline was simple: we serve happiness.",
     ],
   },
@@ -103,13 +103,13 @@ export default function AboutPage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <div className="relative">
-              <div className="absolute -top-5 -left-5 h-24 w-24 border border-gold-300" />
+              <div className="absolute -top-5 -left-5 h-24 w-24 rounded-card border border-gold-300" />
               {/* Real photo from Instagram (The Island Pop Up, 14 Jul 2026) — see public/images/social/CREDITS.md.
                   CLIENT: confirm rights and send the original for the homepage hero. */}
-              <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden shadow-soft">
+              <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden rounded-card shadow-soft">
                 <Image
                   src="/images/social/ig-cart-dusk.jpg"
-                  alt="Jolly's Cream cart at dusk under string lights, the host serving a guest"
+                  alt="Jolly's Vanilla Cream cart at dusk under string lights, the host serving a guest"
                   fill
                   sizes="(min-width: 1024px) 46vw, 92vw"
                   className="scale-110 object-cover"
@@ -128,7 +128,7 @@ export default function AboutPage() {
               {/* CLIENT: confirm founder facts (years abroad, 2017, Marine Drive) */}
               <div className="mt-6 space-y-5 text-[0.93rem] leading-relaxed text-ink-700">
                 <p>
-                  Fazir came home to Sri Lanka after more than ten years abroad
+                  Our founder came home to Sri Lanka after more than ten years abroad
                   with one idea: ice cream that makes people feel good.
                 </p>
                 <p>
@@ -213,7 +213,7 @@ export default function AboutPage() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((v, i) => (
               <Reveal key={v.t} delay={i * 100}>
-                <div className="h-full border border-gold-200/70 bg-cream-50 p-7">
+                <div className="h-full rounded-card border border-gold-200/70 bg-cream-50 p-7">
                   <span className="font-display text-2xl font-semibold text-gold-500">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="mt-3 font-display text-lg leading-snug font-semibold text-plum-900">{v.t}</h3>
                   <p className="mt-2.5 text-[0.83rem] leading-relaxed text-ink-500">{v.c}</p>
@@ -239,7 +239,7 @@ export default function AboutPage() {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {FIND_US_CARDS.map((card, i) => (
             <Reveal key={card.t} delay={i * 110}>
-              <div className="flex h-full flex-col border border-gold-200/70 bg-cream-50 p-7">
+              <div className="flex h-full flex-col rounded-card border border-gold-200/70 bg-cream-50 p-7">
                 <p className="kicker">{card.kicker}</p>
                 <h3 className="mt-3 font-display text-2xl font-semibold text-plum-900">{card.t}</h3>
                 <p className="mt-2.5 flex-1 text-[0.85rem] leading-relaxed text-ink-500">{card.c}</p>

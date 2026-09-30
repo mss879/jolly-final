@@ -39,9 +39,11 @@
 
   --ease-luxe: cubic-bezier(0.76, 0, 0.24, 1);
 
-  /* "Slightly curved" — applied to buttons, pills and inputs only;
-     cards, images and rules stay sharp. */
+  /* Curved corners everywhere (client, Sept 2026: "like the buttons").
+     btn: buttons, pills, inputs and small badges. card: cards, panels,
+     photos and frames — the same curve, scaled for bigger shapes. */
   --radius-btn: 0.375rem;
+  --radius-card: 0.875rem;
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-float-slow: float 10s ease-in-out infinite;

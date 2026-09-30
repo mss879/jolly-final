@@ -1,7 +1,8 @@
 /* Central content store for Jolly's Creamery.
    Venue list and contact details are sourced from jollyscreamery.com
-   (Mar 2024 / Jun 2025 content). The cart line-up and the flavour list follow
-   the client's "Jolly's on Wheels" brochure (Sept 2026). */
+   (Mar 2024 / Jun 2025 content). The cart line-up follows the client's
+   "Jolly's on Wheels" brochure (Sept 2026); the flavours follow their
+   "Our Flavours" sheet (2026). */
 
 export const CONTACT = {
   phone: "+94 707 222 511",
@@ -23,16 +24,67 @@ export type Flavor = {
   dairyFree?: boolean;
 };
 
-/* Brochure order — the first three also lead the Home flavour preview. */
+/* Order of the client's "Our Flavours" sheet (2026) — the first three also
+   lead the Home flavour preview. Scoop photos are cut from that sheet. */
 export const FLAVORS: Flavor[] = [
   {
+    // Client: "Passion Fruit" without "Creamy"
     slug: "passion-fruit-sorbet",
-    name: "Passion Fruit Creamy Sorbet",
-    description:
-      "Sharp, fragrant passion fruit, dairy-free and creamy — the first to go in the heat.",
+    name: "Passion Fruit Sorbet",
+    description: "Sharp, fragrant passion fruit, dairy-free and refreshing — the first to go in the heat.",
     image: "/images/flavors/passion-fruit-sorbet.png",
     category: "Sorbet",
     dairyFree: true,
+  },
+  {
+    slug: "wild-naarang-sorbet",
+    name: "Wild Naarang Sorbet",
+    description: "Wild naarang, bright and citrusy — a burst of island orange in every spoonful.",
+    image: "/images/flavors/wild-naarang-sorbet.png",
+    category: "Sorbet",
+    dairyFree: true,
+  },
+  {
+    slug: "jaffna-mango",
+    name: "Jaffna Mango",
+    description: "Jaffna's Karutha Colomban mango — floral, tart and sweet. The island in a scoop.",
+    image: "/images/flavors/jaffna-mango.png",
+    category: "Fruity",
+  },
+  {
+    slug: "strawberry-cheesecake",
+    name: "Strawberry Cheesecake",
+    description: "Tangy cream-cheese ice cream folded with strawberry compote.",
+    image: "/images/flavors/strawberry-cheesecake.png",
+    category: "Fruity",
+  },
+  {
+    slug: "blueberry",
+    name: "Blueberry",
+    description: "Blueberries, tart and creamy — made when the fruit is in season.",
+    image: "/images/flavors/blueberry.png",
+    category: "Fruity",
+  },
+  {
+    slug: "bubblegum",
+    name: "Bubblegum",
+    description: "Blue, sweet and nostalgic — the flavour that makes grown-ups feel seven again.",
+    image: "/images/flavors/bubblegum.png",
+    category: "Classic",
+  },
+  {
+    slug: "coconut",
+    name: "Coconut",
+    description: "Coconut milk and fresh cream, with a little desiccated coconut for texture.",
+    image: "/images/flavors/coconut.png",
+    category: "Classic",
+  },
+  {
+    slug: "french-vanilla",
+    name: "French Vanilla",
+    description: "Floral vanilla and crème anglaise — extra creamy, yet light.",
+    image: "/images/flavors/french-vanilla.png",
+    category: "Classic",
   },
   {
     slug: "cookies-and-cream",
@@ -42,27 +94,24 @@ export const FLAVORS: Flavor[] = [
     category: "Classic",
   },
   {
-    slug: "flavour-of-the-month",
-    name: "Flavour of the Month",
-    description:
-      "A playful twist on rare, unexpected ingredients — a one-of-a-kind scoop that changes every month.",
-    image: "/images/flavors/flavour-of-the-month.png",
-    category: "Seasonal",
-  },
-  {
     slug: "salted-caramel-peanuts",
     name: "Salted Caramel & Peanuts",
-    description:
-      "Burnt-sugar caramel, roasted peanuts and a hint of salt — the grown-ups' favourite.",
+    description: "Burnt-sugar caramel, roasted peanuts and a hint of salt — the grown-ups' favourite.",
     image: "/images/flavors/salted-caramel-peanuts.png",
     category: "Classic",
   },
   {
-    slug: "strawberry-cheesecake",
-    name: "Strawberry Cheesecake",
-    description:
-      "Tangy cream-cheese ice cream folded with strawberry compote.",
-    image: "/images/flavors/strawberry-cheesecake.png",
+    slug: "milk-toffee",
+    name: "Milk Toffee",
+    description: "The buttery sweetness of milk toffee, with caramelised sugar and condensed milk.",
+    image: "/images/flavors/milk-toffee.png",
+    category: "Classic",
+  },
+  {
+    slug: "amber-coffee-caramel",
+    name: "Amber Coffee & Caramel",
+    description: "Aromatic amber coffee and rich caramel — delicate, yet creamy.",
+    image: "/images/flavors/amber-coffee-caramel.png",
     category: "Classic",
   },
   {
@@ -75,50 +124,17 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "swiss-chocolate",
     name: "Swiss Chocolate",
-    description:
-      "Swiss-style chocolate with African cocoa and sweet cream.",
+    description: "Swiss-style chocolate with African cocoa and sweet cream.",
     image: "/images/flavors/swiss-chocolate.png",
     category: "Chocolate",
   },
   {
-    slug: "coconut",
-    name: "Coconut",
+    slug: "flavour-of-the-month",
+    name: "Flavour of the Month",
     description:
-      "Coconut milk and fresh cream, with a little desiccated coconut for texture.",
-    image: "/images/flavors/coconut.png",
-    category: "Classic",
-  },
-  {
-    slug: "french-vanilla",
-    name: "French Vanilla",
-    description:
-      "Floral vanilla and crème anglaise — extra creamy, yet light.",
-    image: "/images/flavors/french-vanilla.png",
-    category: "Classic",
-  },
-  {
-    slug: "blueberry",
-    name: "Blueberry",
-    description:
-      "Blueberries, tart and creamy — made when the fruit is in season.",
-    image: "/images/flavors/blueberry.png",
-    category: "Fruity",
-  },
-  {
-    slug: "jaffna-mango",
-    name: "Jaffna Mango",
-    description:
-      "Jaffna's Karutha Columban mango — floral, tart and sweet. The island in a scoop.",
-    image: "/images/flavors/jaffna-mango.png",
-    category: "Fruity",
-  },
-  {
-    slug: "bubblegum-blue",
-    name: "Bubblegum Blue",
-    description:
-      "Blue, sweet and nostalgic — the flavour that makes grown-ups feel seven again.",
-    image: "/images/flavors/bubblegum-blue.png",
-    category: "Classic",
+      "A playful twist on rare, unexpected ingredients — a one-of-a-kind scoop that changes every month.",
+    image: "/images/flavors/flavour-of-the-month.png",
+    category: "Seasonal",
   },
 ];
 
@@ -257,7 +273,7 @@ export const SERVICES: Service[] = [
     title: "Weddings",
     blurb: "The moment guests talk about on the way home.",
     description:
-      "Your cart arrives styled to your palette — Cream, Bubblegum Blue or Ferrari Red — and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
+      "Your cart arrives styled to your palette — Vanilla Cream, Bubblegum Blue or Ferrari Red — and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
     // Real photo from the client's Instagram (16 Jun 2026) — see public/images/social/CREDITS.md
     image: "/images/social/ig-bride-cart.jpg",
     imagePortrait: true,
@@ -314,6 +330,17 @@ export const SERVICES: Service[] = [
   },
 ];
 
+/* Each service has its own page at /services/<slug>. */
+export const serviceHref = (slug: string) => `/services/${slug}`;
+
+/* How a booking runs — on the Services page and every service page. */
+export const HOW_IT_WORKS = [
+  ["Tell us about your event", "Date, venue, guest count and the feeling you want to create."],
+  ["We style your cart", "Cart colour and flavour menu chosen with you, to match your palette."],
+  ["We arrive and set the scene", "Fully chilled, fully staffed — before your first guest walks in."],
+  ["Guests feel good", "Live scoops, a smiling host, and the room finds its mood."],
+] as const;
+
 /* ─── Brand constants ─────────────────────────────────────────── */
 
 /* The smiley is part of the tagline wherever it is rendered (preloader,
@@ -363,6 +390,7 @@ export type Cart = {
   image: string;
   alt: string;
   copy: string;
+  formImage: string; // the reserve form's preview — same lobby for all three, so only the colour changes
 };
 
 /* Names and photos from the client's brochure. Order = order on the site and
@@ -372,11 +400,12 @@ export type Cart = {
 export const CARTS: Cart[] = [
   {
     key: "cream",
-    name: "Cream",
+    name: "Vanilla Cream",
     swatch: "#F1E6C4",
     image: "/images/carts/cart-cream.jpg",
-    alt: "Cream Jolly's cart with a vintage bicycle, parasol and glowing lights in an evening garden",
-    copy: "Cream and gold under glowing lights — at home in wedding halls, gardens and five-star lobbies.",
+    alt: "Vanilla Cream Jolly's cart with a vintage bicycle, parasol and glowing lights in an evening garden",
+    copy: "Vanilla cream and gold under glowing lights — at home in wedding halls, gardens and five-star lobbies.",
+    formImage: "/vanilla%20cream.png",
   },
   {
     key: "bubblegum-blue",
@@ -385,6 +414,7 @@ export const CARTS: Cart[] = [
     image: "/images/carts/cart-bubblegum-blue.jpg",
     alt: "Bubblegum Blue Jolly's cart with its host under string lights on a terrace",
     copy: "A playful blue with a vintage bicycle — made for garden parties, terraces and relaxed celebrations.",
+    formImage: "/blue-cart.png",
   },
   {
     key: "ferrari-red",
@@ -393,6 +423,7 @@ export const CARTS: Cart[] = [
     image: "/images/carts/cart-ferrari-red.jpg",
     alt: "Ferrari Red Jolly's cart with a red bicycle on a garden lawn",
     copy: "A bold statement piece for galas, festive seasons and grand celebrations.",
+    formImage: "/red-cart.png",
   },
 ];
 
@@ -400,8 +431,7 @@ export const CARTS: Cart[] = [
 
 export type HeroSlide = {
   key: string;
-  badge?: string; // small pill above the kicker, e.g. "New" / "Coming Soon"
-  kicker: string;
+  badge?: string; // small pill above the headline, e.g. "New" / "Coming Soon"
   line1: string;
   line2: string;
   copy: string;
@@ -417,7 +447,6 @@ export type HeroSlide = {
 export const HERO_SLIDES: HeroSlide[] = [
   {
     key: "moments",
-    kicker: "Jolly's on Wheels · Live Ice Cream Carts",
     // CLIENT: pick one — alternatives are in the Copy Rationale doc
     //   "Creating feel-good moments / at every event" · "Your event is about to / feel good" · "The moment / everyone remembers"
     line1: "The happiest corner",
@@ -425,14 +454,13 @@ export const HERO_SLIDES: HeroSlide[] = [
     copy: "One styled cart, one host, live scoops — and your wedding, corporate event or party ends on its happiest note.",
     cta: CTA,
     cta2: { href: "/services", label: "Explore Services" },
-    // CLIENT PHOTO: replace with the Ramada Women's Day 2025 cart photo (real cart, human element)
-    image: "/images/scenes/hero-cart-banner.jpg",
-    alt: "Jolly's Creamery cream and gold cart in a palatial hotel lobby",
-    objectPos: "object-[72%_center]",
+    // Wedding hero supplied 30 Sept 2026 (public/jollys-wedding-hero.png)
+    image: "/jollys-wedding-hero.png",
+    alt: "A bride at the Vanilla Cream Jolly's cart, its host scooping, in a marble hotel lobby",
+    objectPos: "object-[42%_center]",
   },
   {
     key: "flavours",
-    kicker: "Ice Creams & Dairy-Free Sorbets",
     line1: "Curated flavours",
     line2: "for special occasions",
     copy: "Fresh, seasonal ice creams and dairy-free creamy sorbets, somewhere between gelato and ice cream — chosen with you for the occasion.",
@@ -445,7 +473,6 @@ export const HERO_SLIDES: HeroSlide[] = [
   {
     key: "at-home",
     badge: "Coming Soon",
-    kicker: "Jolly's at Home",
     // PLACEHOLDER — client is sending the tub-launch copy and a "tub moment" visual
     line1: "The same feeling,",
     line2: "soon at home",
@@ -470,7 +497,7 @@ export const REASONS = [
   {
     n: "02",
     t: "Themed to your décor",
-    c: "Cream, Bubblegum Blue or Ferrari Red — a cart colour that sits naturally with your palette, florals and venue.",
+    c: "Vanilla Cream, Bubblegum Blue or Ferrari Red — a cart colour that sits naturally with your palette, florals and venue.",
   },
   {
     n: "03",
@@ -535,17 +562,17 @@ export type NavItem = {
   children?: { href: string; label: string }[];
 };
 
-/* Order agreed with the client: Home → Honest Reviews → About →
+/* Order agreed with the client: Home → Reviews → About →
    Services (dropdown) → Flavours → Contact. Franchise lives in the footer. */
 export const NAV: NavItem[] = [
   { href: "/", label: "Home" },
-  { href: "/reviews", label: "Honest Reviews" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/about", label: "About" },
   {
     href: "/services",
     label: "Services",
     // CLIENT: exact service names + one-line descriptions to follow
-    children: SERVICES.map((s) => ({ href: `/services#${s.slug}`, label: s.title })),
+    children: SERVICES.map((s) => ({ href: serviceHref(s.slug), label: s.title })),
   },
   { href: "/flavors", label: "Flavours" },
   { href: "/contact", label: "Contact" },
@@ -556,13 +583,13 @@ export const FOOTER_LINKS = {
   Explore: [
     { href: "/", label: "Home" },
     { href: "/about", label: "Our Story" },
-    { href: "/reviews", label: "Honest Reviews" },
+    { href: "/reviews", label: "Reviews" },
     { href: "/flavors", label: "Flavours" },
     { href: "/reserve", label: "Reserve Your Event" },
     { href: "/contact", label: "Contact" },
   ],
   Services: [
-    ...SERVICES.map((s) => ({ href: `/services#${s.slug}`, label: s.title })),
+    ...SERVICES.map((s) => ({ href: serviceHref(s.slug), label: s.title })),
     { href: "/franchise", label: "Franchise & Venues" },
   ],
 };

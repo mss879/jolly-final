@@ -7,7 +7,7 @@ export default function SectionHeading({
   align = "left",
   rule = true,
 }: {
-  kicker: string;
+  kicker?: string; // the small gold line above the title; the homepage goes without
   title: React.ReactNode;
   copy?: string;
   align?: "center" | "left";
@@ -16,11 +16,13 @@ export default function SectionHeading({
   const center = align === "center";
   return (
     <Reveal className={center ? "mx-auto max-w-2xl text-center" : ""}>
-      <p className={`kicker flex items-center gap-3 ${center ? "justify-center" : ""}`}>
-        {!center && <span className="h-px w-8 bg-gold-500" />}
-        {kicker}
-      </p>
-      <h2 className="heading-display mt-5 text-4xl sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
+      {kicker && (
+        <p className={`kicker mb-5 flex items-center gap-3 ${center ? "justify-center" : ""}`}>
+          {!center && <span className="h-px w-8 bg-gold-500" />}
+          {kicker}
+        </p>
+      )}
+      <h2 className="heading-display text-4xl sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
         {title}
       </h2>
       {copy && (

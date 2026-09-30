@@ -8,9 +8,15 @@ import ReviewCard from "@/components/ReviewCard";
 import Parallax from "@/components/Parallax";
 import ParallaxBanner from "@/components/ParallaxBanner";
 import { GoogleG, Stars } from "@/components/GoogleBadge";
-import { BADGE_STAT, CARTS, FIND_US, FLAVORS, GOOGLE_RATING, REASONS, REVIEWS, SERVICES, STATS } from "@/lib/data";
+import { BADGE_STAT, CARTS, FIND_US, FLAVORS, REASONS, SERVICES, STATS, serviceHref } from "@/lib/data";
+import { getGoogleReviews, reviewCountLabel } from "@/lib/google-reviews";
 
-export default function HomePage() {
+/* The reviews come live from Google (cached six hours). */
+export const revalidate = 21600;
+
+export default async function HomePage() {
+  const google = await getGoogleReviews();
+
   return (
     <>
       <HeroSlider />
@@ -20,17 +26,17 @@ export default function HomePage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <div className="relative">
-              <div className="absolute -top-5 -left-5 h-24 w-24 border border-gold-300" />
-              <Parallax speed={0.08} className="relative overflow-hidden shadow-soft">
+              <div className="absolute -top-5 -left-5 h-24 w-24 rounded-card border border-gold-300" />
+              <Parallax speed={0.08} className="relative overflow-hidden rounded-card shadow-soft">
                 <Image
                   src="/images/scenes/scene-wedding.jpg"
-                  alt="Jolly's cream and gold cart at a candlelit garden wedding"
+                  alt="Jolly's Vanilla Cream cart at a candlelit garden wedding"
                   width={900}
                   height={600}
                   className="h-full w-full scale-110 object-cover"
                 />
               </Parallax>
-              <div className="absolute -right-4 -bottom-6 hidden border border-gold-200 bg-cream-50 px-6 py-5 shadow-card sm:block">
+              <div className="absolute -right-4 -bottom-6 hidden rounded-card border border-gold-200 bg-cream-50 px-6 py-5 shadow-card sm:block">
                 <p className="font-display text-3xl leading-none font-semibold text-plum-900">{BADGE_STAT[0]}</p>
                 <p className="mt-1 text-[0.62rem] font-semibold tracking-[0.18em] text-ink-500 uppercase">
                   {BADGE_STAT[1]}
@@ -41,7 +47,6 @@ export default function HomePage() {
           <div>
             <SectionHeading
               align="left"
-              kicker="The Jolly's Experience"
               title={
                 <>
                   Elegant décor, live scoops,
@@ -65,7 +70,7 @@ export default function HomePage() {
             <Reveal delay={200}>
               <dl className="mt-9 grid grid-cols-3 gap-4">
                 {STATS.map(([n, l]) => (
-                  <div key={l} className="border border-gold-200/70 bg-cream-50 px-4 py-5 text-center">
+                  <div key={l} className="rounded-card border border-gold-200/70 bg-cream-50 px-4 py-5 text-center">
                     <dt className="sr-only">{l}</dt>
                     <dd className="font-display text-2xl font-semibold text-plum-900">{n}</dd>
                     <dd className="mt-1 text-[0.6rem] font-semibold tracking-[0.14em] text-ink-500 uppercase">{l}</dd>
@@ -94,8 +99,7 @@ export default function HomePage() {
         alt="Pastel scoops in ivory cups with gold spoons on marble"
       >
         <Reveal className="mx-auto max-w-3xl text-center">
-          <p className="kicker !text-gold-300">The Feel-Good Moment</p>
-          <p className="heading-display mt-6 !text-cream-100 text-3xl leading-snug sm:text-5xl">
+          <p className="heading-display !text-cream-100 text-3xl leading-snug sm:text-5xl">
             Every scoop is a small ceremony —
             <span className="italic text-gold-300"> styled, served and savoured.</span>
           </p>
@@ -116,34 +120,33 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -top-20 right-[-10rem] h-80 w-80 rounded-full bg-gold-200/30 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
-            kicker="Loved On Google"
             title={
               <>
-                Rated {GOOGLE_RATING.score} by the people
+                Rated {google.rating} by the people
                 <span className="italic text-gold-600"> we&apos;ve served</span>
               </>
             }
           />
           <Reveal delay={100} className="mt-10 flex justify-start">
-            <div className="flex items-center gap-5 border border-gold-200 bg-white px-8 py-5 shadow-card">
+            <div className="flex items-center gap-5 rounded-card border border-gold-200 bg-white px-8 py-5 shadow-card">
               <GoogleG className="h-8 w-8" />
               <div className="h-10 w-px bg-gold-200" />
               <div>
                 <div className="flex items-end gap-2">
                   <span className="font-display text-3xl leading-none font-semibold text-plum-900">
-                    {GOOGLE_RATING.score}
+                    {google.rating}
                   </span>
-                  <Stars className="mb-0.5 h-4 w-4" />
+                  <Stars n={Math.round(Number(google.rating))} className="mb-0.5 h-4 w-4" />
                 </div>
                 <p className="mt-1 text-[0.64rem] font-semibold tracking-[0.18em] text-ink-500 uppercase">
-                  {GOOGLE_RATING.count} Google reviews
+                  {reviewCountLabel(google)}
                 </p>
               </div>
             </div>
           </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {REVIEWS.slice(0, 3).map((r, i) => (
-              <ReviewCard key={r.name} review={r} index={i} />
+            {google.reviews.slice(0, 3).map((r, i) => (
+              <ReviewCard key={r.key} review={r} index={i} />
             ))}
           </div>
           <Reveal className="mt-14">
@@ -151,7 +154,7 @@ export default function HomePage() {
               href="/reviews"
               className="inline-flex items-center gap-3 rounded-btn border border-gold-400 px-10 py-4 text-[0.78rem] font-semibold tracking-[0.22em] text-plum-900 uppercase transition-all duration-300 hover:border-plum-900 hover:bg-plum-900 hover:text-cream-100"
             >
-              Read the Honest Reviews
+              Read all reviews
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
             </Link>
           </Reveal>
@@ -163,19 +166,18 @@ export default function HomePage() {
       <section className="bg-cream-200/60 py-24 sm:py-32">
         <div className="container-luxe">
           <SectionHeading
-            kicker="Our Carts"
             title={
               <>
                 Three colours,
                 <span className="italic text-gold-600"> one for your theme</span>
               </>
             }
-            copy="Cream for weddings and ballrooms, Bubblegum Blue for gardens and parties, Ferrari Red for galas and grand celebrations — or tell us your palette."
+            copy="Vanilla Cream for weddings and ballrooms, Bubblegum Blue for gardens and parties, Ferrari Red for galas and grand celebrations — or tell us your palette."
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {CARTS.map((c, i) => (
               <Reveal key={c.key} delay={i * 110}>
-                <figure className="group relative overflow-hidden shadow-card">
+                <figure className="group relative overflow-hidden rounded-card shadow-card">
                   <div className="relative aspect-[3/4] w-full overflow-hidden">
                     <Image
                       src={c.image}
@@ -200,7 +202,6 @@ export default function HomePage() {
       {/* Why an ice cream cart — three reasons */}
       <section className="container-luxe py-24 sm:py-32">
         <SectionHeading
-          kicker="Why It Works"
           title={
             <>
               Why an ice cream cart?
@@ -227,7 +228,6 @@ export default function HomePage() {
       {/* Flavours preview */}
       <section className="container-luxe py-24 sm:py-32">
         <SectionHeading
-          kicker="Our Flavours"
           title={
             <>
               Fresh, seasonal,
@@ -256,7 +256,6 @@ export default function HomePage() {
       <section className="bg-cream-200/60 py-24 sm:py-32">
         <div className="container-luxe">
           <SectionHeading
-            kicker="What We Do"
             title={
               <>
                 You host the event,
@@ -268,8 +267,8 @@ export default function HomePage() {
             {SERVICES.map((s, i) => (
               <Reveal key={s.slug} delay={i * 100}>
                 <Link
-                  href={`/services#${s.slug}`}
-                  className="group flex h-full flex-col overflow-hidden border border-gold-200/70 bg-cream-50 shadow-[0_10px_30px_-18px_rgba(50,0,75,0.18)] transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-card"
+                  href={serviceHref(s.slug)}
+                  className="group flex h-full flex-col overflow-hidden rounded-card border border-gold-200/70 bg-cream-50 shadow-[0_10px_30px_-18px_rgba(50,0,75,0.18)] transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-card"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
@@ -297,7 +296,6 @@ export default function HomePage() {
       {/* Follow the joy */}
       <section className="container-luxe pb-8">
         <SectionHeading
-          kicker="Instagram"
           title={
             <>
               Feel-good times
@@ -309,7 +307,7 @@ export default function HomePage() {
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
             { src: "/images/carts/cart-beach.jpeg", alt: "Bubblegum Blue cart on a beachfront deck" },
-            { src: "/images/social/ig-bride-cart.jpg", alt: "Bride at the Cream cart under pendant lights" },
+            { src: "/images/social/ig-bride-cart.jpg", alt: "Bride at the Vanilla Cream cart under pendant lights" },
             { src: "/images/social/ig-couple-bw.jpg", alt: "Couple laughing with ice cream cups at a wedding" },
             { src: "/images/carts/cart-lobby-crimson.jpeg", alt: "Ferrari Red cart in a hotel lobby" },
           ].map((t, i) => (
@@ -318,7 +316,7 @@ export default function HomePage() {
                 href="https://www.instagram.com/jollys_creamery/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative block aspect-square overflow-hidden"
+                className="group relative block aspect-square overflow-hidden rounded-card"
               >
                 <Image
                   src={t.src}

@@ -11,7 +11,7 @@ export const BOOKING_FIELDS = [
   { key: "venue", label: "Venue" },
   { key: "cart", label: "Cart colour" },
   { key: "flavours", label: "Flavours" },
-  { key: "custom_flavour", label: "Custom flavour" },
+  { key: "custom_flavour", label: "Custom flavours" },
   { key: "message", label: "Event details" },
 ] as const;
 

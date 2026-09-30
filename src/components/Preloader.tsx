@@ -76,9 +76,12 @@ export default function Preloader() {
         ))}
       </p>
 
-      <div className="mt-2 overflow-hidden px-[0.4em] pb-[0.2em] sm:mt-3">
+      {/* The mask for the slide-up. It carries the font size so its em
+          padding scales with the words — room for the italic overhang and
+          the tail of the "g", which would otherwise be clipped. */}
+      <div className="mt-2 overflow-hidden px-[0.4em] pb-[0.3em] font-display text-[16vw] sm:mt-3 sm:text-7xl md:text-8xl">
         <h1
-          className="font-display text-[16vw] leading-[1.05] font-medium text-plum-900 italic transition-all duration-[850ms] ease-[cubic-bezier(0.76,0,0.24,1)] sm:text-7xl md:text-8xl"
+          className="leading-[1.05] font-medium text-plum-900 italic transition-all duration-[850ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
           style={{
             transitionDelay: "620ms",
             opacity: playing ? 1 : 0,
@@ -98,7 +101,7 @@ export default function Preloader() {
       </div>
 
       <div
-        className="mt-8 h-px bg-gold-400 transition-all duration-[900ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
+        className="mt-1 h-px bg-gold-400 transition-all duration-[900ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
         style={{
           transitionDelay: "1050ms",
           width: playing ? "9rem" : "0rem",

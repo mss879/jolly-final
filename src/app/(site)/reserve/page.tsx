@@ -33,7 +33,7 @@ export default function ReservePage() {
       <section className="container-luxe pb-20">
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
           <Reveal>
-            <div className="border border-gold-200/70 bg-cream-50 p-7 shadow-card sm:p-9">
+            <div className="rounded-card border border-gold-200/70 bg-cream-50 p-7 shadow-card sm:p-9">
               <h2 className="font-display text-2xl font-semibold text-plum-900">Reserve your date</h2>
               <p className="mt-1.5 mb-7 text-[0.83rem] text-ink-500">
                 Pick a cart colour, tell us your flavours and how to reach you — we&apos;ll handle the rest.
@@ -44,7 +44,7 @@ export default function ReservePage() {
 
           <div className="flex flex-col gap-5">
             <Reveal delay={120}>
-              <div className="border border-gold-200/70 bg-cream-200/70 p-6">
+              <div className="rounded-card border border-gold-200/70 bg-cream-200/70 p-6">
                 <p className="kicker">Rather Talk?</p>
                 <a
                   href={CONTACT.phoneHref}
@@ -68,7 +68,7 @@ export default function ReservePage() {
             </Reveal>
 
             <Reveal delay={200}>
-              <div className="border border-gold-200/70 bg-cream-50 p-6">
+              <div className="rounded-card border border-gold-200/70 bg-cream-50 p-6">
                 <p className="kicker">What You Get</p>
                 <ul className="mt-4 flex flex-col gap-3.5">
                   {REASONS.map((r) => (

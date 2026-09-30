@@ -60,7 +60,7 @@ export default function ContactPage() {
                   href={c.href}
                   target={c.href.startsWith("http") ? "_blank" : undefined}
                   rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group block border border-gold-200/70 bg-cream-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card"
+                  className="group block rounded-card border border-gold-200/70 bg-cream-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card"
                 >
                   <p className="kicker">{c.label}</p>
                   <p className="mt-2 font-display text-xl font-semibold break-all text-plum-900">{c.value}</p>
@@ -70,7 +70,7 @@ export default function ContactPage() {
             ))}
 
             <Reveal delay={280}>
-              <div className="border border-gold-200/70 bg-cream-200/70 p-6">
+              <div className="rounded-card border border-gold-200/70 bg-cream-200/70 p-6">
                 <p className="kicker">Follow The Joy</p>
                 <div className="mt-3 flex flex-col gap-2 text-sm">
                   <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="text-ink-700 transition-colors hover:text-plum-900">
@@ -88,7 +88,7 @@ export default function ContactPage() {
           </div>
 
           <Reveal delay={120}>
-            <div className="border border-gold-200/70 bg-cream-50 p-7 shadow-card sm:p-9">
+            <div className="rounded-card border border-gold-200/70 bg-cream-50 p-7 shadow-card sm:p-9">
               <h2 className="font-display text-2xl font-semibold text-plum-900">Send a message</h2>
               <p className="mt-1.5 mb-7 text-[0.83rem] text-ink-500">
                 A few details and we&apos;ll come back to you.
@@ -102,7 +102,7 @@ export default function ContactPage() {
       {/* Event bookings belong on the reserve page */}
       <section className="container-luxe pb-20">
         <Reveal>
-          <div className="flex flex-col items-start justify-between gap-6 border border-gold-200/70 bg-cream-200/60 px-8 py-9 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-card border border-gold-200/70 bg-cream-200/60 px-8 py-9 sm:flex-row sm:items-center">
             <div>
               <p className="kicker">Booking an event?</p>
               <p className="mt-2 font-display text-xl text-plum-900 sm:text-2xl">

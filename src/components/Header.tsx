@@ -80,12 +80,15 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+      /* The bottom border is always there, transparent until scrolled. Added
+         only on scroll, it would fade in from the text colour — a black line
+         across the top of the page while the header turns sticky. */
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-500 ${
         open
-          ? "bg-cream-100"
+          ? "border-transparent bg-cream-100"
           : scrolled
-            ? "border-b border-gold-200/70 bg-cream-100/90 shadow-[0_10px_40px_-20px_rgba(50,0,75,0.25)] backdrop-blur-md"
-            : "bg-transparent"
+            ? "border-gold-200/70 bg-cream-100/90 shadow-[0_10px_40px_-20px_rgba(50,0,75,0.25)] backdrop-blur-md"
+            : "border-transparent bg-transparent"
       }`}
     >
       {/* Stays above the full-screen mobile menu, which lives inside the header */}
@@ -168,7 +171,7 @@ export default function Header() {
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
                     <ul
                       id={panelId}
-                      className={`w-60 rounded-btn border border-gold-200/80 bg-cream-50 p-1.5 shadow-card transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                      className={`w-60 rounded-card border border-gold-200/80 bg-cream-50 p-1.5 shadow-card transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                         isOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
                       }`}
                     >

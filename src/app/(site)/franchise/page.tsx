@@ -36,8 +36,8 @@ export default function FranchisePage() {
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <div className="relative">
-              <div className="absolute -top-4 -left-4 h-20 w-20 border border-gold-300" />
-              <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden shadow-soft">
+              <div className="absolute -top-4 -left-4 h-20 w-20 rounded-card border border-gold-300" />
+              <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden rounded-card shadow-soft">
                 <Image
                   src="/images/carts/cart-lobby-crimson.jpeg"
                   alt="Ferrari Red Jolly's cart placed in a hotel lobby"
@@ -77,7 +77,7 @@ export default function FranchisePage() {
             <Reveal delay={200}>
               <dl className="mt-9 grid grid-cols-3 gap-4">
                 {[BADGE_STAT, STATS[0], STATS[1]].map(([n, l]) => (
-                  <div key={l} className="border border-gold-200/70 bg-cream-50 px-4 py-5 text-center">
+                  <div key={l} className="rounded-card border border-gold-200/70 bg-cream-50 px-4 py-5 text-center">
                     <dt className="sr-only">{l}</dt>
                     <dd className="font-display text-2xl font-semibold text-plum-900">{n}</dd>
                     <dd className="mt-1 text-[0.6rem] font-semibold tracking-[0.14em] text-ink-500 uppercase">{l}</dd>
@@ -104,7 +104,7 @@ export default function FranchisePage() {
           <div className="mt-14 grid gap-6 md:grid-cols-2">
             {FRANCHISE.models.map((m, i) => (
               <Reveal key={m.t} delay={i * 110}>
-                <div className="h-full border border-gold-200/70 bg-cream-50 p-8">
+                <div className="h-full rounded-card border border-gold-200/70 bg-cream-50 p-8">
                   <span className="font-display text-2xl font-semibold text-gold-500">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="mt-3 font-display text-xl font-semibold text-plum-900">{m.t}</h3>
                   <p className="mt-3 text-[0.88rem] leading-relaxed text-ink-500">{m.c}</p>

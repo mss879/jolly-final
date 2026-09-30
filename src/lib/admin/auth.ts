@@ -31,7 +31,8 @@ const getSession = cache(async (): Promise<Session | null> => {
 
   const verdict = (async (): Promise<Verdict> => {
     try {
-      const { data: isAdmin, error } = await supabase.rpc("is_admin");
+      // GET, so a dropped connection is retried rather than read as "not an admin".
+      const { data: isAdmin, error } = await supabase.rpc("is_admin", {}, { get: true });
       if (isMissingSchema(error)) return "needs-migration";
       return error || !isAdmin ? "not-admin" : "admin";
     } catch {

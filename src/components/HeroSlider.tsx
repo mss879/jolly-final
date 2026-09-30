@@ -83,11 +83,7 @@ export default function HeroSlider() {
                       {s.badge}
                     </span>
                   )}
-                  <p className="kicker flex items-center gap-4">
-                    <span className="h-px w-10 bg-gold-500" />
-                    {s.kicker}
-                  </p>
-                  <h1 className="heading-display mt-6 text-[2.15rem] leading-[1.06] text-balance sm:text-[3.25rem] lg:text-6xl xl:text-[3.85rem]">
+                  <h1 className="heading-display text-[2.15rem] leading-[1.06] text-balance sm:text-[3.25rem] lg:text-6xl xl:text-[3.85rem]">
                     <span className="block">{s.line1}</span>
                     <span className="mt-2 block italic text-gold-600">{s.line2}</span>
                   </h1>
@@ -131,7 +127,7 @@ export default function HeroSlider() {
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === active}
                 onClick={() => go(i)}
-                className="group relative h-[3px] w-14 overflow-hidden bg-gold-200"
+                className="group relative h-[3px] w-14 overflow-hidden rounded-full bg-gold-200"
               >
                 {i === active && (
                   <span

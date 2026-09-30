@@ -101,7 +101,7 @@ export default function BookingDetailView({ detail }: { detail: BookingDetail })
                       ))}
                       {b.custom_flavour && (
                         <span className="rounded-btn border border-plum-200 bg-plum-100 px-2 py-0.5 text-[0.75rem] text-plum-900">
-                          Custom: {b.custom_flavour}
+                          Custom flavours: {b.custom_flavour}
                         </span>
                       )}
                     </span>

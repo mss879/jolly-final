@@ -1,6 +1,6 @@
 import "server-only";
 import type { PostgrestError } from "@supabase/supabase-js";
-import type { BookingRow, InquiryRow, LeadRow } from "@/lib/supabase/database.types";
+import type { BookingRow, InquiryRow, LeadRow, RecentEventRow } from "@/lib/supabase/database.types";
 import { requireAdmin } from "./auth";
 import { addDays, colomboDay, startOfColomboDay, weekdayIndex } from "./format";
 import type {
@@ -17,6 +17,11 @@ import type {
 
 const DAY_MS = 86_400_000;
 export const PAGE_SIZE = 25;
+
+/* Read-only functions go out as GET. supabase-js retries a GET by itself when
+   the connection drops or Supabase answers 503/520, but never a POST — and a
+   single failed call is enough to take a whole page down. */
+const READ = { get: true } as const;
 
 function must<T>(result: { data: T; error: PostgrestError | null }) {
   if (result.error) throw new Error(`${result.error.code}: ${result.error.message}`);
@@ -316,7 +321,7 @@ export async function getFormAnalytics(days: AnalyticsRange) {
   const { from, to } = rangeBounds(days);
   const [, result] = await Promise.all([
     verify(),
-    supabase.rpc("booking_form_analytics", { p_from: from.toISOString(), p_to: to.toISOString() }),
+    supabase.rpc("booking_form_analytics", { p_from: from.toISOString(), p_to: to.toISOString() }, READ),
   ]);
   return must(result) as unknown as FormAnalytics;
 }
@@ -347,6 +352,55 @@ export async function getCalendarMonth(month: string) {
   ]);
 
   return { gridStart, gridEnd, events: must(events).map(toBooking), pending: count(pending) };
+}
+
+/* ─── Recent events (Reviews page) ─── */
+
+export type AdminEvent = {
+  id: string;
+  title: string;
+  eventType: string | null;
+  eventDate: string | null;
+  location: string | null;
+  summary: string | null;
+  photos: string[]; // storage paths; the first is the cover
+  published: boolean;
+  updatedAt: string;
+};
+
+function toEvent(row: RecentEventRow): AdminEvent {
+  return {
+    id: row.id,
+    title: row.title,
+    eventType: row.event_type,
+    eventDate: row.event_date,
+    location: row.location,
+    summary: row.summary,
+    photos: row.photos,
+    published: row.published,
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function getEvents() {
+  const { supabase, verify } = await requireAdmin();
+  const [, result] = await Promise.all([
+    verify(),
+    supabase
+      .from("recent_events")
+      .select("*")
+      .order("event_date", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .limit(500),
+  ]);
+  return must(result).map(toEvent);
+}
+
+export async function getEvent(id: string) {
+  const { supabase, verify } = await requireAdmin();
+  const [, result] = await Promise.all([verify(), supabase.from("recent_events").select("*").eq("id", id).maybeSingle()]);
+  const row = maybe(result);
+  return row ? toEvent(row) : null;
 }
 
 /* ─── Dashboard ─── */
@@ -416,16 +470,18 @@ export async function getDashboard() {
       .order("submitted_at", { ascending: false, nullsFirst: false })
       .limit(5),
     supabase.from("crm_stages").select("id, name, is_system").order("is_system", { ascending: false }).order("position"),
-    supabase.rpc("crm_pipeline_summary"),
-    supabase.rpc("admin_daily_activity", { p_from: activityFrom, p_days: 30 }),
-    supabase.rpc("booking_form_analytics", {
-      p_from: analyticsRange.from.toISOString(),
-      p_to: analyticsRange.to.toISOString(),
-    }),
-    supabase.rpc("booking_form_analytics", {
-      p_from: previousRange.from.toISOString(),
-      p_to: previousRange.to.toISOString(),
-    }),
+    supabase.rpc("crm_pipeline_summary", {}, READ),
+    supabase.rpc("admin_daily_activity", { p_from: activityFrom, p_days: 30 }, READ),
+    supabase.rpc(
+      "booking_form_analytics",
+      { p_from: analyticsRange.from.toISOString(), p_to: analyticsRange.to.toISOString() },
+      READ,
+    ),
+    supabase.rpc(
+      "booking_form_analytics",
+      { p_from: previousRange.from.toISOString(), p_to: previousRange.to.toISOString() },
+      READ,
+    ),
   ]);
 
   const summary = new Map(must(pipelineRows).map((r) => [r.stage_id, r]));

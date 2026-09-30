@@ -33,7 +33,7 @@ export default function FlavorsPage() {
 
       <section className="container-luxe pb-4">
         <Reveal>
-          <div className="border border-gold-200/70 bg-cream-200/60 px-8 py-10 text-center">
+          <div className="rounded-card border border-gold-200/70 bg-cream-200/60 px-8 py-10 text-center">
             <p className="font-display text-xl text-plum-900 italic sm:text-2xl">
               Building your event menu?
             </p>

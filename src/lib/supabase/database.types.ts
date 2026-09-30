@@ -1,4 +1,4 @@
-/* Types for the schema in supabase/migrations/20260917120000_admin_backend.sql.
+/* Types for the schema in supabase/migrations (admin backend + recent events).
    Written by hand in the shape `supabase gen types typescript` produces —
    regenerate with the CLI once the project is linked, and keep the
    exported aliases at the bottom. */
@@ -289,6 +289,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      recent_events: {
+        Row: {
+          id: string;
+          title: string;
+          event_type: string | null;
+          event_date: string | null;
+          location: string | null;
+          summary: string | null;
+          photos: string[];
+          published: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          event_type?: string | null;
+          event_date?: string | null;
+          location?: string | null;
+          summary?: string | null;
+          photos?: string[];
+          published?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          event_type?: string | null;
+          event_date?: string | null;
+          location?: string | null;
+          summary?: string | null;
+          photos?: string[];
+          published?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -358,6 +397,18 @@ export type Database = {
         Args: { p_from: string; p_days: number };
         Returns: { day: string; inquiries: number; requests: number }[];
       };
+      published_events: {
+        Args: { p_limit?: number };
+        Returns: {
+          id: string;
+          title: string;
+          event_type: string | null;
+          event_date: string | null;
+          location: string | null;
+          summary: string | null;
+          photos: string[];
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -374,3 +425,4 @@ export type InquiryRow = PublicTables["inquiries"]["Row"];
 export type BookingRow = PublicTables["bookings"]["Row"];
 export type StageRow = PublicTables["crm_stages"]["Row"];
 export type LeadRow = PublicTables["crm_leads"]["Row"];
+export type RecentEventRow = PublicTables["recent_events"]["Row"];

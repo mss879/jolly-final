@@ -43,7 +43,7 @@ export default function FlavorCard({
         alt={`${flavor.name} scoop`}
         fill
         sizes="200px"
-        className="object-contain drop-shadow-[0_26px_26px_rgba(50,0,75,0.22)]"
+        className="object-contain"
       />
     </div>
   );
@@ -90,17 +90,12 @@ export default function FlavorCard({
     );
   }
 
-  // "float" — the default: no box, the scoop floats on the cream with a soft shadow beneath
+  // "float" — the default: no box and no glow, just the scoop on the cream
+  // (the client asked for the purple glow behind the scoops to go)
   return (
     <Reveal delay={(index % 3) * 90}>
       <article className="group relative flex h-full flex-col items-center px-4 pt-4 text-center">
-        <div className="relative">
-          {scoop("h-40 w-40 sm:h-44 sm:w-44", "group-hover:-translate-y-2 group-hover:-rotate-3")}
-          <span
-            aria-hidden
-            className={`absolute inset-x-10 -bottom-1 h-5 rounded-[100%] bg-plum-900/15 blur-md transition-all duration-700 ${EASE} group-hover:inset-x-12 group-hover:bg-plum-900/10`}
-          />
-        </div>
+        {scoop("h-40 w-40 sm:h-44 sm:w-44", "group-hover:-translate-y-2 group-hover:-rotate-3")}
         <span className="mt-6 text-[0.6rem] font-semibold tracking-[0.22em] text-gold-600 uppercase">
           {flavor.category}
         </span>

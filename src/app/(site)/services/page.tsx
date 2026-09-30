@@ -4,20 +4,13 @@ import Link from "next/link";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import Parallax from "@/components/Parallax";
-import { SERVICES } from "@/lib/data";
+import { HOW_IT_WORKS, SERVICES, serviceHref } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
     "You host the event, we bring the mood — ice cream carts with a live host for weddings, corporate events, private parties and brand collaborations.",
 };
-
-const STEPS = [
-  ["Tell us about your event", "Date, venue, guest count and the feeling you want to create."],
-  ["We style your cart", "Cart colour and flavour menu chosen with you, to match your palette."],
-  ["We arrive and set the scene", "Fully chilled, fully staffed — before your first guest walks in."],
-  ["Guests feel good", "Live scoops, a smiling host, and the room finds its mood."],
-];
 
 export default function ServicesPage() {
   return (
@@ -47,8 +40,8 @@ export default function ServicesPage() {
           >
             <Reveal>
               <div className="relative">
-                <div className={`absolute -top-4 h-20 w-20  border border-gold-300 ${i % 2 ? "-right-4" : "-left-4"}`} />
-                <Parallax speed={0.07} className={`relative overflow-hidden shadow-soft ${s.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
+                <div className={`absolute -top-4 h-20 w-20 rounded-card border border-gold-300 ${i % 2 ? "-right-4" : "-left-4"}`} />
+                <Parallax speed={0.07} className={`relative overflow-hidden rounded-card shadow-soft ${s.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
                   <Image
                     src={s.image}
                     alt={s.title}
@@ -65,7 +58,11 @@ export default function ServicesPage() {
                   <span className="h-px w-8 bg-gold-500" />
                   {String(i + 1).padStart(2, "0")}
                 </p>
-                <h2 className="heading-display mt-4 text-3xl sm:text-4xl">{s.title}</h2>
+                <h2 className="heading-display mt-4 text-3xl sm:text-4xl">
+                  <Link href={serviceHref(s.slug)} className="transition-colors hover:text-gold-600">
+                    {s.title}
+                  </Link>
+                </h2>
                 <p className="mt-3 font-display text-lg text-gold-600 italic">{s.blurb}</p>
                 <p className="mt-5 text-[0.93rem] leading-relaxed text-ink-700">{s.description}</p>
               </Reveal>
@@ -82,12 +79,21 @@ export default function ServicesPage() {
                 </ul>
               </Reveal>
               <Reveal delay={220}>
-                <Link
-                  href={`/reserve?type=${s.slug}`}
-                  className="mt-8 inline-flex rounded-btn bg-plum-900 px-8 py-3.5 text-[0.75rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold"
-                >
-                  Enquire about {s.title}
-                </Link>
+                <div className="mt-8 flex flex-wrap items-center gap-4">
+                  <Link
+                    href={serviceHref(s.slug)}
+                    className="inline-flex rounded-btn bg-plum-900 px-8 py-3.5 text-[0.75rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold"
+                  >
+                    Discover {s.title}
+                  </Link>
+                  <Link
+                    href={`/reserve?type=${s.slug}`}
+                    className="group inline-flex items-center gap-2 text-[0.75rem] font-semibold tracking-[0.18em] text-plum-900 uppercase"
+                  >
+                    Enquire
+                    <span className="inline-block h-px w-6 bg-gold-500 transition-all duration-300 group-hover:w-10" />
+                  </Link>
+                </div>
               </Reveal>
             </div>
           </div>
@@ -107,10 +113,10 @@ export default function ServicesPage() {
             }
           />
           <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map(([t, c], i) => (
+            {HOW_IT_WORKS.map(([t, c], i) => (
               <Reveal key={t} delay={i * 100} as="li">
-                <div className="relative h-full border border-gold-200/70 bg-cream-50 p-7 pt-9">
-                  <span className="absolute -top-5 left-7 flex h-10 w-10 items-center justify-center bg-plum-900 font-display text-sm font-semibold text-cream-100 shadow-soft">
+                <div className="relative h-full rounded-card border border-gold-200/70 bg-cream-50 p-7 pt-9">
+                  <span className="absolute -top-5 left-7 flex h-10 w-10 items-center justify-center rounded-btn bg-plum-900 font-display text-sm font-semibold text-cream-100 shadow-soft">
                     {i + 1}
                   </span>
                   <h3 className="font-display text-lg leading-snug font-semibold text-plum-900">{t}</h3>
@@ -125,7 +131,7 @@ export default function ServicesPage() {
       {/* Franchise path — left the nav, still reachable from Services */}
       <section className="container-luxe py-20">
         <Reveal>
-          <div className="flex flex-col items-start justify-between gap-6 border border-gold-200/70 bg-cream-50 px-8 py-9 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-card border border-gold-200/70 bg-cream-50 px-8 py-9 sm:flex-row sm:items-center">
             <div>
               <p className="kicker">Own a venue?</p>
               <p className="mt-2 font-display text-xl text-plum-900 sm:text-2xl">

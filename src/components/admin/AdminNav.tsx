@@ -15,6 +15,7 @@ const LINKS: { href: string; label: string; icon: IconName; count?: keyof Counts
   { href: "/admin/crm", label: "CRM", icon: "board" },
   { href: "/admin/bookings", label: "Bookings", icon: "bookings", count: "pendingBookings", hint: "awaiting confirmation" },
   { href: "/admin/calendar", label: "Calendar", icon: "calendar" },
+  { href: "/admin/events", label: "Events", icon: "photo" },
 ];
 
 function Brand() {

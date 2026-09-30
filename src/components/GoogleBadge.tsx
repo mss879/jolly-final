@@ -41,11 +41,11 @@ export default function GoogleBadge() {
   return (
     <Link
       href="/reviews"
-      className="group block border border-gold-200/80 bg-cream-50/90 p-5 shadow-card backdrop-blur-sm transition-all duration-300 hover:border-gold-300 hover:shadow-gold sm:p-6"
+      className="group block rounded-card border border-gold-200/80 bg-cream-50/90 p-5 shadow-card backdrop-blur-sm transition-all duration-300 hover:border-gold-300 hover:shadow-gold sm:p-6"
     >
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center bg-white shadow-[0_4px_14px_-4px_rgba(50,0,75,0.25)]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-btn bg-white shadow-[0_4px_14px_-4px_rgba(50,0,75,0.25)]">
             <GoogleG />
           </span>
           <div>

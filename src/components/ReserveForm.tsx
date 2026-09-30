@@ -21,7 +21,8 @@ import {
 } from "@/lib/booking-tracker";
 
 /* Reserve-your-event form — the long, interactive one (/reserve).
-   Cart colour swaps a live preview and flavour chips are optional.
+   Cart colour swaps a live preview; the flavour cards (scoop, name, a line
+   about it) are optional.
    Every field is saved as the visitor goes (src/lib/booking-tracker.ts), so a
    half-finished form still reaches /admin/bookings as an incomplete booking,
    and the focus/blur timings feed the booking-form analytics.
@@ -35,8 +36,23 @@ const labelCls = "mb-1.5 block text-[0.7rem] font-semibold tracking-[0.16em] tex
 const inputCls =
   "w-full rounded-btn border border-gold-200 bg-cream-50 px-4 py-3 text-sm text-ink-900 placeholder:text-ink-500/60 outline-none transition-all focus:border-gold-400 focus:ring-2 focus:ring-gold-300/40";
 
-const chipCls =
-  "cursor-pointer rounded-btn border border-gold-300 bg-cream-50 px-3 py-1.5 text-[0.66rem] font-semibold tracking-[0.12em] text-ink-700 uppercase transition-colors hover:border-gold-500 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-900 has-checked:text-cream-100";
+/* A flavour you can tick: scoop, name and a line about it. The checkbox
+   itself is visually hidden; the card shows its state. */
+const flavourCardCls =
+  "group relative flex cursor-pointer items-center gap-3 rounded-card border border-gold-200 bg-cream-50 p-2.5 pr-9 transition-colors hover:border-gold-400 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-100/50";
+
+function Tick() {
+  return (
+    <span
+      aria-hidden
+      className="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full border border-gold-300 bg-cream-50 text-transparent transition-colors group-has-checked:border-plum-900 group-has-checked:bg-plum-900 group-has-checked:text-cream-100"
+    >
+      <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="m2.5 6.2 2.3 2.3 4.7-5" />
+      </svg>
+    </span>
+  );
+}
 
 // Picked rather than typed: saved on change, not on blur.
 const CHOICE_FIELDS = new Set<BookingFieldKey>(["event_type", "cart", "flavours"]);
@@ -99,7 +115,7 @@ function buildEnquiry(f: FormData) {
     `Estimated guests: ${v.guests || "-"}`,
     `Cart colour: ${v.cart || "-"}`,
     `Flavour preferences: ${v.flavours.length ? v.flavours.join(", ") : "-"}`,
-    `Custom flavour: ${v.custom_flavour || "-"}`,
+    `Custom flavours: ${v.custom_flavour || "-"}`,
     "",
     v.message,
   ].join("\n");
@@ -275,7 +291,7 @@ export default function ReserveForm() {
         ref={thanksRef}
         tabIndex={-1}
         role="status"
-        className="border border-gold-200 bg-cream-100 px-6 py-8 text-center outline-none sm:px-10"
+        className="rounded-card border border-gold-200 bg-cream-100 px-6 py-8 text-center outline-none sm:px-10"
       >
         <p className="kicker">Request received</p>
         <h3 className="mt-3 font-display text-2xl font-semibold text-plum-900 sm:text-3xl">
@@ -399,12 +415,12 @@ export default function ReserveForm() {
               );
             })}
           </div>
-          <div className="relative aspect-[3/4] overflow-hidden rounded-btn border border-gold-200 bg-cream-200/60">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-card border border-gold-200 bg-cream-200/60">
             {CARTS.map((c) => (
               <Image
                 key={c.key}
-                src={c.image}
-                alt={c.key === cart ? c.alt : ""}
+                src={c.formImage}
+                alt={c.key === cart ? `${c.name} Jolly's cart with a bicycle in a marble hotel lobby` : ""}
                 fill
                 sizes="(min-width: 640px) 176px, 112px"
                 className={`object-cover transition-opacity duration-500 ${c.key === cart ? "opacity-100" : "opacity-0"}`}
@@ -425,34 +441,58 @@ export default function ReserveForm() {
             (optional — pick any, or add your own)
           </span>
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           {FLAVORS.map((f) => (
-            <label key={f.slug} className={chipCls}>
+            <label key={f.slug} className={flavourCardCls}>
               <input type="checkbox" name="flavours" value={f.name} className="sr-only" />
-              {f.name}
+              <span className="relative h-14 w-14 shrink-0">
+                <Image src={f.image} alt="" fill sizes="56px" className="object-contain" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[0.84rem] leading-tight font-semibold text-plum-900">{f.name}</span>
+                <span className="mt-1 block text-[0.72rem] leading-snug text-ink-500">{f.description}</span>
+                {f.dairyFree && (
+                  <span className="mt-1.5 inline-block rounded-btn bg-plum-100 px-2 py-0.5 text-[0.54rem] font-bold tracking-[0.14em] text-plum-900 uppercase">
+                    Dairy Free
+                  </span>
+                )}
+              </span>
+              <Tick />
             </label>
           ))}
-          <label className={chipCls}>
+          <label className={flavourCardCls}>
             <input
               type="checkbox"
               className="sr-only"
               checked={customFlavour}
               onChange={(e) => toggleCustomFlavour(e.target.checked)}
             />
-            + Custom
+            <span
+              aria-hidden
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-dashed border-gold-400 font-display text-2xl text-gold-600"
+            >
+              +
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[0.84rem] leading-tight font-semibold text-plum-900">Custom Flavours</span>
+              <span className="mt-1 block text-[0.72rem] leading-snug text-ink-500">
+                Something special in mind? Tell us and we&apos;ll create it.
+              </span>
+            </span>
+            <Tick />
           </label>
         </div>
         {customFlavour && (
           <div className="mt-3">
             <label htmlFor="custom_flavour" className="sr-only">
-              Your custom flavour
+              Your custom flavours
             </label>
             <input
               ref={customFlavourRef}
               id="custom_flavour"
               name="custom_flavour"
               maxLength={200}
-              placeholder="Tell us the flavour you have in mind"
+              placeholder="Tell us the flavours you have in mind"
               className={inputCls}
             />
           </div>
@@ -496,7 +536,7 @@ export default function ReserveForm() {
           </p>
         )}
         {outcome.status === "failed" && (
-          <div role="alert" className="mt-5 border border-gold-300 bg-cream-100 p-5">
+          <div role="alert" className="mt-5 rounded-card border border-gold-300 bg-cream-100 p-5">
             <p className="text-sm text-ink-900">
               We couldn&apos;t send that just now. Your details are still here — send them another way and
               we&apos;ll reply within one working day.
