@@ -18,15 +18,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.jollyscreamery.com"),
   title: {
-    default: "Jolly's Creamery — Ice Cream Carts for Weddings & Events in Sri Lanka",
+    default: "Jolly's Creamery · Ice Cream Carts for Weddings & Events in Sri Lanka",
     template: "%s · Jolly's Creamery",
   },
   description:
     "Luxury ice cream carts with a live host for weddings, corporate events and parties across Sri Lanka. Found at Shangri-La and Hilton Colombo. You're about to feel good.",
   openGraph: {
-    title: "Jolly's Creamery — You're about to feel good",
+    title: "Jolly's Creamery · You're about to feel good",
     description:
-      "Elegant décor, live scoops, joyful memories — ice cream carts for weddings, corporate events and private parties across Sri Lanka.",
+      "Elegant décor, live scoops, joyful memories. Ice cream carts for weddings, corporate events and private parties across Sri Lanka.",
     type: "website",
     images: ["/images/carts/cart-lobby-cream.jpeg"],
   },

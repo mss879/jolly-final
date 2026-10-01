@@ -19,7 +19,7 @@ type Outcome =
   | { status: "failed"; email: string; whatsapp: string };
 
 function composeMessage(f: FormData) {
-  const subject = `Website enquiry — ${f.get("name")}`;
+  const subject = `Website enquiry: ${f.get("name")}`;
   const body = [
     `Name: ${f.get("name")}`,
     `Email: ${f.get("email")}`,
@@ -123,7 +123,7 @@ export default function ContactForm() {
           {outcome.status === "sending" ? "Sending…" : "Send Message"}
         </button>
         <p className="mt-4 text-sm text-ink-700" aria-live="polite">
-          {outcome.status === "sent" && "Thank you — your message is with us. We'll be in touch."}
+          {outcome.status === "sent" && "Thank you. Your message is with us, and we'll be in touch."}
           {outcome.status === "invalid" && `${outcome.message}.`}
           {outcome.status === "failed" && (
             <>

@@ -3,21 +3,16 @@ import Link from "next/link";
 import SectionHeading from "@/components/SectionHeading";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
+import SocialLinks from "@/components/SocialLinks";
 import { CONTACT, CTA, FIND_US } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Talk to Jolly's Creamery — call +94 707 222 511, message us on WhatsApp, or send a note. Booking an event? Reserve your date in a minute.",
+    "Talk to Jolly's Creamery: call +94 707 222 511, message us on WhatsApp, or send a note. Booking an event? Reserve your date in a minute.",
 };
 
 const CHANNELS = [
-  {
-    label: "Call us",
-    value: CONTACT.phone,
-    href: CONTACT.phoneHref,
-    note: "Mon–Sun · 9am–9pm",
-  },
   {
     label: "WhatsApp",
     value: CONTACT.phone,
@@ -46,7 +41,7 @@ export default function ContactPage() {
                 <span className="italic text-gold-600"> we&apos;ll reply</span>
               </>
             }
-            copy="Questions, partnerships or a quick hello — reach us however suits you."
+            copy="Questions, partnerships or a quick hello. Reach us however suits you."
           />
         </div>
       </section>
@@ -54,8 +49,23 @@ export default function ContactPage() {
       <section className="container-luxe pb-16">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
           <div className="flex flex-col gap-5">
+            <Reveal>
+              <div className="rounded-card border border-gold-200/70 bg-cream-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card">
+                <p className="kicker">Call us</p>
+                <div className="mt-2 flex flex-col items-start gap-1">
+                  <a href={CONTACT.phoneHref} className="font-display text-xl font-semibold text-plum-900 transition-colors hover:text-gold-600">
+                    {CONTACT.phone}
+                  </a>
+                  <a href={CONTACT.phone2Href} className="font-display text-xl font-semibold text-plum-900 transition-colors hover:text-gold-600">
+                    {CONTACT.phone2}
+                  </a>
+                </div>
+                <p className="mt-1 text-[0.78rem] text-ink-500">Mon–Sun · 9am–9pm</p>
+              </div>
+            </Reveal>
+
             {CHANNELS.map((c, i) => (
-              <Reveal key={c.label} delay={i * 90}>
+              <Reveal key={c.label} delay={(i + 1) * 90}>
                 <a
                   href={c.href}
                   target={c.href.startsWith("http") ? "_blank" : undefined}
@@ -72,14 +82,7 @@ export default function ContactPage() {
             <Reveal delay={280}>
               <div className="rounded-card border border-gold-200/70 bg-cream-200/70 p-6">
                 <p className="kicker">Follow The Joy</p>
-                <div className="mt-3 flex flex-col gap-2 text-sm">
-                  <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="text-ink-700 transition-colors hover:text-plum-900">
-                    Instagram — @jollys_creamery
-                  </a>
-                  <a href={CONTACT.facebook} target="_blank" rel="noopener noreferrer" className="text-ink-700 transition-colors hover:text-plum-900">
-                    Facebook — Jolly&apos;s Creamery
-                  </a>
-                </div>
+                <SocialLinks tone="light" whatsapp={false} className="mt-4" />
                 <p className="mt-4 border-t border-gold-200 pt-4 text-[0.78rem] leading-relaxed text-ink-500">
                   {FIND_US.line}
                 </p>

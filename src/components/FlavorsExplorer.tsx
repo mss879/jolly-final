@@ -46,7 +46,7 @@ export default function FlavorsExplorer({ variant = DEFAULT_FLAVOR_VARIANT }: { 
         ))}
       </div>
       <p className="mt-8 text-[0.72rem] tracking-[0.18em] text-ink-500 uppercase">
-        Seasonal menu — flavours change with what&apos;s fresh
+        Seasonal menu: flavours change with what&apos;s fresh
       </p>
     </section>
   );

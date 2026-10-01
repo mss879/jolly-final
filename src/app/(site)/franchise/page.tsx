@@ -10,7 +10,7 @@ import { BADGE_STAT, CONTACT, FRANCHISE, STATS } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Franchise & Venue Partnerships",
   description:
-    "Host a permanently placed, fully serviced Jolly's ice cream cart at your hotel, café or attraction — revenue-share and rental models across Sri Lanka.",
+    "Host a permanently placed, fully serviced Jolly's ice cream cart at your hotel, café or attraction. Revenue-share and rental models across Sri Lanka.",
 };
 
 export default function FranchisePage() {
@@ -59,7 +59,7 @@ export default function FranchisePage() {
               </h2>
               <p className="mt-5 text-[0.93rem] leading-relaxed text-ink-700">
                 We handle the cart, the stock, the host and the upkeep. You offer
-                your guests a live ice cream moment — and a dessert line that earns.
+                your guests a live ice cream moment, and a dessert line that earns.
               </p>
             </Reveal>
             <Reveal delay={140}>
@@ -124,7 +124,7 @@ export default function FranchisePage() {
             <span className="italic text-gold-600"> your venue?</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[0.93rem] leading-relaxed text-ink-700">
-            Tell us about your property and your footfall — we&apos;ll come back with
+            Tell us about your property and your footfall. We&apos;ll come back with
             the model that fits.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-5">

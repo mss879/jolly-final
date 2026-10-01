@@ -7,7 +7,7 @@ import Reveal from "@/components/Reveal";
 export const metadata: Metadata = {
   title: "Our Flavours",
   description:
-    "Fresh, seasonal flavours — island fruits, silky classics, rich chocolates and dairy-free creamy sorbets from Jolly's Creamery, with a texture somewhere between gelato and ice cream.",
+    "Fresh, seasonal flavours: island fruits, silky classics, rich chocolates and dairy-free creamy sorbets from Jolly's Creamery, with a texture somewhere between gelato and ice cream.",
 };
 
 export default function FlavorsPage() {
@@ -24,7 +24,7 @@ export default function FlavorsPage() {
                 <span className="italic text-gold-600"> made to feel good</span>
               </>
             }
-            copy="Real fruit, fresh cream and a texture somewhere between gelato and ice cream — plus dairy-free creamy sorbets, so every guest gets a scoop."
+            copy="Real fruit, fresh cream and a texture somewhere between gelato and ice cream, plus dairy-free creamy sorbets, so every guest gets a scoop."
           />
         </div>
       </section>
@@ -39,7 +39,7 @@ export default function FlavorsPage() {
             </p>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-700">
               Most events carry a handful of flavours. We&apos;ll help you balance
-              island fruit, chocolate and classics — with dairy-free sorbets so
+              island fruit, chocolate and classics, with dairy-free sorbets so
               every guest gets a scoop.
             </p>
             <Link

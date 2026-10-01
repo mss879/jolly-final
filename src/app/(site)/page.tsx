@@ -11,6 +11,12 @@ import { GoogleG, Stars } from "@/components/GoogleBadge";
 import { BADGE_STAT, CARTS, FIND_US, FLAVORS, REASONS, SERVICES, STATS, serviceHref } from "@/lib/data";
 import { getGoogleReviews, reviewCountLabel } from "@/lib/google-reviews";
 
+/* Home shows the carts blue → cream → red (client, Oct 2026); CARTS itself
+   keeps the booking form's order. */
+const HOME_CARTS = (["bubblegum-blue", "cream", "ferrari-red"] as const).flatMap(
+  (key) => CARTS.find((c) => c.key === key) ?? [],
+);
+
 /* The reviews come live from Google (cached six hours). */
 export const revalidate = 21600;
 
@@ -29,8 +35,8 @@ export default async function HomePage() {
               <div className="absolute -top-5 -left-5 h-24 w-24 rounded-card border border-gold-300" />
               <Parallax speed={0.08} className="relative overflow-hidden rounded-card shadow-soft">
                 <Image
-                  src="/images/scenes/scene-wedding.jpg"
-                  alt="Jolly's Vanilla Cream cart at a candlelit garden wedding"
+                  src="/images/scenes/scene-wedding-sunset.webp"
+                  alt="Jolly's Vanilla Cream cart dressed with orchids at a candlelit garden wedding at sunset"
                   width={900}
                   height={600}
                   className="h-full w-full scale-110 object-cover"
@@ -95,19 +101,19 @@ export default async function HomePage() {
           CLIENT: when the background clip arrives, add
           video={{ webm: "/video/why-cart.webm", mp4: "/video/why-cart.mp4" }} */}
       <ParallaxBanner
-        image="/images/scenes/scene-party.jpg"
-        alt="Pastel scoops in ivory cups with gold spoons on marble"
+        image="/images/scenes/scene-six-scoops.webp"
+        alt="Six scoops in ivory cups with gold spoons on a marble table, beside cream balloons and gold ribbon"
+        overlay="bg-plum-950/65"
       >
         <Reveal className="mx-auto max-w-3xl text-center">
           <p className="heading-display !text-cream-100 text-3xl leading-snug sm:text-5xl">
-            Every scoop is a small ceremony —
-            <span className="italic text-gold-300"> styled, served and savoured.</span>
+            Guests visit the coffee bar and the cake table.
+            <span className="italic text-gold-300"> They queue for this one.</span>
           </p>
-          <p className="mx-auto mt-7 max-w-2xl font-display text-lg leading-snug text-cream-100 sm:text-xl">
-            Guests visit the coffee bar and the cake table. They queue for this
-            one.
+          <p className="heading-display mx-auto mt-7 max-w-2xl text-lg !leading-snug !text-cream-100 sm:text-xl">
+            Every scoop is a small ceremony: styled, served and savoured.
           </p>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-cream-100/80">
+          <p className="heading-display mx-auto mt-28 text-base !leading-snug !text-cream-100 sm:mt-40 sm:text-lg">
             A cart and a host turn the last hour of your event into the part
             everyone remembers.
           </p>
@@ -149,6 +155,13 @@ export default async function HomePage() {
               <ReviewCard key={r.key} review={r} index={i} />
             ))}
           </div>
+          {google.credit && (
+            <p className="mt-5 text-[0.68rem] text-ink-500">
+              <a href={google.credit.href} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-plum-900">
+                {google.credit.label}
+              </a>
+            </p>
+          )}
           <Reveal className="mt-14">
             <Link
               href="/reviews"
@@ -172,25 +185,27 @@ export default async function HomePage() {
                 <span className="italic text-gold-600"> one for your theme</span>
               </>
             }
-            copy="Vanilla Cream for weddings and ballrooms, Bubblegum Blue for gardens and parties, Ferrari Red for galas and grand celebrations — or tell us your palette."
+            copy="Bubblegum Blue for gardens and parties, Vanilla Cream for weddings and ballrooms, Ferrari Red for galas and grand celebrations. Or tell us your palette."
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {CARTS.map((c, i) => (
+            {HOME_CARTS.map((c, i) => (
               <Reveal key={c.key} delay={i * 110}>
                 <figure className="group relative overflow-hidden rounded-card shadow-card">
-                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                  {/* 4:5 shows the photos edge to edge — the bicycle and the menu easel stay in frame */}
+                  <div className="relative aspect-[4/5] w-full overflow-hidden">
                     <Image
                       src={c.image}
                       alt={c.alt}
                       fill
                       sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
+                      className="object-cover object-bottom transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-plum-950/70 via-plum-950/10 to-transparent" />
                   </div>
                   <figcaption className="absolute inset-x-0 bottom-0 p-6">
                     <p className="font-display text-xl font-semibold text-cream-100">{c.name}</p>
-                    <p className="mt-1.5 text-[0.8rem] leading-relaxed text-cream-100/85">{c.copy}</p>
+                    {/* room for three lines, so names and copy line up across the cards */}
+                    <p className="mt-1.5 min-h-[3lh] text-[0.8rem] leading-relaxed text-cream-100/85">{c.copy}</p>
                   </figcaption>
                 </figure>
               </Reveal>

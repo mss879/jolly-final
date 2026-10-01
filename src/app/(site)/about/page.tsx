@@ -9,13 +9,13 @@ import { FIND_US, IG_QUOTE } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Our Story",
   description:
-    "How Jolly's began — from a shipping container on Marine Drive to permanent carts at Shangri-La Colombo and Hilton Colombo, and 500+ events across Sri Lanka.",
+    "How Jolly's began: from a shipping container on Marine Drive to permanent carts at Shangri-La Colombo and Hilton Colombo, and 500+ events across Sri Lanka.",
 };
 
 const VALUES = [
   {
     t: "Fresh and seasonal",
-    c: "Real fruit, fresh cream and a texture somewhere between gelato and ice cream — made for the season, not the shelf.",
+    c: "Real fruit, fresh cream and a texture somewhere between gelato and ice cream, made for the season, not the shelf.",
   },
   {
     t: "Styled end to end",
@@ -23,7 +23,7 @@ const VALUES = [
   },
   {
     t: "Proudly Sri Lankan",
-    c: "Jaffna Karutha Columban mango, island strawberries, traditional milk toffee — our island inspires our menu.",
+    c: "Jaffna Karutha Columban mango, island strawberries, traditional milk toffee. Our island inspires our menu.",
   },
   {
     t: "Joy is the standard",
@@ -42,15 +42,15 @@ const STORY: { heading: string; paragraphs: string[] }[] = [
     heading: "Where it began",
     paragraphs: [
       "Before the carts there was a kitchen after work. Our founder had come home after more than ten years abroad with an idea that would not leave him alone. Ice cream that made people feel good, not just taste good.",
-      "For a year and a half the neighbours were the tasting panel. The flavours were Sri Lankan from the start — cinnamon, cardamom, coconut, Karutha Columban mango, milk toffee. The early tagline was simple: we serve happiness.",
+      "For a year and a half the neighbours were the tasting panel. The flavours were Sri Lankan from the start: cinnamon, cardamom, coconut, Karutha Columban mango, milk toffee. The early tagline was simple: we serve happiness.",
     ],
   },
   {
     // CLIENT STORY: chapter 2 — what makes the ice cream different
     heading: "What we make",
     paragraphs: [
-      "Our ice cream sits somewhere between gelato and ice cream — smooth, full and fresh, made with real fruit and fresh cream. The flavours follow the season rather than a fixed list.",
-      "Alongside it, dairy-free creamy sorbets — so every guest gets a scoop of the same moment.",
+      "Our ice cream sits somewhere between gelato and ice cream: smooth, full and fresh, made with real fruit and fresh cream. The flavours follow the season rather than a fixed list.",
+      "Alongside it, dairy-free creamy sorbets, so every guest gets a scoop of the same moment.",
     ],
   },
   {
@@ -133,7 +133,7 @@ export default function AboutPage() {
                 </p>
                 <p>
                   In 2017 Jolly&apos;s opened from a shipping container on Marine
-                  Drive. The cart came later — built to roll into a ballroom or
+                  Drive. The cart came later, built to roll into a ballroom or
                   onto a beach deck and scoop in front of your guests.
                 </p>
                 <p>

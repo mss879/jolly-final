@@ -15,7 +15,7 @@ const OPTIONS: { v: FlavorCardVariant; label: string; name: string; why: string;
     v: "float",
     label: "Option A",
     name: "Floating scoop",
-    why: "No box at all — the scoop floats on the cream with a soft shadow beneath it. Closest to the round, floating look of the previous site.",
+    why: "No box at all: the scoop floats on the cream with a soft shadow beneath it. Closest to the round, floating look of the previous site.",
     recommended: true,
   },
   {
@@ -28,7 +28,7 @@ const OPTIONS: { v: FlavorCardVariant; label: string; name: string; why: string;
     v: "editorial",
     label: "Option C",
     name: "Editorial menu row",
-    why: "A menu-style row — scoop on the left, name and notes on the right, gold hairlines between. Reads like a tasting menu.",
+    why: "A menu-style row: scoop on the left, name and notes on the right, gold hairlines between. Reads like a tasting menu.",
   },
 ];
 
@@ -38,7 +38,7 @@ export default function FlavourCardPreview() {
   return (
     <>
       <section className="container-luxe pt-44 pb-10 sm:pt-52">
-        <p className="kicker">Internal preview — not linked from the site</p>
+        <p className="kicker">Internal preview, not linked from the site</p>
         <h1 className="heading-display mt-5 text-4xl sm:text-5xl">Flavour card options</h1>
         <p className="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-ink-700">
           Three non-box treatments for the flavour cards, shown with the same three flavours.

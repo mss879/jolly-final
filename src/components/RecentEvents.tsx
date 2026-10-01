@@ -53,7 +53,7 @@ function Viewer({ event, onClose }: { event: PublicEvent; onClose: () => void })
             <Image
               key={event.photos[i]}
               src={event.photos[i]}
-              alt={`${event.title} — photo ${i + 1} of ${n}`}
+              alt={`${event.title}, photo ${i + 1} of ${n}`}
               fill
               sizes="(min-width: 1024px) 38rem, 100vw"
               className="object-contain"

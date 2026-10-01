@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, type FocusEvent, type FormEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type FocusEvent, type FormEvent, type ReactNode } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
@@ -21,8 +21,11 @@ import {
 } from "@/lib/booking-tracker";
 
 /* Reserve-your-event form — the long, interactive one (/reserve).
-   Cart colour swaps a live preview; the flavour cards (scoop, name, a line
-   about it) are optional.
+   Four numbered steps. On a desktop the details and the cart sit side by side
+   and the flavours run four across, so the form fills the page width; on a
+   phone everything stacks into one column with two flavours to a row.
+   Cart colour swaps a live preview; the flavour cards (scoop and name) are
+   optional.
    Every field is saved as the visitor goes (src/lib/booking-tracker.ts), so a
    half-finished form still reaches /admin/bookings as an incomplete booking,
    and the focus/blur timings feed the booking-form analytics.
@@ -33,19 +36,38 @@ import {
    once received — keep src/lib/booking-fields.ts and the migration in step. */
 
 const labelCls = "mb-1.5 block text-[0.7rem] font-semibold tracking-[0.16em] text-ink-700 uppercase";
+/* 16px text on phones: anything smaller makes iOS zoom the page on focus. */
 const inputCls =
-  "w-full rounded-btn border border-gold-200 bg-cream-50 px-4 py-3 text-sm text-ink-900 placeholder:text-ink-500/60 outline-none transition-all focus:border-gold-400 focus:ring-2 focus:ring-gold-300/40";
+  "w-full min-w-0 rounded-btn border border-gold-200 bg-cream-50 px-4 py-3 text-base text-ink-900 placeholder:text-ink-500/60 outline-none transition-all focus:border-gold-400 focus:ring-2 focus:ring-gold-300/40 sm:text-sm";
 
-/* A flavour you can tick: scoop, name and a line about it. The checkbox
-   itself is visually hidden; the card shows its state. */
+/* iOS draws an empty date field shorter than the rest and lets it overflow
+   its column; a set height and no native chrome keep it in line. */
+const dateCls = "block h-[3.125rem] appearance-none sm:h-[2.875rem]";
+
+/* The numbered heading of each step. */
+function Step({ n, children }: { n: string; children: ReactNode }) {
+  return (
+    <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+      <span className="font-display text-[0.8rem] font-semibold tracking-[0.08em] text-gold-500">{n}</span>
+      {children}
+    </span>
+  );
+}
+const stepTitleCls = "font-display text-lg font-semibold text-plum-900";
+const stepCls = "mb-4 block w-full";
+
+/* A flavour you can tick. On a phone the scoop sits above its name, two to a
+   row; from tablet up it sits beside the name. The checkbox itself is visually
+   hidden; the card shows its state. */
 const flavourCardCls =
-  "group relative flex cursor-pointer items-center gap-3 rounded-card border border-gold-200 bg-cream-50 p-2.5 pr-9 transition-colors hover:border-gold-400 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-100/50";
+  "group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-card border border-gold-200 bg-cream-50 px-3 pt-5 pb-4 text-center transition-colors hover:border-gold-400 focus-within:ring-2 focus-within:ring-gold-300/60 has-checked:border-plum-900 has-checked:bg-plum-100/50 sm:flex-row sm:gap-3.5 sm:p-3 sm:pr-11 sm:text-left";
+const flavourNameCls = "block text-[0.84rem] leading-snug font-semibold text-balance text-plum-900";
 
 function Tick() {
   return (
     <span
       aria-hidden
-      className="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full border border-gold-300 bg-cream-50 text-transparent transition-colors group-has-checked:border-plum-900 group-has-checked:bg-plum-900 group-has-checked:text-cream-100"
+      className="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full border border-gold-300 bg-cream-50 text-transparent transition-colors group-has-checked:border-plum-900 group-has-checked:bg-plum-900 group-has-checked:text-cream-100 sm:top-1/2 sm:right-3.5 sm:-translate-y-1/2"
     >
       <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="m2.5 6.2 2.3 2.3 4.7-5" />
@@ -104,7 +126,7 @@ function readFields(f: FormData) {
 
 function buildEnquiry(f: FormData) {
   const v = readFields(f);
-  const subject = `Event enquiry — ${v.event_type} · ${v.event_date || "date TBC"}`;
+  const subject = `Event enquiry: ${v.event_type} · ${v.event_date || "date TBC"}`;
   const body = [
     `Name: ${v.name}`,
     `Phone: ${v.phone}`,
@@ -319,81 +341,115 @@ export default function ReserveForm() {
       onBlur={onBlur}
       onChange={onChange}
       onInvalidCapture={onInvalid}
-      className="grid gap-4 sm:grid-cols-2"
+      className="grid gap-x-12 gap-y-9 lg:grid-cols-[0.95fr_1.05fr] lg:gap-y-11"
     >
-      <div>
-        <label htmlFor="name" className={labelCls}>
-          Full name *
-        </label>
-        <input id="name" name="name" required autoComplete="name" placeholder="Your name" className={inputCls} />
-      </div>
-      <div>
-        <label htmlFor="phone" className={labelCls}>
-          Phone / WhatsApp *
-        </label>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          required
-          autoComplete="tel"
-          placeholder="+94 ..."
-          className={inputCls}
-        />
-      </div>
-      <div>
-        <label htmlFor="email" className={labelCls}>
-          Email *
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder="you@example.com"
-          className={inputCls}
-        />
-      </div>
-      <div>
-        <label htmlFor="event_type" className={labelCls}>
-          Event type *
-        </label>
-        <Suspense fallback={<EventTypeSelect />}>
-          <EventTypeFromUrl />
-        </Suspense>
-      </div>
-      <div>
-        <label htmlFor="event_date" className={labelCls}>
-          Event date
-        </label>
-        <input id="event_date" name="event_date" type="date" className={inputCls} />
-      </div>
-      <div>
-        <label htmlFor="guests" className={labelCls}>
-          Estimated guests
-        </label>
-        <input id="guests" name="guests" type="number" min={1} placeholder="150" className={inputCls} />
-      </div>
-      <div className="sm:col-span-2">
-        <label htmlFor="venue" className={labelCls}>
-          Venue / location
-        </label>
-        <input id="venue" name="venue" placeholder="e.g. Colombo 07, or the venue name" className={inputCls} />
-      </div>
+      {/* 01 — who and when */}
+      <fieldset className="min-w-0">
+        <legend className={stepCls}>
+          <Step n="01">
+            <span className={stepTitleCls}>Your details</span>
+          </Step>
+        </legend>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="name" className={labelCls}>
+              Full name *
+            </label>
+            <input
+              id="name"
+              name="name"
+              required
+              autoComplete="name"
+              autoCapitalize="words"
+              placeholder="Your name"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label htmlFor="phone" className={labelCls}>
+              Phone / WhatsApp *
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              required
+              autoComplete="tel"
+              placeholder="+94 ..."
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className={labelCls}>
+              Email *
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
+              required
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              placeholder="you@example.com"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label htmlFor="event_type" className={labelCls}>
+              Event type *
+            </label>
+            <Suspense fallback={<EventTypeSelect />}>
+              <EventTypeFromUrl />
+            </Suspense>
+          </div>
+          <div>
+            <label htmlFor="event_date" className={labelCls}>
+              Event date
+            </label>
+            <input id="event_date" name="event_date" type="date" className={`${inputCls} ${dateCls}`} />
+          </div>
+          <div>
+            <label htmlFor="guests" className={labelCls}>
+              Estimated guests
+            </label>
+            <input
+              id="guests"
+              name="guests"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              placeholder="150"
+              className={inputCls}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="venue" className={labelCls}>
+              Venue / location
+            </label>
+            <input id="venue" name="venue" placeholder="Venue name or area" className={inputCls} />
+          </div>
+        </div>
+      </fieldset>
 
-      {/* Cart colour — the preview image follows the selection */}
-      <fieldset className="sm:col-span-2">
-        <legend className={labelCls}>Cart colour</legend>
-        <div className="grid grid-cols-[1fr_7rem] gap-4 sm:grid-cols-[1fr_11rem] sm:gap-5">
-          <div className="flex flex-col gap-2.5">
+      {/* 02 — cart colour; the preview follows the selection */}
+      <fieldset className="min-w-0">
+        <legend className={stepCls}>
+          <Step n="02">
+            <span className={stepTitleCls}>Cart colour</span>
+          </Step>
+        </legend>
+        <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] gap-2.5 min-[380px]:grid-cols-[minmax(0,1fr)_7.5rem] min-[380px]:gap-3 sm:grid-cols-[minmax(0,1fr)_12rem] sm:gap-4 xl:grid-cols-[minmax(0,1fr)_15.25rem]">
+          <div className="grid min-w-0 grid-rows-3 gap-2.5">
             {CARTS.map((c) => {
               const on = c.key === cart;
               return (
                 <label
                   key={c.key}
-                  className={`flex cursor-pointer items-center gap-3 rounded-btn border bg-cream-50 px-3.5 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-gold-300/60 ${
-                    on ? "border-plum-900" : "border-gold-200 hover:border-gold-400"
+                  className={`flex min-w-0 cursor-pointer items-center gap-2.5 rounded-card border px-2.5 py-2 transition-colors focus-within:ring-2 focus-within:ring-gold-300/60 min-[380px]:gap-3 min-[380px]:px-3 sm:gap-4 sm:px-4 ${
+                    on ? "border-plum-900 bg-plum-100/50" : "border-gold-200 bg-cream-50 hover:border-gold-400"
                   }`}
                 >
                   <input
@@ -406,11 +462,15 @@ export default function ReserveForm() {
                   />
                   <span
                     aria-hidden
-                    className="h-6 w-6 shrink-0 rounded-full ring-1 ring-gold-400/80 ring-offset-2 ring-offset-cream-50"
+                    className="h-5 w-5 shrink-0 rounded-full ring-1 ring-gold-400/80 ring-offset-2 ring-offset-cream-50 min-[380px]:h-6 min-[380px]:w-6 sm:h-7 sm:w-7"
                     style={{ backgroundColor: c.swatch }}
                   />
-                  <span className="flex-1 text-sm leading-tight font-semibold text-plum-900">{c.name}</span>
-                  <span className={`h-2 w-2 shrink-0 rounded-full transition-colors ${on ? "bg-plum-900" : "bg-gold-200"}`} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[0.84rem] leading-tight font-semibold text-plum-900 sm:text-sm">
+                      {c.name}
+                    </span>
+                    <span className="mt-1 hidden text-[0.75rem] leading-snug text-ink-500 sm:block">{c.occasion}</span>
+                  </span>
                 </label>
               );
             })}
@@ -422,7 +482,7 @@ export default function ReserveForm() {
                 src={c.formImage}
                 alt={c.key === cart ? `${c.name} Jolly's cart with a bicycle in a marble hotel lobby` : ""}
                 fill
-                sizes="(min-width: 640px) 176px, 112px"
+                sizes="(min-width: 1280px) 244px, (min-width: 640px) 192px, 120px"
                 className={`object-cover transition-opacity duration-500 ${c.key === cart ? "opacity-100" : "opacity-0"}`}
               />
             ))}
@@ -433,24 +493,23 @@ export default function ReserveForm() {
         </div>
       </fieldset>
 
-      {/* Flavour preferences — optional chips */}
-      <div className="sm:col-span-2">
-        <p className={labelCls}>
-          Flavour preferences{" "}
-          <span className="font-normal tracking-normal text-ink-500 normal-case">
-            (optional — pick any, or add your own)
-          </span>
-        </p>
-        <div className="grid gap-2.5 sm:grid-cols-2">
+      {/* 03 — flavour preferences, optional */}
+      <fieldset className="min-w-0 lg:col-span-2">
+        <legend className={stepCls}>
+          <Step n="03">
+            <span className={stepTitleCls}>Flavour preferences</span>
+            <span className="text-[0.78rem] text-ink-500">Optional. Pick any, or add your own.</span>
+          </Step>
+        </legend>
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
           {FLAVORS.map((f) => (
             <label key={f.slug} className={flavourCardCls}>
               <input type="checkbox" name="flavours" value={f.name} className="sr-only" />
-              <span className="relative h-14 w-14 shrink-0">
-                <Image src={f.image} alt="" fill sizes="56px" className="object-contain" />
+              <span className="relative h-16 w-16 shrink-0 sm:h-14 sm:w-14">
+                <Image src={f.image} alt="" fill sizes="64px" className="object-contain" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[0.84rem] leading-tight font-semibold text-plum-900">{f.name}</span>
-                <span className="mt-1 block text-[0.72rem] leading-snug text-ink-500">{f.description}</span>
+                <span className={flavourNameCls}>{f.name}</span>
                 {f.dairyFree && (
                   <span className="mt-1.5 inline-block rounded-btn bg-plum-100 px-2 py-0.5 text-[0.54rem] font-bold tracking-[0.14em] text-plum-900 uppercase">
                     Dairy Free
@@ -460,7 +519,8 @@ export default function ReserveForm() {
               <Tick />
             </label>
           ))}
-          <label className={flavourCardCls}>
+          {/* Sixteenth card: its own row where the grid is three across */}
+          <label className={`${flavourCardCls} lg:col-span-full lg:justify-center lg:pl-11 xl:col-span-1 xl:justify-start xl:pl-3`}>
             <input
               type="checkbox"
               className="sr-only"
@@ -469,16 +529,11 @@ export default function ReserveForm() {
             />
             <span
               aria-hidden
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-dashed border-gold-400 font-display text-2xl text-gold-600"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-dashed border-gold-400 font-display text-2xl text-gold-600 sm:h-14 sm:w-14"
             >
               +
             </span>
-            <span className="min-w-0">
-              <span className="block text-[0.84rem] leading-tight font-semibold text-plum-900">Custom Flavours</span>
-              <span className="mt-1 block text-[0.72rem] leading-snug text-ink-500">
-                Something special in mind? Tell us and we&apos;ll create it.
-              </span>
-            </span>
+            <span className={flavourNameCls}>Custom Flavours</span>
             <Tick />
           </label>
         </div>
@@ -497,16 +552,19 @@ export default function ReserveForm() {
             />
           </div>
         )}
-      </div>
+      </fieldset>
 
-      <div className="sm:col-span-2">
-        <label htmlFor="message" className={labelCls}>
-          Tell us about your event
+      {/* 04 — anything else, and send */}
+      <div className="min-w-0 lg:col-span-2">
+        <label htmlFor="message" className={stepCls}>
+          <Step n="04">
+            <span className={stepTitleCls}>Tell us about your event</span>
+          </Step>
         </label>
         <textarea
           id="message"
           name="message"
-          rows={5}
+          rows={4}
           placeholder="Theme, colours, the feeling you want to create"
           className={inputCls}
         />
@@ -520,15 +578,19 @@ export default function ReserveForm() {
         </label>
       </div>
 
-      <div className="sm:col-span-2">
-        <button
-          type="submit"
-          disabled={outcome.status === "sending"}
-          className="inline-flex items-center gap-2.5 rounded-btn bg-plum-900 px-8 py-4 text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold disabled:cursor-wait disabled:opacity-70"
-        >
-          {outcome.status === "sending" ? "Sending…" : "Request Your Date"}
-        </button>
-        <p className="mt-3 text-[0.75rem] text-ink-500">We save your details as you type, so nothing is lost.</p>
+      <div className="min-w-0 lg:col-span-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <button
+            type="submit"
+            disabled={outcome.status === "sending"}
+            className="inline-flex w-full items-center justify-center gap-2.5 rounded-btn bg-plum-900 px-10 py-4 text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase shadow-soft transition-all duration-300 hover:bg-plum-800 hover:shadow-gold disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+          >
+            {outcome.status === "sending" ? "Sending…" : "Request Your Date"}
+          </button>
+          <p className="text-center text-[0.75rem] leading-relaxed text-ink-500 sm:text-left">
+            We save your details as you type, so nothing is lost.
+          </p>
+        </div>
 
         {outcome.status === "invalid" && (
           <p role="alert" className="mt-4 text-sm font-medium text-plum-900">
@@ -538,7 +600,7 @@ export default function ReserveForm() {
         {outcome.status === "failed" && (
           <div role="alert" className="mt-5 rounded-card border border-gold-300 bg-cream-100 p-5">
             <p className="text-sm text-ink-900">
-              We couldn&apos;t send that just now. Your details are still here — send them another way and
+              We couldn&apos;t send that just now. Your details are still here. Send them another way and
               we&apos;ll reply within one working day.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">

@@ -7,11 +7,15 @@
 export const CONTACT = {
   phone: "+94 707 222 511",
   phoneHref: "tel:+94707222511",
+  phone2: "+94 705 336 452",
+  phone2Href: "tel:+94705336452",
   whatsappHref: "https://wa.me/94707222511",
   email: "key.account@creamndairy.com",
   emailHref: "mailto:key.account@creamndairy.com",
   facebook: "https://www.facebook.com/Jollyscreamery",
   instagram: "https://www.instagram.com/jollys_creamery/",
+  tiktok: "https://www.tiktok.com/@jollyscreamery",
+  linkedin: "https://www.linkedin.com/company/jollyscreamery/",
   tagline: "You're about to feel good",
 };
 
@@ -31,7 +35,7 @@ export const FLAVORS: Flavor[] = [
     // Client: "Passion Fruit" without "Creamy"
     slug: "passion-fruit-sorbet",
     name: "Passion Fruit Sorbet",
-    description: "Sharp, fragrant passion fruit, dairy-free and refreshing — the first to go in the heat.",
+    description: "Sharp, fragrant passion fruit, dairy-free and refreshing. The first to go in the heat.",
     image: "/images/flavors/passion-fruit-sorbet.png",
     category: "Sorbet",
     dairyFree: true,
@@ -39,7 +43,7 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "wild-naarang-sorbet",
     name: "Wild Naarang Sorbet",
-    description: "Wild naarang, bright and citrusy — a burst of island orange in every spoonful.",
+    description: "Wild naarang, bright and citrusy. A burst of island orange in every spoonful.",
     image: "/images/flavors/wild-naarang-sorbet.png",
     category: "Sorbet",
     dairyFree: true,
@@ -47,7 +51,7 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "jaffna-mango",
     name: "Jaffna Mango",
-    description: "Jaffna's Karutha Colomban mango — floral, tart and sweet. The island in a scoop.",
+    description: "Jaffna's Karutha Columban mango: floral, tart and sweet. The island in a scoop.",
     image: "/images/flavors/jaffna-mango.png",
     category: "Fruity",
   },
@@ -61,14 +65,14 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "blueberry",
     name: "Blueberry",
-    description: "Blueberries, tart and creamy — made when the fruit is in season.",
+    description: "Blueberries, tart and creamy, made when the fruit is in season.",
     image: "/images/flavors/blueberry.png",
     category: "Fruity",
   },
   {
     slug: "bubblegum",
     name: "Bubblegum",
-    description: "Blue, sweet and nostalgic — the flavour that makes grown-ups feel seven again.",
+    description: "Blue, sweet and nostalgic. The flavour that makes grown-ups feel seven again.",
     image: "/images/flavors/bubblegum.png",
     category: "Classic",
   },
@@ -82,21 +86,21 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "french-vanilla",
     name: "French Vanilla",
-    description: "Floral vanilla and crème anglaise — extra creamy, yet light.",
+    description: "Floral vanilla and crème anglaise. Extra creamy, yet light.",
     image: "/images/flavors/french-vanilla.png",
     category: "Classic",
   },
   {
     slug: "cookies-and-cream",
     name: "Cookies & Cream",
-    description: "Silky vanilla with crunchy cookie pieces — indulgence in every bite.",
+    description: "Silky vanilla with crunchy cookie pieces. Indulgence in every bite.",
     image: "/images/flavors/cookies-and-cream.png",
     category: "Classic",
   },
   {
     slug: "salted-caramel-peanuts",
     name: "Salted Caramel & Peanuts",
-    description: "Burnt-sugar caramel, roasted peanuts and a hint of salt — the grown-ups' favourite.",
+    description: "Burnt-sugar caramel, roasted peanuts and a hint of salt. The grown-ups' favourite.",
     image: "/images/flavors/salted-caramel-peanuts.png",
     category: "Classic",
   },
@@ -110,14 +114,14 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "amber-coffee-caramel",
     name: "Amber Coffee & Caramel",
-    description: "Aromatic amber coffee and rich caramel — delicate, yet creamy.",
+    description: "Aromatic amber coffee and rich caramel. Delicate, yet creamy.",
     image: "/images/flavors/amber-coffee-caramel.png",
     category: "Classic",
   },
   {
     slug: "double-chocolate",
     name: "Double Chocolate",
-    description: "Deep cocoa, twice over — rich, smooth and unhurried.",
+    description: "Deep cocoa, twice over. Rich, smooth and unhurried.",
     image: "/images/flavors/double-chocolate.png",
     category: "Chocolate",
   },
@@ -132,7 +136,7 @@ export const FLAVORS: Flavor[] = [
     slug: "flavour-of-the-month",
     name: "Flavour of the Month",
     description:
-      "A playful twist on rare, unexpected ingredients — a one-of-a-kind scoop that changes every month.",
+      "A playful twist on rare, unexpected ingredients. A one-of-a-kind scoop that changes every month.",
     image: "/images/flavors/flavour-of-the-month.png",
     category: "Seasonal",
   },
@@ -220,7 +224,7 @@ export const REVIEWS: Review[] = [
     event: "Private Party · Colombo 07",
     rating: 5,
     timeAgo: "1 month ago",
-    text: "Every detail considered — the flavours, the cart, the host. The salted caramel and peanuts went first.",
+    text: "Every detail considered: the flavours, the cart, the host. The salted caramel and peanuts went first.",
     accent: "#7A5C2E",
   },
   {
@@ -238,7 +242,7 @@ export const REVIEWS: Review[] = [
     event: "Beach Wedding · South Coast",
     rating: 5,
     timeAgo: "5 months ago",
-    text: "They set up on the sand at golden hour. Passion fruit sorbet with that view — our guests called it the highlight.",
+    text: "They set up on the sand at golden hour. Passion fruit sorbet with that view. Our guests called it the highlight.",
     accent: "#A0552E",
   },
   {
@@ -252,9 +256,11 @@ export const REVIEWS: Review[] = [
   },
 ];
 
+/* The listing's own figures (4.5 from 149 reviews, 1 Oct 2026) — shown in the
+   headline stats and wherever Google's live answer is not available. */
 export const GOOGLE_RATING = {
-  score: "4.9",
-  count: "120+",
+  score: "4.5",
+  count: "140+",
 };
 
 export type Service = {
@@ -273,7 +279,7 @@ export const SERVICES: Service[] = [
     title: "Weddings",
     blurb: "The moment guests talk about on the way home.",
     description:
-      "Your cart arrives styled to your palette — Vanilla Cream, Bubblegum Blue or Ferrari Red — and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
+      "Your cart arrives styled to your palette, in Vanilla Cream, Bubblegum Blue or Ferrari Red, and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
     // Real photo from the client's Instagram (16 Jun 2026) — see public/images/social/CREDITS.md
     image: "/images/social/ig-bride-cart.jpg",
     imagePortrait: true,
@@ -287,7 +293,7 @@ export const SERVICES: Service[] = [
   {
     slug: "corporate",
     title: "Corporate Events",
-    blurb: "Launches, galas and conferences — a reason to gather between the speeches.",
+    blurb: "Launches, galas and conferences. A reason to gather between the speeches.",
     description:
       "Between the speeches and the networking, the cart is where people end up. We serve at scale without queues, and every scoop still comes with a word from our host.",
     // CLIENT PHOTO: swap for the blue cart + staff-uniform photo when received
@@ -302,9 +308,9 @@ export const SERVICES: Service[] = [
   {
     slug: "private-parties",
     title: "Private Parties",
-    blurb: "Birthdays, anniversaries and garden parties — the corner everyone drifts to.",
+    blurb: "Birthdays, anniversaries and garden parties. The corner everyone drifts to.",
     description:
-      "The cart arrives styled, chilled and ready, and becomes the centre of the party. Bubblegum for the children, salted caramel for the grown-ups, dairy-free sorbets for everyone — and it usually runs out before the cake.",
+      "The cart arrives styled, chilled and ready, and becomes the centre of the party. Bubblegum for the children, salted caramel for the grown-ups, dairy-free sorbets for everyone, and it usually runs out before the cake.",
     image: "/images/scenes/scene-party.jpg",
     points: [
       "Flexible packages for 30–300 guests", // CLIENT: confirm guest range
@@ -318,7 +324,7 @@ export const SERVICES: Service[] = [
     title: "Brand Collaborations",
     blurb: "Your brand on the cart, your flavour in the scoop.",
     description:
-      "Put your brand on the most photographed corner of the room. We co-brand the cart and can develop a signature or limited-edition flavour. Launches, pop-ups and partner activations — content-ready from the first scoop.",
+      "Put your brand on the most photographed corner of the room. We co-brand the cart and can develop a signature or limited-edition flavour. Launches, pop-ups and partner activations, content-ready from the first scoop.",
     // CLIENT PHOTO: replace with the G2 brand-collaboration photo when received
     image: "/images/scenes/hero-scoops.jpg",
     points: [
@@ -337,7 +343,7 @@ export const serviceHref = (slug: string) => `/services/${slug}`;
 export const HOW_IT_WORKS = [
   ["Tell us about your event", "Date, venue, guest count and the feeling you want to create."],
   ["We style your cart", "Cart colour and flavour menu chosen with you, to match your palette."],
-  ["We arrive and set the scene", "Fully chilled, fully staffed — before your first guest walks in."],
+  ["We arrive and set the scene", "Fully chilled, fully staffed, before your first guest walks in."],
   ["Guests feel good", "Live scoops, a smiling host, and the room finds its mood."],
 ] as const;
 
@@ -355,7 +361,7 @@ export const CTA = { label: "Reserve Your Event", href: "/reserve" } as const;
    removed at the client's request, Sept 2026.) */
 export const FIND_US = {
   anchors: ["Shangri-La Colombo", "Hilton Colombo"],
-  line: "Find us at Shangri-La Colombo and Hilton Colombo — and at 30+ locations from Colombo down south.",
+  line: "Find us at Shangri-La Colombo and Hilton Colombo, and at 30+ locations from Colombo down south.",
 } as const;
 
 /* Headline stats — no flavour counts (client: "a very basic way of promoting"). */
@@ -371,7 +377,7 @@ export const BADGE_STAT = ["500+", "Events served"] as const;
 
 /* Footer brand line. */
 export const BRAND_BLURB =
-  "Styled ice cream carts with a live host — feel-good moments at weddings, corporate events and private parties across Sri Lanka.";
+  "Styled ice cream carts with a live host. Feel-good moments at weddings, corporate events and private parties across Sri Lanka.";
 
 /* The client's own words, from their 16 June 2026 Instagram post — used as
    the About-page pull-quote. */
@@ -390,7 +396,8 @@ export type Cart = {
   image: string;
   alt: string;
   copy: string;
-  formImage: string; // the reserve form's preview — same lobby for all three, so only the colour changes
+  occasion: string; // where it suits best, shown beside the colour in the reserve form
+  formImage: string; // the reserve form's preview, each cart in a marble hotel lobby
 };
 
 /* Names and photos from the client's brochure. Order = order on the site and
@@ -404,8 +411,10 @@ export const CARTS: Cart[] = [
     swatch: "#F1E6C4",
     image: "/images/carts/cart-cream.jpg",
     alt: "Vanilla Cream Jolly's cart with a vintage bicycle, parasol and glowing lights in an evening garden",
-    copy: "Vanilla cream and gold under glowing lights — at home in wedding halls, gardens and five-star lobbies.",
-    formImage: "/vanilla%20cream.png",
+    copy: "Vanilla cream and gold under glowing lights, at home in wedding halls, gardens and five-star lobbies.",
+    occasion: "Weddings and ballrooms",
+    // Lobby photo supplied by the client, 1 Oct 2026
+    formImage: "/images/carts/form-vanilla-cream.webp",
   },
   {
     key: "bubblegum-blue",
@@ -413,16 +422,19 @@ export const CARTS: Cart[] = [
     swatch: "#5CB8C9",
     image: "/images/carts/cart-bubblegum-blue.jpg",
     alt: "Bubblegum Blue Jolly's cart with its host under string lights on a terrace",
-    copy: "A playful blue with a vintage bicycle — made for garden parties, terraces and relaxed celebrations.",
+    copy: "A playful blue with a vintage bicycle, made for garden parties, terraces and relaxed celebrations.",
+    occasion: "Gardens and parties",
     formImage: "/blue-cart.png",
   },
   {
     key: "ferrari-red",
     name: "Ferrari Red",
     swatch: "#C0141F",
-    image: "/images/carts/cart-ferrari-red.jpg",
-    alt: "Ferrari Red Jolly's cart with a red bicycle on a garden lawn",
+    // Photo supplied by the client, 1 Oct 2026
+    image: "/images/carts/cart-ferrari-red-ballroom.webp",
+    alt: "Ferrari Red Jolly's cart with a red bicycle and flower basket in a curtained hotel ballroom",
     copy: "A bold statement piece for galas, festive seasons and grand celebrations.",
+    occasion: "Galas and grand celebrations",
     formImage: "/red-cart.png",
   },
 ];
@@ -451,19 +463,21 @@ export const HERO_SLIDES: HeroSlide[] = [
     //   "Creating feel-good moments / at every event" · "Your event is about to / feel good" · "The moment / everyone remembers"
     line1: "The happiest corner",
     line2: "of your event",
-    copy: "One styled cart, one host, live scoops — and your wedding, corporate event or party ends on its happiest note.",
+    copy: "One styled cart, one host, live scoops, and your wedding, corporate event or party ends on its happiest note.",
     cta: CTA,
     cta2: { href: "/services", label: "Explore Services" },
-    // Wedding hero supplied 30 Sept 2026 (public/jollys-wedding-hero.png)
-    image: "/jollys-wedding-hero.png",
-    alt: "A bride at the Vanilla Cream Jolly's cart, its host scooping, in a marble hotel lobby",
-    objectPos: "object-[42%_center]",
+    // Wedding hero supplied 1 Oct 2026 (replaces public/jollys-wedding-hero.png).
+    // The photo is 4:3, so the file adds a blurred margin on the left — hidden
+    // under the cream veil — to seat the cart to the right of the headline.
+    image: "/images/scenes/hero-wedding-evening-wide.webp",
+    alt: "A bride at the Vanilla Cream Jolly's cart at night, its host scooping under pendant lights",
+    objectPos: "object-right",
   },
   {
     key: "flavours",
     line1: "Curated flavours",
     line2: "for special occasions",
-    copy: "Fresh, seasonal ice creams and dairy-free creamy sorbets, somewhere between gelato and ice cream — chosen with you for the occasion.",
+    copy: "Fresh, seasonal ice creams and dairy-free creamy sorbets, somewhere between gelato and ice cream, chosen with you for the occasion.",
     cta: { href: "/flavors", label: "Explore Flavours" },
     cta2: CTA,
     image: "/images/scenes/hero-flavour-banner.jpg",
@@ -492,17 +506,17 @@ export const REASONS = [
   {
     n: "01",
     t: "It sets the mood",
-    c: "The cart arrives and the room lifts — guests gather, phones come out, and the party finds its rhythm.",
+    c: "The cart arrives and the room lifts. Guests gather, phones come out, and the party finds its rhythm.",
   },
   {
     n: "02",
     t: "Themed to your décor",
-    c: "Vanilla Cream, Bubblegum Blue or Ferrari Red — a cart colour that sits naturally with your palette, florals and venue.",
+    c: "Vanilla Cream, Bubblegum Blue or Ferrari Red: a cart colour that sits naturally with your palette, florals and venue.",
   },
   {
     n: "03",
     t: "Every guest gets a scoop",
-    c: "Ice creams and dairy-free sorbets, served live by our host — so nobody at the table is left out.",
+    c: "Ice creams and dairy-free sorbets, served live by our host, so nobody at the table is left out.",
   },
 ] as const;
 
@@ -549,7 +563,7 @@ export const FRANCHISE = {
     },
     {
       t: "Rental",
-      c: "A fixed monthly rental for a branded, fully serviced Jolly's cart — ideal for hotels and attractions that want a permanent feature.",
+      c: "A fixed monthly rental for a branded, fully serviced Jolly's cart. Ideal for hotels and attractions that want a permanent feature.",
     },
   ],
 } as const;

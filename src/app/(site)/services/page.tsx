@@ -9,7 +9,7 @@ import { HOW_IT_WORKS, SERVICES, serviceHref } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "You host the event, we bring the mood — ice cream carts with a live host for weddings, corporate events, private parties and brand collaborations.",
+    "You host the event, we bring the mood. Ice cream carts with a live host for weddings, corporate events, private parties and brand collaborations.",
 };
 
 export default function ServicesPage() {
@@ -26,7 +26,7 @@ export default function ServicesPage() {
                 <span className="italic text-gold-600"> we bring the mood</span>
               </>
             }
-            copy="Weddings, corporate events, private parties and brand collaborations — a styled cart, a live host, and ice creams and dairy-free sorbets so every guest joins in."
+            copy="Weddings, corporate events, private parties and brand collaborations: a styled cart, a live host, and ice creams and dairy-free sorbets so every guest joins in."
           />
         </div>
       </section>

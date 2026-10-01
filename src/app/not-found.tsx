@@ -21,7 +21,7 @@ export default function NotFound() {
           <span className="italic text-gold-600"> melted away</span>
         </h1>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-700">
-          The page you&apos;re looking for doesn&apos;t exist — but the feel-good part of
+          The page you&apos;re looking for doesn&apos;t exist, but the feel-good part of
           the menu is very much still open.
         </p>
         <Link

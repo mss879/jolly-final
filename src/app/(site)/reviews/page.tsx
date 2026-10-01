@@ -13,7 +13,7 @@ import { getPublishedEvents } from "@/lib/recent-events";
 export const metadata: Metadata = {
   title: "Reviews",
   description:
-    "Reviews, straight from Google, and recent events — what hosts and guests say about Jolly's on Wheels at weddings, corporate events and parties across Sri Lanka.",
+    "Reviews, straight from Google, and recent events: what hosts and guests say about Jolly's on Wheels at weddings, corporate events and parties across Sri Lanka.",
 };
 
 /* Rebuilt at most hourly. Publishing or editing an event in the admin
@@ -37,7 +37,7 @@ export default async function ReviewsPage() {
                   <span className="italic text-gold-600"> own words</span>
                 </>
               }
-              copy="Straight from Google, unedited — and a look at the events we've served lately."
+              copy="Straight from Google, unedited, and a look at the events we've served lately."
             />
 
             <Reveal className="mt-10 max-w-md">
@@ -118,6 +118,13 @@ export default async function ReviewsPage() {
             Hosted with us? Leave a review
           </a>
         </Reveal>
+        {google.credit && (
+          <p className="mt-6 text-[0.68rem] text-ink-500">
+            <a href={google.credit.href} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-plum-900">
+              {google.credit.label}
+            </a>
+          </p>
+        )}
       </section>
 
       {/* Recent events — managed in /admin/events */}

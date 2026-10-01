@@ -126,13 +126,13 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             {CARTS.map((c, i) => (
               <Reveal key={c.key} delay={i * 100}>
                 <figure className="group relative overflow-hidden rounded-card shadow-card">
-                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                  <div className="relative aspect-[4/5] w-full overflow-hidden">
                     <Image
                       src={c.image}
                       alt={c.alt}
                       fill
                       sizes="(min-width: 640px) 30vw, 92vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
+                      className="object-cover object-bottom transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-plum-950/70 via-plum-950/10 to-transparent" />
                   </div>
