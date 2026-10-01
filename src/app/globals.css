@@ -120,6 +120,17 @@ body {
   @media (width >= 64rem) { padding-inline: 2.5rem; }
 }
 
+/* The header and the home hero: a wider frame than the page sections, so the
+   logo and the headline sit closer to the left edge on large screens. */
+@utility container-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 86rem;
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) { padding-inline: 2rem; }
+  @media (width >= 64rem) { padding-inline: 2.5rem; }
+}
+
 @utility kicker {
   font-family: var(--font-sans);
   font-size: 0.72rem;

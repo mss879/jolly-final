@@ -92,7 +92,7 @@ export default function Header() {
       }`}
     >
       {/* Stays above the full-screen mobile menu, which lives inside the header */}
-      <div className="container-luxe relative z-50 flex items-center justify-between gap-4 py-3 sm:py-4">
+      <div className="container-wide relative z-50 flex items-center justify-between gap-4 py-3 sm:py-4">
         <Link href="/" aria-label="Jolly's Creamery, home" className="shrink-0">
           {/* The full logo (dot, wordmark and cone) — never crop it */}
           <Image

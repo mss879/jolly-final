@@ -62,7 +62,7 @@ export default function HeroSlider() {
         })}
 
         {/* copy */}
-        <div className="container-luxe relative flex h-full flex-col justify-center">
+        <div className="container-wide relative flex h-full flex-col justify-center">
           <div className="relative max-w-4xl pt-16">
             {SLIDES.map((s, i) => {
               const on = i === active;
