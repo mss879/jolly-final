@@ -296,8 +296,8 @@ export const SERVICES: Service[] = [
     blurb: "Launches, galas and conferences. A reason to gather between the speeches.",
     description:
       "Between the speeches and the networking, the cart is where people end up. We serve at scale without queues, and every scoop still comes with a word from our host.",
-    // CLIENT PHOTO: swap for the blue cart + staff-uniform photo when received
-    image: "/images/scenes/scene-corporate.jpg",
+    // Photo supplied by the client, 5 Oct 2026
+    image: "/images/scenes/scene-corporate-office.webp",
     points: [
       "High-volume service without queues",
       "Branded cups and signage on request",
@@ -420,8 +420,9 @@ export const CARTS: Cart[] = [
     key: "bubblegum-blue",
     name: "Bubblegum Blue",
     swatch: "#5CB8C9",
-    image: "/images/carts/cart-bubblegum-blue.jpg",
-    alt: "Bubblegum Blue Jolly's cart with its host under string lights on a terrace",
+    // Photo supplied by the client, 5 Oct 2026
+    image: "/images/carts/cart-bubblegum-blue-lobby.webp",
+    alt: "Bubblegum Blue Jolly's cart with a blue bicycle and flower basket under the arches of a hotel lobby",
     copy: "A playful blue with a vintage bicycle, made for garden parties, terraces and relaxed celebrations.",
     occasion: "Gardens and parties",
     formImage: "/blue-cart.png",
@@ -480,23 +481,26 @@ export const HERO_SLIDES: HeroSlide[] = [
     copy: "Fresh, seasonal ice creams and dairy-free creamy sorbets, somewhere between gelato and ice cream, chosen with you for the occasion.",
     cta: { href: "/flavors", label: "Explore Flavours" },
     cta2: CTA,
-    image: "/images/scenes/hero-flavour-banner.jpg",
-    alt: "Ice cream scoops in gold-rimmed porcelain coupes on cream silk",
-    objectPos: "object-[70%_center]",
+    // AI render (Higgsfield, 5 Oct 2026) from the real Jolly's cup and the
+    // menu's scoop photos. Zoomed out with a blurred margin on the left so
+    // all six cups sit right of the headline.
+    image: "/images/scenes/hero-flavours-cups.webp",
+    alt: "Six Jolly's cups of mango, passion fruit sorbet, blueberry, strawberry cheesecake, double chocolate and vanilla on a marble table at a wedding reception",
+    objectPos: "object-right",
   },
   {
     key: "at-home",
     badge: "Coming Soon",
-    // PLACEHOLDER — client is sending the tub-launch copy and a "tub moment" visual
-    line1: "The same feeling,",
-    line2: "soon at home",
-    copy: "The scoops your guests queue for, soon in a 500 ml tub for your own sofa. Be the first to know.",
+    // 500 ml tubs, 5 Oct 2026
+    line1: "Feel good at home,",
+    line2: "500 ml at a time",
+    copy: "The scoops your guests queue for, soon in 500 ml tubs for your own freezer. Fresh, seasonal and ready when you are.",
     cta: { href: "/reserve?type=at-home", label: "Be First to Know" },
     cta2: { href: "/flavors", label: "Explore Flavours" },
-    // PLACEHOLDER image — swap for the client's lifestyle shot (people sharing a tub, brand colours)
-    image: "/images/scenes/scene-party.jpg",
-    alt: "Cups of pastel ice cream with gold spoons at a celebration",
-    objectPos: "object-[60%_center]",
+    // Tub visual supplied by the client, 5 Oct 2026
+    image: "/images/scenes/hero-tubs-500ml.webp",
+    alt: "Jolly's 500 ml tubs of Double Chocolate and Passion Fruit Sorbet, lids off, on a marble counter",
+    objectPos: "object-center",
   },
 ];
 
@@ -515,8 +519,8 @@ export const REASONS = [
   },
   {
     n: "03",
-    t: "Every guest gets a scoop",
-    c: "Ice creams and dairy-free sorbets, served live by our host, so nobody at the table is left out.",
+    t: "It brings guests together",
+    c: "More than dessert, the cart becomes a natural gathering point where guests meet, connect and share a moment.",
   },
 ] as const;
 

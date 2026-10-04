@@ -101,19 +101,19 @@ export default async function HomePage() {
           CLIENT: when the background clip arrives, add
           video={{ webm: "/video/why-cart.webm", mp4: "/video/why-cart.mp4" }} */}
       <ParallaxBanner
-        image="/images/scenes/scene-six-scoops.webp"
-        alt="Six scoops in ivory cups with gold spoons on a marble table, beside cream balloons and gold ribbon"
-        overlay="bg-plum-950/65"
+        image="/images/scenes/scene-guests-queue.webp"
+        alt="Guests in evening wear queueing at a Jolly's cart in a bright hotel ballroom"
+        overlay="bg-plum-950/70 md:bg-transparent md:bg-gradient-to-l md:from-plum-950/90 md:from-25% md:via-plum-950/55 md:via-50% md:to-transparent md:to-75%"
       >
-        <Reveal className="mx-auto max-w-3xl text-center">
-          <p className="heading-display !text-cream-100 text-3xl leading-snug sm:text-5xl">
-            Guests visit the coffee bar and the cake table.
-            <span className="italic text-gold-300"> They queue for this one.</span>
+        {/* One typeface, one size. The copy sits over the back of the queue,
+            so the cart and the front of the line stay clear on the left. */}
+        <Reveal className="ml-auto max-w-lg space-y-5 border-l border-gold-300/50 pl-8 font-display text-xl leading-snug font-medium text-cream-100 sm:text-2xl sm:leading-snug">
+          <p>
+            Guests visit the coffee bar and the cake table.{" "}
+            <span className="text-gold-300">They queue for this one.</span>
           </p>
-          <p className="heading-display mx-auto mt-7 max-w-2xl text-lg !leading-snug !text-cream-100 sm:text-xl">
-            Every scoop is a small ceremony: styled, served and savoured.
-          </p>
-          <p className="heading-display mx-auto mt-28 text-base !leading-snug !text-cream-100 sm:mt-40 sm:text-lg">
+          <p>Every scoop is a small ceremony: styled, served and savoured.</p>
+          <p>
             A cart and a host turn the last hour of your event into the part
             everyone remembers.
           </p>
