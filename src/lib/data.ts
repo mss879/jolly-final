@@ -35,7 +35,7 @@ export const FLAVORS: Flavor[] = [
     // Client: "Passion Fruit" without "Creamy"
     slug: "passion-fruit-sorbet",
     name: "Passion Fruit Sorbet",
-    description: "Sharp, fragrant passion fruit, dairy-free and refreshing. The first to go in the heat.",
+    description: "Intensely fruity and refreshing, the passion fruit creamy sorbet is a tropical delight.",
     image: "/images/flavors/passion-fruit-sorbet.png",
     category: "Sorbet",
     dairyFree: true,
@@ -43,7 +43,7 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "wild-naarang-sorbet",
     name: "Wild Naarang Sorbet",
-    description: "Wild naarang, bright and citrusy. A burst of island orange in every spoonful.",
+    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
     image: "/images/flavors/wild-naarang-sorbet.png",
     category: "Sorbet",
     dairyFree: true,
@@ -51,92 +51,91 @@ export const FLAVORS: Flavor[] = [
   {
     slug: "jaffna-mango",
     name: "Jaffna Mango",
-    description: "Jaffna's Karutha Columban mango: floral, tart and sweet. The island in a scoop.",
+    description: "Floral, tart and sweet Jaffna Karutha Columban treat for the summer days",
     image: "/images/flavors/jaffna-mango.png",
     category: "Fruity",
   },
   {
     slug: "strawberry-cheesecake",
     name: "Strawberry Cheesecake",
-    description: "Tangy cream-cheese ice cream folded with strawberry compote.",
+    description: "A creamy and tangy dessert topped with luscious strawberry compote.",
     image: "/images/flavors/strawberry-cheesecake.png",
     category: "Fruity",
   },
   {
     slug: "blueberry",
     name: "Blueberry",
-    description: "Blueberries, tart and creamy, made when the fruit is in season.",
+    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
     image: "/images/flavors/blueberry.png",
     category: "Fruity",
   },
   {
     slug: "bubblegum",
     name: "Bubblegum",
-    description: "Blue, sweet and nostalgic. The flavour that makes grown-ups feel seven again.",
+    description: "As the name says, a flavour that would make you feel like a kid again. It's a promise!",
     image: "/images/flavors/bubblegum.png",
     category: "Classic",
   },
   {
     slug: "coconut",
     name: "Coconut",
-    description: "Coconut milk and fresh cream, with a little desiccated coconut for texture.",
+    description: "Versatile coconut milk and dairy, with creaminess and desiccated coconut texture.",
     image: "/images/flavors/coconut.png",
     category: "Classic",
   },
   {
     slug: "french-vanilla",
     name: "French Vanilla",
-    description: "Floral vanilla and crème anglaise. Extra creamy, yet light.",
+    description: "Floral vanilla and crème anglaise ice cream, a delightful blend that's extra creamy yet light",
     image: "/images/flavors/french-vanilla.png",
     category: "Classic",
   },
   {
     slug: "cookies-and-cream",
     name: "Cookies & Cream",
-    description: "Silky vanilla with crunchy cookie pieces. Indulgence in every bite.",
+    description: "Silky smooth vanilla paired with crunchy cookie surprises. Indulgence in every bite.",
     image: "/images/flavors/cookies-and-cream.png",
     category: "Classic",
   },
   {
     slug: "salted-caramel-peanuts",
     name: "Salted Caramel & Peanuts",
-    description: "Burnt-sugar caramel, roasted peanuts and a hint of salt. The grown-ups' favourite.",
+    description: "A burnt sugar ice cream with a rich, velvety blend of creamy notes and a hint of salt",
     image: "/images/flavors/salted-caramel-peanuts.png",
     category: "Classic",
   },
   {
     slug: "milk-toffee",
     name: "Milk Toffee",
-    description: "The buttery sweetness of milk toffee, with caramelised sugar and condensed milk.",
+    description: "The buttery sweetness of traditional milk toffee with hints of caramelised sugar and condensed milk.",
     image: "/images/flavors/milk-toffee.png",
     category: "Classic",
   },
   {
     slug: "amber-coffee-caramel",
     name: "Amber Coffee & Caramel",
-    description: "Aromatic amber coffee and rich caramel. Delicate, yet creamy.",
+    description: "Rich caramel and aromatic amber coffee, a delicate yet creamy blend.",
     image: "/images/flavors/amber-coffee-caramel.png",
     category: "Classic",
   },
   {
     slug: "double-chocolate",
     name: "Double Chocolate",
-    description: "Deep cocoa, twice over. Rich, smooth and unhurried.",
+    description: "A decadent cocoa delight that transforms each scoop into a moment of pure bliss.",
     image: "/images/flavors/double-chocolate.png",
     category: "Chocolate",
   },
   {
     slug: "swiss-chocolate",
     name: "Swiss Chocolate",
-    description: "Swiss-style chocolate with African cocoa and sweet cream.",
+    description: "Swiss-inspired chocolate crafted with rich African cocoa and sweet cream",
     image: "/images/flavors/swiss-chocolate.png",
     category: "Chocolate",
   },
   {
     slug: "flavour-of-the-month",
     name: "Flavour of the Month",
-    description:
-      "A playful twist on rare, unexpected ingredients. A one-of-a-kind scoop that changes every month.",
+    description: "A twist on unique and unconventional ingredients, offering a one-of-a-kind treat you won't want to miss.",
     image: "/images/flavors/flavour-of-the-month.png",
     category: "Seasonal",
   },
@@ -270,6 +269,7 @@ export type Service = {
   description: string;
   image: string;
   imagePortrait?: boolean; // portrait photo → 4:5 frame on the Services page
+  imagePosition?: string; // object-position class for cropped frames, e.g. "object-[50%_35%]"
   points: string[];
 };
 
@@ -277,7 +277,7 @@ export const SERVICES: Service[] = [
   {
     slug: "weddings",
     title: "Weddings",
-    blurb: "The moment guests talk about on the way home.",
+    blurb: "Styled to your palette, the moment guests talk about on the way home.",
     description:
       "Your cart arrives styled to your palette, in Vanilla Cream, Bubblegum Blue or Ferrari Red, and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
     // Real photo from the client's Instagram (16 Jun 2026) — see public/images/social/CREDITS.md
@@ -293,11 +293,11 @@ export const SERVICES: Service[] = [
   {
     slug: "corporate",
     title: "Corporate Events",
-    blurb: "Launches, galas and conferences. A reason to gather between the speeches.",
+    blurb: "Launches, galas and conferences. The break everyone looks forward to.",
     description:
       "Between the speeches and the networking, the cart is where people end up. We serve at scale without queues, and every scoop still comes with a word from our host.",
-    // Photo supplied by the client, 5 Oct 2026
-    image: "/images/scenes/scene-corporate-office.webp",
+    // Photo supplied by the client, 13 Oct 2026 (replaces scene-corporate-office.webp)
+    image: "/images/scenes/scene-corporate-cheers.webp",
     points: [
       "High-volume service without queues",
       "Branded cups and signage on request",
@@ -308,10 +308,14 @@ export const SERVICES: Service[] = [
   {
     slug: "private-parties",
     title: "Private Parties",
-    blurb: "Birthdays, anniversaries and garden parties. The corner everyone drifts to.",
+    blurb: "Birthdays, anniversaries and garden parties. The corner everyone loves.",
     description:
       "The cart arrives styled, chilled and ready, and becomes the centre of the party. Bubblegum for the children, salted caramel for the grown-ups, dairy-free sorbets for everyone, and it usually runs out before the cake.",
-    image: "/images/scenes/scene-party.jpg",
+    // Photo supplied by the client, 13 Oct 2026 (replaces scene-party.jpg).
+    // Portrait: crop a little above centre so the parents' faces stay in.
+    image: "/images/scenes/scene-private-party-family.webp",
+    imagePortrait: true,
+    imagePosition: "object-[50%_35%]",
     points: [
       "Flexible packages for 30–300 guests", // CLIENT: confirm guest range
       "Children's favourites and dairy-free sorbets",
@@ -322,7 +326,7 @@ export const SERVICES: Service[] = [
   {
     slug: "brand-collaborations",
     title: "Brand Collaborations",
-    blurb: "Your brand on the cart, your flavour in the scoop.",
+    blurb: "Your brand on the cart and a signature flavour in every scoop served.",
     description:
       "Put your brand on the most photographed corner of the room. We co-brand the cart and can develop a signature or limited-edition flavour. Launches, pop-ups and partner activations, content-ready from the first scoop.",
     // CLIENT PHOTO: replace with the G2 brand-collaboration photo when received
@@ -444,16 +448,23 @@ export const CARTS: Cart[] = [
 
 export type HeroSlide = {
   key: string;
-  badge?: string; // small pill above the headline, e.g. "New" / "Coming Soon"
-  line1: string;
-  line2: string;
-  copy: string;
-  cta: { href: string; label: string };
-  cta2: { href: string; label: string };
   image: string;
   alt: string;
   objectPos: string;
-};
+} & (
+  | {
+      imageOnly?: false;
+      badge?: string; // small pill above the headline, e.g. "New" / "Coming Soon"
+      line1: string;
+      line2: string;
+      copy: string;
+      cta: { href: string; label: string };
+      cta2: { href: string; label: string };
+    }
+  // A finished banner with its own lettering: shown whole, with no headline,
+  // buttons, cream veil or slow zoom over it.
+  | { imageOnly: true }
+);
 
 /* Array order = display order. To promote a launch or an offer, move its
    slide to index 0 — it becomes the first (preloaded) slide. */
@@ -475,18 +486,12 @@ export const HERO_SLIDES: HeroSlide[] = [
     objectPos: "object-right",
   },
   {
-    key: "flavours",
-    line1: "Curated flavours",
-    line2: "for special occasions",
-    copy: "Fresh, seasonal ice creams and dairy-free creamy sorbets, somewhere between gelato and ice cream, chosen with you for the occasion.",
-    cta: { href: "/flavors", label: "Explore Flavours" },
-    cta2: CTA,
-    // AI render (Higgsfield, 5 Oct 2026) from the real Jolly's cup and the
-    // menu's scoop photos. Zoomed out with a blurred margin on the left so
-    // all six cups sit right of the headline.
-    image: "/images/scenes/hero-flavours-cups.webp",
-    alt: "Six Jolly's cups of mango, passion fruit sorbet, blueberry, strawberry cheesecake, double chocolate and vanilla on a marble table at a wedding reception",
-    objectPos: "object-right",
+    key: "find-us",
+    imageOnly: true,
+    // "Find Us At" banner supplied by the client, 13 Oct 2026
+    image: "/images/scenes/hero-find-us-at.webp",
+    alt: "A turquoise Jolly's cart in a hotel lobby beside the logos of Shangri-La Colombo, Taj Samudra, Hilton Colombo, Tito's, Sheraton Colombo, Ramada Colombo, Marriott Weligama Bay and Cinnamon Lakeside, under the heading Find Us At",
+    objectPos: "object-center",
   },
   {
     key: "at-home",

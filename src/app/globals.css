@@ -84,6 +84,8 @@
   color-scheme: light;
 }
 
+/* Smooth for in-page anchors only: data-scroll-behavior="smooth" on <html>
+   (layout.tsx) makes Next jump straight to the top when changing page. */
 html {
   scroll-behavior: smooth;
 }

@@ -6,7 +6,9 @@ import Image from "next/image";
 /* Full-bleed image band whose background drifts slower than the page —
    the classic luxury parallax strip. Pass `video` to play a muted,
    looping clip over the image (the image doubles as poster and as the
-   reduced-motion fallback). Expected assets: public/video/*.webm|mp4. */
+   reduced-motion fallback). Expected assets: public/video/*.webm|mp4.
+   `parallax={false}` drops the zoom and drift so the image shows edge to
+   edge, uncropped, when the band has a fixed aspect ratio. */
 export default function ParallaxBanner({
   image,
   alt,
@@ -14,6 +16,7 @@ export default function ParallaxBanner({
   heightClass = "min-h-[62vh]",
   overlay = "bg-plum-950/45",
   video,
+  parallax = true,
 }: {
   image: string;
   alt: string;
@@ -21,6 +24,7 @@ export default function ParallaxBanner({
   heightClass?: string;
   overlay?: string;
   video?: { webm?: string; mp4?: string };
+  parallax?: boolean;
 }) {
   const wrap = useRef<HTMLDivElement | null>(null);
   const img = useRef<HTMLDivElement | null>(null);
@@ -42,10 +46,12 @@ export default function ParallaxBanner({
       raf = 0;
       const r = w.getBoundingClientRect();
       const progress = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
-      m.style.transform = `translate3d(0, ${(progress * -7).toFixed(2)}%, 0) scale(1.25)`;
+      // Drift only: the 125% zoom comes from the scale-125 class (Tailwind v4's
+      // `scale` property), which would stack with a scale() here.
+      m.style.transform = `translate3d(0, ${(progress * -7).toFixed(2)}%, 0)`;
     };
     const onScroll = () => {
-      if (active && !raf) raf = requestAnimationFrame(update);
+      if (parallax && active && !raf) raf = requestAnimationFrame(update);
     };
     const io = new IntersectionObserver(
       ([e]) => {
@@ -60,22 +66,24 @@ export default function ParallaxBanner({
       { rootMargin: "10% 0px 10% 0px" },
     );
     io.observe(w);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
+    if (parallax) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      update();
+    }
     return () => {
       io.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [parallax]);
 
   const hasVideo = Boolean(video?.webm || video?.mp4);
 
   return (
     <section ref={wrap} className={`relative flex ${heightClass} items-center overflow-hidden`}>
-      <div ref={img} className="absolute inset-0 scale-125 will-change-transform">
+      <div ref={img} className={`absolute inset-0 ${parallax ? "scale-125 will-change-transform" : ""}`}>
         <Image src={image} alt={alt} fill sizes="100vw" className="object-cover" />
         {hasVideo && (
           <video
@@ -99,7 +107,7 @@ export default function ParallaxBanner({
       <div className={`absolute inset-0 ${overlay}`} />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gold-500/50" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gold-500/50" />
-      <div className="container-luxe relative py-24">{children}</div>
+      <div className="container-luxe relative py-24 md:py-16">{children}</div>
     </section>
   );
 }

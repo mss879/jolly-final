@@ -97,25 +97,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Parallax statement strip — why an ice cream cart.
+      {/* Statement strip — why an ice cream cart. On desktop the band is
+          locked to 3:1 with no zoom, so a 1920 × 640 (or 3840 × 1280) banner
+          fills it exactly, uncropped.
           CLIENT: when the background clip arrives, add
           video={{ webm: "/video/why-cart.webm", mp4: "/video/why-cart.mp4" }} */}
       <ParallaxBanner
-        image="/images/scenes/scene-guests-queue.webp"
-        alt="Guests in evening wear queueing at a Jolly's cart in a bright hotel ballroom"
-        overlay="bg-plum-950/70 md:bg-transparent md:bg-gradient-to-l md:from-plum-950/90 md:from-25% md:via-plum-950/55 md:via-50% md:to-transparent md:to-75%"
+        image="/images/scenes/scene-lobby-queue-wide.webp"
+        alt="Guests in evening wear queueing at a Jolly's cart in a bright hotel lobby"
+        heightClass="min-h-[62vh] md:min-h-0 md:aspect-[3/1] md:items-end"
+        parallax={false}
+        overlay="bg-plum-950/70 md:bg-transparent md:bg-radial-[ellipse_50%_85%_at_50%_100%] md:from-plum-950/85 md:via-plum-950/45 md:via-55% md:to-transparent"
       >
-        {/* One typeface, one size. The copy sits over the back of the queue,
-            so the cart and the front of the line stay clear on the left. */}
-        <Reveal className="ml-auto max-w-lg space-y-5 border-l border-gold-300/50 pl-8 font-display text-xl leading-snug font-medium text-cream-100 sm:text-2xl sm:leading-snug">
+        {/* One line, centred at the bottom over a soft fade, so the photo
+            stays clear everywhere else. */}
+        <Reveal className="mx-auto max-w-3xl text-center font-display text-2xl leading-snug font-medium text-cream-100 [text-shadow:0_1px_14px_rgb(0_0_0/0.45)] sm:text-3xl sm:leading-snug">
           <p>
             Guests visit the coffee bar and the cake table.{" "}
-            <span className="text-gold-300">They queue for this one.</span>
-          </p>
-          <p>Every scoop is a small ceremony: styled, served and savoured.</p>
-          <p>
-            A cart and a host turn the last hour of your event into the part
-            everyone remembers.
+            <span className="block text-gold-300">They queue for this one.</span>
           </p>
         </Reveal>
       </ParallaxBanner>
@@ -291,12 +290,12 @@ export default async function HomePage() {
                       alt={s.title}
                       fill
                       sizes="(min-width: 1024px) 24vw, (min-width: 768px) 45vw, 92vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
+                      className={`object-cover ${s.imagePosition ?? ""} transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105`}
                     />
                   </div>
-                  <div className="flex flex-1 flex-col p-6">
-                    <h3 className="font-display text-lg font-semibold text-plum-900">{s.title}</h3>
-                    <p className="mt-2 flex-1 text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
+                  <div className="flex flex-1 flex-col p-6 lg:px-5">
+                    <h3 className="font-display text-lg font-semibold whitespace-nowrap text-plum-900 lg:text-base xl:text-lg">{s.title}</h3>
+                    <p className="mt-2 min-h-[4.875em] flex-1 text-pretty text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
                     <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-transform duration-300 group-hover:translate-x-1">
                       Learn more →
                     </span>

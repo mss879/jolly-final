@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CONTACT, HERO_SLIDES, SMILEY } from "@/lib/data";
+import { HERO_SLIDES } from "@/lib/data";
 
 /* Slides live in src/lib/data.ts (HERO_SLIDES) — array order is display
    order, so a launch/offer slide can be promoted by moving it to index 0. */
@@ -50,13 +50,21 @@ export default function HeroSlider() {
                 fill
                 preload={i === 0}
                 sizes="100vw"
-                className={`object-cover ${s.objectPos} ${on ? "animate-kenburns" : ""}`}
+                className={`object-cover ${s.objectPos} ${on && !s.imageOnly ? "animate-kenburns" : ""}`}
               />
-              {/* cream veil for typography */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cream-100 from-[18%] via-cream-100/72 via-[46%] to-transparent to-[78%]" />
-              <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-cream-100 via-cream-100/60 to-transparent" />
-              <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream-100/85 to-transparent" />
-              <div className="absolute inset-0 bg-cream-100/45 sm:bg-transparent" />
+              {s.imageOnly ? (
+                // cream veil across the top only, so the logo and navbar read
+                // as clearly as on the other slides
+                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent" />
+              ) : (
+                <>
+                  {/* cream veil for typography */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cream-100 from-[18%] via-cream-100/72 via-[46%] to-transparent to-[78%]" />
+                  <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-cream-100 via-cream-100/60 to-transparent" />
+                  <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream-100/85 to-transparent" />
+                  <div className="absolute inset-0 bg-cream-100/45 sm:bg-transparent" />
+                </>
+              )}
             </div>
           );
         })}
@@ -65,6 +73,7 @@ export default function HeroSlider() {
         <div className="container-wide relative flex h-full flex-col justify-center">
           <div className="relative max-w-4xl pt-16">
             {SLIDES.map((s, i) => {
+              if (s.imageOnly) return null;
               const on = i === active;
               return (
                 <div
@@ -161,11 +170,6 @@ export default function HeroSlider() {
             </button>
           </div>
         </div>
-
-        {/* tagline watermark */}
-        <p className="pointer-events-none absolute bottom-8 left-5 z-10 hidden font-display text-sm tracking-[0.08em] text-plum-900/60 italic lg:block sm:left-10">
-          {CONTACT.tagline} <span aria-hidden className="not-italic">{SMILEY}</span>
-        </p>
       </div>
     </section>
   );

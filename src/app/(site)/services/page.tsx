@@ -47,7 +47,7 @@ export default function ServicesPage() {
                     alt={s.title}
                     fill
                     sizes="(min-width: 1024px) 46vw, 92vw"
-                    className="scale-110 object-cover"
+                    className={`scale-110 object-cover ${s.imagePosition ?? ""}`}
                   />
                 </Parallax>
               </div>

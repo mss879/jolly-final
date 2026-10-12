@@ -83,7 +83,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                   fill
                   preload
                   sizes="(min-width: 1024px) 46vw, 92vw"
-                  className="scale-110 object-cover"
+                  className={`scale-110 object-cover ${service.imagePosition ?? ""}`}
                 />
               </Parallax>
             </div>
@@ -194,12 +194,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                     alt={s.title}
                     fill
                     sizes="(min-width: 768px) 30vw, 92vw"
-                    className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105"
+                    className={`object-cover ${s.imagePosition ?? ""} transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105`}
                   />
                 </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="font-display text-lg font-semibold text-plum-900">{s.title}</h3>
-                  <p className="mt-2 flex-1 text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
+                <div className="flex flex-1 flex-col p-6 lg:px-5">
+                  <h3 className="font-display text-lg font-semibold whitespace-nowrap text-plum-900 lg:text-base xl:text-lg">{s.title}</h3>
+                  <p className="mt-2 min-h-[4.875em] flex-1 text-pretty text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
                   <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-transform duration-300 group-hover:translate-x-1">
                     Learn more →
                   </span>
