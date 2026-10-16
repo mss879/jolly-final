@@ -5,21 +5,26 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import Parallax from "@/components/Parallax";
 import { BADGE_STAT, CONTACT, FRANCHISE, STATS } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbs, pageMetadata } from "@/lib/seo";
 
 /* Footer-only page (the client took Franchise out of the main nav). */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Franchise & Venue Partnerships",
   description:
     "Host a permanently placed, fully serviced Jolly's ice cream cart at your hotel, café or attraction. Revenue-share and rental models across Sri Lanka.",
-};
+  path: "/franchise",
+});
 
 export default function FranchisePage() {
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Franchise & Venue Partnerships", path: "/franchise" }])} />
       <section className="relative overflow-hidden pt-44 pb-16 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] bg-gold-200/40 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
+            as="h1"
             kicker={FRANCHISE.kicker}
             title={
               <>
@@ -36,7 +41,7 @@ export default function FranchisePage() {
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <div className="relative">
-              <div className="absolute -top-4 -left-4 h-20 w-20 rounded-card border border-gold-300" />
+              <div className="absolute -top-4 -left-4 hidden h-20 w-20 rounded-card border border-gold-300 sm:block" />
               <Parallax speed={0.07} className="relative aspect-[4/5] overflow-hidden rounded-card shadow-soft">
                 <Image
                   src="/images/carts/cart-lobby-crimson.jpeg"

@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import SiteChrome from "@/components/SiteChrome";
+
+export const metadata: Metadata = { title: "Page not found" };
 
 /* Unmatched URLs render outside the (site) group, so bring the chrome along. */
 export default function NotFound() {

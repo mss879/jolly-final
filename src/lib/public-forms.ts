@@ -11,6 +11,8 @@ export function isObject(value: unknown): value is JsonObject {
 }
 
 export async function readJson(request: Request): Promise<JsonObject | null> {
+  // turn away an oversized body before reading it
+  if (Number(request.headers.get("content-length") ?? 0) > 64_000) return null;
   try {
     const raw = await request.text();
     if (raw.length > 64_000) return null;

@@ -26,11 +26,14 @@ export async function createClient() {
   });
 }
 
-/* Anonymous client for the public form endpoints. It can only call the
-   submit_inquiry / track_booking / submit_booking functions. */
+/* Client for the public form endpoints, which only call the submit_inquiry /
+   track_booking / submit_booking functions. With SUPABASE_SECRET_KEY set (a
+   server-only secret, never NEXT_PUBLIC_) it uses that, so the functions can
+   be closed to direct browser calls (migration 20261016120000); without it,
+   the publishable key. */
 export function createPublicClient() {
   if (!supabaseConfigured) return null;
-  return createSupabaseClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
+  return createSupabaseClient<Database>(SUPABASE_URL, process.env.SUPABASE_SECRET_KEY || SUPABASE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
 }

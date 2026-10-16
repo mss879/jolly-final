@@ -6,7 +6,7 @@ import { BRAND_BLURB, CONTACT, CTA, FIND_US, FOOTER_LINKS, SMILEY } from "@/lib/
 
 const columnHeading = "text-[0.68rem] font-semibold tracking-[0.28em] text-gold-300 uppercase";
 const footerLink =
-  "inline-block text-[0.86rem] leading-none text-cream-100/70 transition-colors duration-300 hover:text-gold-300";
+  "inline-block py-1.5 text-[0.86rem] leading-none text-cream-100/70 transition-colors duration-300 hover:text-gold-300";
 
 export default function Footer() {
   return (
@@ -64,7 +64,7 @@ export default function Footer() {
             <nav key={heading} aria-label={heading}>
               <h3 className={columnHeading}>{heading}</h3>
               <span className="mt-3 block h-px w-8 bg-gold-500/70" />
-              <ul className="mt-6 flex flex-col gap-3.5">
+              <ul className="mt-4.5 flex flex-col gap-0.5">
                 {links.map((l) => (
                   <li key={l.href}>
                     <Link href={l.href} className={footerLink}>

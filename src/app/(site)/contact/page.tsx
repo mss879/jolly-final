@@ -5,12 +5,15 @@ import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import SocialLinks from "@/components/SocialLinks";
 import { CONTACT, CTA, FIND_US } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbs, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
     "Talk to Jolly's Creamery: call +94 707 222 511, message us on WhatsApp, or send a note. Booking an event? Reserve your date in a minute.",
-};
+  path: "/contact",
+});
 
 const CHANNELS = [
   {
@@ -30,10 +33,12 @@ const CHANNELS = [
 export default function ContactPage() {
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Contact", path: "/contact" }])} />
       <section className="relative overflow-hidden pt-44 pb-12 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] bg-plum-100/70 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
+            as="h1"
             kicker="Contact"
             title={
               <>
@@ -73,7 +78,17 @@ export default function ContactPage() {
                   className="group block rounded-card border border-gold-200/70 bg-cream-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card"
                 >
                   <p className="kicker">{c.label}</p>
-                  <p className="mt-2 font-display text-xl font-semibold break-all text-plum-900">{c.value}</p>
+                  <p className="mt-2 font-display text-lg font-semibold break-words text-plum-900 sm:text-xl">
+                    {/* lets a long email wrap after the @ on a phone, never mid-word */}
+                    {c.value.includes("@") ? (
+                      <>
+                        {c.value.split("@")[0]}@<wbr />
+                        {c.value.split("@")[1]}
+                      </>
+                    ) : (
+                      c.value
+                    )}
+                  </p>
                   <p className="mt-1 text-[0.78rem] text-ink-500">{c.note}</p>
                 </a>
               </Reveal>

@@ -6,12 +6,14 @@ export default function SectionHeading({
   copy,
   align = "left",
   rule = true,
+  as: Heading = "h2",
 }: {
   kicker?: string; // the small gold line above the title; the homepage goes without
   title: React.ReactNode;
   copy?: string;
   align?: "center" | "left";
   rule?: boolean;
+  as?: "h1" | "h2"; // h1 for the title at the top of a page
 }) {
   const center = align === "center";
   return (
@@ -22,9 +24,9 @@ export default function SectionHeading({
           {kicker}
         </p>
       )}
-      <h2 className="heading-display text-4xl sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
+      <Heading className="heading-display text-4xl sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
         {title}
-      </h2>
+      </Heading>
       {copy && (
         <p className={`mt-6 text-[0.95rem] leading-relaxed text-ink-700 ${center ? "" : "max-w-2xl"}`}>
           {copy}

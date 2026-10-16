@@ -52,6 +52,8 @@
   --animate-kenburns: kenburns 9s ease-out both;
   --animate-shimmer: shimmer 2.6s linear infinite;
   --animate-pop: pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-marquee: marquee 48s linear infinite;
+  --animate-scroll-cue: scroll-cue 2.4s var(--ease-luxe) infinite;
 
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -77,6 +79,13 @@
     from { opacity: 0; transform: scale(0.3) rotate(-25deg); }
     70% { opacity: 1; transform: scale(1.12) rotate(4deg); }
     to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+  @keyframes scroll-cue {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(200%); }
   }
 }
 
@@ -163,6 +172,45 @@ body {
     opacity 0.9s var(--ease-luxe),
     transform 0.9s var(--ease-luxe);
 }
+
+/* Story animations, played when their Unveil wrapper gains .is-in. Children
+   stagger with an inline --delay. */
+.unveil .mask {
+  display: block;
+  /* clips only below the line, with room for descenders and italic overhang */
+  clip-path: inset(-0.5em -0.5em -0.16em -0.5em);
+}
+.unveil .mask > span {
+  display: block;
+  transform: translateY(112%);
+  transition: transform 1.25s var(--ease-luxe) var(--delay, 0ms);
+}
+.unveil .fade {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 1s var(--ease-luxe) var(--delay, 0ms),
+    transform 1s var(--ease-luxe) var(--delay, 0ms);
+}
+.unveil .wipe {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.5s var(--ease-luxe) var(--delay, 0ms);
+}
+.unveil .wipe img {
+  transform: scale(1.18);
+  transition: transform 2.4s var(--ease-luxe) var(--delay, 0ms);
+}
+.unveil .draw-x,
+.unveil .draw-y {
+  transition: transform 1.3s var(--ease-luxe) var(--delay, 0ms);
+}
+.unveil .draw-x { transform: scaleX(0); transform-origin: left; }
+.unveil .draw-y { transform: scaleY(0); transform-origin: top; }
+.unveil.is-in :is(.mask > span, .fade, .wipe img, .draw-x, .draw-y) {
+  transform: none;
+}
+.unveil.is-in .fade { opacity: 1; }
+.unveil.is-in .wipe { clip-path: inset(0 0 0 0); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

@@ -3,20 +3,41 @@ import FlavorsExplorer from "@/components/FlavorsExplorer";
 import SectionHeading from "@/components/SectionHeading";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import JsonLd from "@/components/JsonLd";
+import { FLAVORS } from "@/lib/data";
+import { SITE_URL, breadcrumbs, businessRef, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+/* The flavour list as a menu, for search engines. */
+const MENU = {
+  "@context": "https://schema.org",
+  "@type": "Menu",
+  name: "Jolly's Creamery flavours",
+  url: `${SITE_URL}/flavors`,
+  provider: businessRef,
+  hasMenuItem: FLAVORS.map((f) => ({
+    "@type": "MenuItem",
+    name: f.name,
+    description: f.description,
+    image: `${SITE_URL}${f.image}`,
+  })),
+};
+
+export const metadata: Metadata = pageMetadata({
   title: "Our Flavours",
   description:
-    "Fresh, seasonal flavours: island fruits, silky classics, rich chocolates and dairy-free creamy sorbets from Jolly's Creamery, with a texture somewhere between gelato and ice cream.",
-};
+    "Fresh, seasonal flavours from Jolly's Creamery: island fruits, silky classics, rich chocolates and dairy-free sorbets, somewhere between gelato and ice cream.",
+  path: "/flavors",
+});
 
 export default function FlavorsPage() {
   return (
     <>
+      <JsonLd data={[breadcrumbs([{ name: "Our Flavours", path: "/flavors" }]), MENU]} />
       <section className="relative overflow-hidden pt-44 pb-6 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 left-[-12rem] h-[26rem] w-[26rem] bg-gold-200/40 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
+            as="h1"
             kicker="Our Flavours"
             title={
               <>

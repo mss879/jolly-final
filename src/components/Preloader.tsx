@@ -16,7 +16,14 @@ export default function Preloader() {
     const liftAt = reduced ? 900 : 2500;
     const doneAt = liftAt + (reduced ? 300 : 950);
     timers.push(setTimeout(() => setPhase("play"), 30));
-    timers.push(setTimeout(() => setPhase("lift"), liftAt));
+    timers.push(
+      setTimeout(() => {
+        setPhase("lift");
+        // lets page openings wait for the curtain (Unveil afterPreloader)
+        document.documentElement.dataset.preloaderLifted = "";
+        window.dispatchEvent(new Event("preloader:lift"));
+      }, liftAt),
+    );
     timers.push(
       setTimeout(() => {
         setPhase("done");
@@ -36,6 +43,7 @@ export default function Preloader() {
 
   return (
     <div
+      id="preloader"
       aria-hidden
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-cream-100 transition-transform duration-[950ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
       style={{ transform: phase === "lift" ? "translateY(-100%)" : "translateY(0)" }}
@@ -80,7 +88,7 @@ export default function Preloader() {
           padding scales with the words — room for the italic overhang and
           the tail of the "g", which would otherwise be clipped. */}
       <div className="mt-2 overflow-hidden px-[0.4em] pb-[0.3em] font-display text-[16vw] sm:mt-3 sm:text-7xl md:text-8xl">
-        <h1
+        <p
           className="leading-[1.05] font-medium text-plum-900 italic transition-all duration-[850ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
           style={{
             transitionDelay: "620ms",
@@ -97,7 +105,7 @@ export default function Preloader() {
           >
             {SMILEY}
           </span>
-        </h1>
+        </p>
       </div>
 
       <div

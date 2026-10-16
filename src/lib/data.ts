@@ -185,81 +185,12 @@ export const VENUES = {
 
 export const ALL_VENUES = Object.values(VENUES).flat();
 
-export type Review = {
-  name: string;
-  initial: string;
-  event: string;
-  rating: number;
-  timeAgo: string;
-  text: string;
-  accent: string; // avatar tint
-};
-
-/* ⚠️ PLACEHOLDER REVIEWS — replace with the client's real Google
-   reviews (Google Business Profile → Reviews) before launch. The
-   layout, rating maths and Google styling are production-ready. */
-export const REVIEWS: Review[] = [
-  {
-    name: "Shenali Perera",
-    initial: "S",
-    event: "Wedding · Colombo",
-    rating: 5,
-    timeAgo: "2 months ago",
-    text: "The cream and gold cart looked like it was designed for our wedding. Guests are still talking about the Jaffna Mango.",
-    accent: "#B98E2F",
-  },
-  {
-    name: "Dinesh Fernando",
-    initial: "D",
-    event: "Corporate Gala · Colombo",
-    rating: 5,
-    timeAgo: "3 weeks ago",
-    text: "Arrived early, matched the ballroom, served 300 guests without a queue. Easy from booking to the last scoop.",
-    accent: "#32004B",
-  },
-  {
-    name: "Amaya Wickramasinghe",
-    initial: "A",
-    event: "Private Party · Colombo 07",
-    rating: 5,
-    timeAgo: "1 month ago",
-    text: "Every detail considered: the flavours, the cart, the host. The salted caramel and peanuts went first.",
-    accent: "#7A5C2E",
-  },
-  {
-    name: "Ravi Jayawardena",
-    initial: "R",
-    event: "Brand Activation · Colombo",
-    rating: 5,
-    timeAgo: "2 months ago",
-    text: "We booked the cart for a launch and it became the busiest corner of the room. The sorbets were a hit in the heat.",
-    accent: "#58267A",
-  },
-  {
-    name: "Natasha de Silva",
-    initial: "N",
-    event: "Beach Wedding · South Coast",
-    rating: 5,
-    timeAgo: "5 months ago",
-    text: "They set up on the sand at golden hour. Passion fruit sorbet with that view. Our guests called it the highlight.",
-    accent: "#A0552E",
-  },
-  {
-    name: "Michael Peiris",
-    initial: "M",
-    event: "Anniversary · Colombo",
-    rating: 5,
-    timeAgo: "3 months ago",
-    text: "Understated and done properly. A beautiful cart, a warm host, and a team that cared about the evening.",
-    accent: "#2E5A46",
-  },
-];
-
-/* The listing's own figures (4.5 from 149 reviews, 1 Oct 2026) — shown in the
-   headline stats and wherever Google's live answer is not available. */
+/* The listing's own figures (4.6 from 155 reviews, 16 Oct 2026, the same
+   capture as src/lib/google-reviews-snapshot.ts) — shown in the headline
+   stats and wherever Google's live answer is not available. */
 export const GOOGLE_RATING = {
-  score: "4.5",
-  count: "140+",
+  score: "4.6",
+  count: "155",
 };
 
 export type Service = {
@@ -368,6 +299,23 @@ export const FIND_US = {
   line: "Find us at Shangri-La Colombo and Hilton Colombo, and at 30+ locations from Colombo down south.",
 } as const;
 
+/* Venue logos on the "Find Us At" hero slide, in the order of the client's
+   banner (13 Oct 2026). Cut out of that banner onto a transparent ground:
+   every file is the same 324×272 box, so the logos keep the relative sizes
+   the banner gave them. */
+export type PartnerLogo = { name: string; src: string };
+
+export const PARTNER_LOGOS: PartnerLogo[] = [
+  { name: "Shangri-La Colombo", src: "/images/partners/shangri-la-colombo.png" },
+  { name: "Taj Samudra Colombo", src: "/images/partners/taj-samudra.png" },
+  { name: "Hilton Colombo", src: "/images/partners/hilton-colombo.png" },
+  { name: "Tito's", src: "/images/partners/titos.png" },
+  { name: "Sheraton Colombo", src: "/images/partners/sheraton-colombo.png" },
+  { name: "Ramada by Wyndham Colombo", src: "/images/partners/ramada-colombo.png" },
+  { name: "Marriott Resort Weligama Bay", src: "/images/partners/marriott-weligama-bay.png" },
+  { name: "Cinnamon Lakeside Colombo", src: "/images/partners/cinnamon-lakeside.png" },
+];
+
 /* Headline stats — no flavour counts (client: "a very basic way of promoting"). */
 export const STATS = [
   ["32", "Partner locations"],
@@ -449,6 +397,9 @@ export const CARTS: Cart[] = [
 export type HeroSlide = {
   key: string;
   image: string;
+  // Portrait version (1080×1920) shown below 1024px. Without one, phones get
+  // the middle of the landscape image.
+  mobileImage?: string;
   alt: string;
   objectPos: string;
 } & (
@@ -464,6 +415,8 @@ export type HeroSlide = {
   // A finished banner with its own lettering: shown whole, with no headline,
   // buttons, cream veil or slow zoom over it.
   | { imageOnly: true }
+  // A photo with a heading and venue logos, in white tiles, coded over it.
+  | { imageOnly?: false; heading: string; logos: PartnerLogo[] }
 );
 
 /* Array order = display order. To promote a launch or an offer, move its
@@ -487,11 +440,14 @@ export const HERO_SLIDES: HeroSlide[] = [
   },
   {
     key: "find-us",
-    imageOnly: true,
-    // "Find Us At" banner supplied by the client, 13 Oct 2026
-    image: "/images/scenes/hero-find-us-at.webp",
-    alt: "A turquoise Jolly's cart in a hotel lobby beside the logos of Shangri-La Colombo, Taj Samudra, Hilton Colombo, Tito's, Sheraton Colombo, Ramada Colombo, Marriott Weligama Bay and Cinnamon Lakeside, under the heading Find Us At",
-    objectPos: "object-center",
+    heading: "Find Us At",
+    logos: PARTNER_LOGOS,
+    // Backgrounds supplied by the client, 15 Oct 2026. The logos and heading
+    // are coded on top (they used to be baked into hero-find-us-at.webp).
+    image: "/images/scenes/hero-find-us-desktop.webp",
+    mobileImage: "/images/scenes/hero-find-us-mobile.webp",
+    alt: "A red Jolly's cart with pendant lights beside Café Kai in a hotel lobby",
+    objectPos: "object-right",
   },
   {
     key: "at-home",

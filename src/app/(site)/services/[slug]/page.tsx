@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import Parallax from "@/components/Parallax";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
+import JsonLd from "@/components/JsonLd";
 import { CARTS, CONTACT, HOW_IT_WORKS, SERVICES, serviceHref } from "@/lib/data";
+import { SITE_URL, breadcrumbs, businessRef, pageMetadata, snippet } from "@/lib/seo";
 
 /* One page per service. The four are fixed, so each is built ahead of time
    and any other slug is a 404. */
@@ -19,7 +21,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const service = SERVICES.find((s) => s.slug === slug);
   if (!service) return {};
-  return { title: service.title, description: `${service.blurb} ${service.description}` };
+  return pageMetadata({
+    title: service.title,
+    description: snippet(`${service.blurb} ${service.description}`),
+    path: serviceHref(service.slug),
+  });
 }
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -27,9 +33,29 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const service = SERVICES.find((s) => s.slug === slug);
   if (!service) notFound();
   const others = SERVICES.filter((s) => s.slug !== service.slug);
+  const path = serviceHref(service.slug);
 
   return (
     <>
+      <JsonLd
+        data={[
+          breadcrumbs([
+            { name: "Services", path: "/services" },
+            { name: service.title, path },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: `Ice cream cart for ${service.title.toLowerCase()}`,
+            serviceType: "Ice cream cart catering",
+            description: service.description,
+            url: `${SITE_URL}${path}`,
+            image: `${SITE_URL}${service.image}`,
+            provider: businessRef,
+            areaServed: { "@type": "Country", name: "Sri Lanka" },
+          },
+        ]}
+      />
       <section className="relative overflow-hidden pt-40 pb-16 sm:pt-48">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] rounded-full bg-gold-200/40 blur-3xl" />
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
@@ -72,7 +98,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
           <Reveal delay={100}>
             <div className="relative">
-              <div className="absolute -top-4 -right-4 h-20 w-20 rounded-card border border-gold-300" />
+              <div className="absolute -top-4 -right-4 hidden h-20 w-20 rounded-card border border-gold-300 sm:block" />
               <Parallax
                 speed={0.07}
                 className={`relative overflow-hidden rounded-card shadow-soft ${service.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}

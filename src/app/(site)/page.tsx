@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HeroSlider from "@/components/HeroSlider";
@@ -8,8 +9,17 @@ import ReviewCard from "@/components/ReviewCard";
 import Parallax from "@/components/Parallax";
 import ParallaxBanner from "@/components/ParallaxBanner";
 import { GoogleG, Stars } from "@/components/GoogleBadge";
-import { BADGE_STAT, CARTS, FIND_US, FLAVORS, REASONS, SERVICES, STATS, serviceHref } from "@/lib/data";
-import { getGoogleReviews, reviewCountLabel } from "@/lib/google-reviews";
+import { BADGE_STAT, CARTS, FLAVORS, REASONS, SERVICES, STATS, serviceHref } from "@/lib/data";
+import { featuredReviews, getGoogleReviews, reviewCountLabel } from "@/lib/google-reviews";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Jolly's Creamery · Ice Cream Carts for Weddings & Events in Sri Lanka",
+  description:
+    "Styled ice cream carts with a live host for weddings, corporate events and parties across Sri Lanka. At Shangri-La and Hilton Colombo. You're about to feel good.",
+  path: "/",
+  absoluteTitle: true,
+});
 
 /* Home shows the carts blue → cream → red (client, Oct 2026); CARTS itself
    keeps the booking form's order. */
@@ -17,8 +27,8 @@ const HOME_CARTS = (["bubblegum-blue", "cream", "ferrari-red"] as const).flatMap
   (key) => CARTS.find((c) => c.key === key) ?? [],
 );
 
-/* The reviews come live from Google (cached six hours). */
-export const revalidate = 21600;
+/* Rebuilt daily, so the reviews' "2 months ago" stays current. */
+export const revalidate = 86400;
 
 export default async function HomePage() {
   const google = await getGoogleReviews();
@@ -32,7 +42,7 @@ export default async function HomePage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <div className="relative">
-              <div className="absolute -top-5 -left-5 h-24 w-24 rounded-card border border-gold-300" />
+              <div className="absolute -top-5 -left-5 hidden h-24 w-24 rounded-card border border-gold-300 sm:block" />
               <Parallax speed={0.08} className="relative overflow-hidden rounded-card shadow-soft">
                 <Image
                   src="/images/scenes/scene-wedding-sunset.webp"
@@ -68,9 +78,6 @@ export default async function HomePage() {
               <p className="mt-5 max-w-xl text-[0.92rem] leading-relaxed text-ink-500">
                 Wedding, corporate evening or private party: the mood lifts the
                 moment the cart rolls in, and guests remember the night for it.
-              </p>
-              <p className="mt-5 max-w-xl border-l-2 border-gold-400 pl-4 text-[0.9rem] leading-relaxed text-plum-900">
-                {FIND_US.line}
               </p>
             </Reveal>
             <Reveal delay={200}>
@@ -150,17 +157,10 @@ export default async function HomePage() {
             </div>
           </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {google.reviews.slice(0, 3).map((r, i) => (
+            {featuredReviews(google).map((r, i) => (
               <ReviewCard key={r.key} review={r} index={i} />
             ))}
           </div>
-          {google.credit && (
-            <p className="mt-5 text-[0.68rem] text-ink-500">
-              <a href={google.credit.href} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-plum-900">
-                {google.credit.label}
-              </a>
-            </p>
-          )}
           <Reveal className="mt-14">
             <Link
               href="/reviews"

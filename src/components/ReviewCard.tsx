@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { ShownReview } from "@/lib/google-reviews";
 import { GoogleG, Stars } from "./GoogleBadge";
 import Reveal from "./Reveal";
+import ReviewPhotos from "./ReviewPhotos";
 
 export default function ReviewCard({ review, index = 0 }: { review: ShownReview; index?: number }) {
   return (
@@ -37,7 +38,11 @@ export default function ReviewCard({ review, index = 0 }: { review: ShownReview;
           <Stars n={review.rating} />
           <span className="text-[0.68rem] text-ink-500">{review.when}</span>
         </div>
-        <p className="mt-4 line-clamp-8 flex-1 text-[0.88rem] leading-relaxed whitespace-pre-line text-ink-700">“{review.text}”</p>
+        {/* empty for a star-only rating */}
+        {review.text && (
+          <p className="mt-4 line-clamp-8 flex-1 text-[0.88rem] leading-relaxed whitespace-pre-line text-ink-700">“{review.text}”</p>
+        )}
+        {review.photos.length > 0 && <ReviewPhotos photos={review.photos} name={review.name} />}
         {review.href && (
           <a
             href={review.href}

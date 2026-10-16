@@ -1,8 +1,10 @@
 import { createPublicClient } from "@/lib/supabase/server";
 import { formError, readJson, text, unavailable } from "@/lib/public-forms";
+import { overLimit, tooManyRequests } from "@/lib/rate-limit";
 
 /* POST /api/contact — the contact form. Lands in /admin/inquiries. */
 export async function POST(request: Request) {
+  if (overLimit(request, "contact", 6, 10 * 60_000)) return tooManyRequests(600);
   const body = await readJson(request);
   if (!body) return Response.json({ error: "Invalid request." }, { status: 400 });
 

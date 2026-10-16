@@ -4,20 +4,25 @@ import SectionHeading from "@/components/SectionHeading";
 import ReserveForm from "@/components/ReserveForm";
 import Reveal from "@/components/Reveal";
 import { CONTACT, FIND_US, REASONS } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbs, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Reserve Your Event",
   description:
     "Reserve Jolly's on Wheels for your wedding, corporate event or private party. Pick a cart colour, tell us your flavours, or call +94 707 222 511.",
-};
+  path: "/reserve",
+});
 
 export default function ReservePage() {
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Reserve Your Event", path: "/reserve" }])} />
       <section className="relative overflow-hidden pt-44 pb-12 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] bg-plum-100/70 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
+            as="h1"
             kicker="Reserve Your Event"
             title={
               <>

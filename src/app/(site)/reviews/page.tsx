@@ -3,21 +3,25 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "@/components/SectionHeading";
 import ReviewCard from "@/components/ReviewCard";
+import ShowMore from "@/components/ShowMore";
 import RecentEvents from "@/components/RecentEvents";
 import Reveal from "@/components/Reveal";
 import { GoogleG, Stars } from "@/components/GoogleBadge";
 import { CONTACT, CTA } from "@/lib/data";
 import { getGoogleReviews, reviewCountLabel } from "@/lib/google-reviews";
 import { getPublishedEvents } from "@/lib/recent-events";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbs, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Reviews",
   description:
-    "Reviews, straight from Google, and recent events: what hosts and guests say about Jolly's on Wheels at weddings, corporate events and parties across Sri Lanka.",
-};
+    "Rated 4.6 from 155 Google reviews: what hosts and guests say about Jolly's ice cream carts at weddings, corporate events and parties across Sri Lanka.",
+  path: "/reviews",
+});
 
 /* Rebuilt at most hourly. Publishing or editing an event in the admin
-   refreshes it straight away; the Google answer is cached for six hours. */
+   refreshes it straight away. */
 export const revalidate = 3600;
 
 export default async function ReviewsPage() {
@@ -25,11 +29,13 @@ export default async function ReviewsPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Reviews", path: "/reviews" }])} />
       <section className="relative overflow-hidden pt-44 pb-14 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] rounded-full bg-gold-200/40 blur-3xl" />
         <div className="container-luxe grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <SectionHeading
+              as="h1"
               kicker="Reviews"
               title={
                 <>
@@ -89,15 +95,18 @@ export default async function ReviewsPage() {
           </p>
         </div>
 
+        {/* All 155, in Google's own order, star-only ratings included. Cards
+            keep their own height, so a rating without words stays compact. */}
         {google.reviews.length > 0 ? (
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ShowMore className="mt-10 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3" initial={12} step={24} label="Show more reviews">
             {google.reviews.map((r, i) => (
               <ReviewCard key={r.key} review={r} index={i} />
             ))}
-          </div>
+          </ShowMore>
         ) : (
           <p className="mt-10 text-sm text-ink-500">Read what our guests say on Google.</p>
         )}
+
 
         <Reveal className="mt-12 flex flex-wrap items-center gap-4">
           <a
@@ -118,13 +127,6 @@ export default async function ReviewsPage() {
             Hosted with us? Leave a review
           </a>
         </Reveal>
-        {google.credit && (
-          <p className="mt-6 text-[0.68rem] text-ink-500">
-            <a href={google.credit.href} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-plum-900">
-              {google.credit.label}
-            </a>
-          </p>
-        )}
       </section>
 
       {/* Recent events — managed in /admin/events */}

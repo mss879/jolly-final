@@ -5,20 +5,25 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import Parallax from "@/components/Parallax";
 import { HOW_IT_WORKS, SERVICES, serviceHref } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbs, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Services",
   description:
     "You host the event, we bring the mood. Ice cream carts with a live host for weddings, corporate events, private parties and brand collaborations.",
-};
+  path: "/services",
+});
 
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Services", path: "/services" }])} />
       <section className="relative overflow-hidden pt-44 pb-16 sm:pt-52">
         <div className="pointer-events-none absolute -top-24 right-[-12rem] h-[26rem] w-[26rem] bg-gold-200/40 blur-3xl" />
         <div className="container-luxe">
           <SectionHeading
+            as="h1"
             kicker="Our Services"
             title={
               <>
@@ -40,7 +45,7 @@ export default function ServicesPage() {
           >
             <Reveal>
               <div className="relative">
-                <div className={`absolute -top-4 h-20 w-20 rounded-card border border-gold-300 ${i % 2 ? "-right-4" : "-left-4"}`} />
+                <div className={`absolute -top-4 hidden h-20 w-20 rounded-card border border-gold-300 sm:block ${i % 2 ? "-right-4" : "-left-4"}`} />
                 <Parallax speed={0.07} className={`relative overflow-hidden rounded-card shadow-soft ${s.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
                   <Image
                     src={s.image}

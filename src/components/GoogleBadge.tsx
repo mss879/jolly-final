@@ -1,9 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { GOOGLE_RATING, REVIEWS } from "@/lib/data";
-
 export function GoogleG({ className = "h-5 w-5" }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" className={className} aria-hidden>
@@ -24,67 +18,5 @@ export function Stars({ n = 5, className = "h-3.5 w-3.5" }: { n?: number; classN
         </svg>
       ))}
     </span>
-  );
-}
-
-/* Google-reviews strip for the hero — rating + rotating quote. */
-export default function GoogleBadge() {
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setI((v) => (v + 1) % REVIEWS.length), 5200);
-    return () => clearInterval(t);
-  }, []);
-
-  const r = REVIEWS[i];
-
-  return (
-    <Link
-      href="/reviews"
-      className="group block rounded-card border border-gold-200/80 bg-cream-50/90 p-5 shadow-card backdrop-blur-sm transition-all duration-300 hover:border-gold-300 hover:shadow-gold sm:p-6"
-    >
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-btn bg-white shadow-[0_4px_14px_-4px_rgba(50,0,75,0.25)]">
-            <GoogleG />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display text-xl leading-none font-semibold text-plum-900">
-                {GOOGLE_RATING.score}
-              </span>
-              <Stars />
-            </div>
-            <p className="mt-1 text-[0.68rem] font-medium tracking-[0.16em] text-ink-500 uppercase">
-              {GOOGLE_RATING.count} Google reviews
-            </p>
-          </div>
-        </div>
-
-        <div className="hidden h-10 w-px bg-gold-200 sm:block" />
-
-        <div className="relative min-h-[2.6rem] flex-1 basis-56 overflow-hidden">
-          {REVIEWS.map((rv, idx) => (
-            <p
-              key={rv.name}
-              className="absolute inset-0 text-[0.83rem] leading-snug text-ink-700 italic transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{
-                opacity: idx === i ? 1 : 0,
-                transform: idx === i ? "translateY(0)" : "translateY(10px)",
-              }}
-            >
-              “{rv.text.length > 110 ? rv.text.slice(0, 110).trimEnd() + "…" : rv.text}”
-              <span className="not-italic font-medium text-plum-900"> — {rv.name}</span>
-            </p>
-          ))}
-          {/* spacer for layout */}
-          <p className="invisible text-[0.83rem] leading-snug italic">“{r.text.slice(0, 110)}” — {r.name}</p>
-        </div>
-
-        <span className="hidden text-[0.7rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-transform duration-300 group-hover:translate-x-1 md:block">
-          Read all →
-        </span>
-      </div>
-    </Link>
   );
 }

@@ -6,14 +6,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CTA, NAV } from "@/lib/data";
 
-const HOVER_CLOSE_DELAY = 160; // ms of grace before a dropdown closes on mouse-leave
-
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false); // mobile overlay
-  const [menu, setMenu] = useState<string | null>(null); // open desktop dropdown, by href
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const triggerRef = useRef<HTMLAnchorElement | null>(null);
+  // Open desktop dropdown, by href. Dropdowns open on click, not hover (client,
+  // Oct 2026: hover fired while the pointer was only passing by).
+  const [menu, setMenu] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const firstItemRef = useRef<HTMLAnchorElement | null>(null);
   const pathname = usePathname();
 
@@ -39,31 +39,17 @@ export default function Header() {
     };
   }, [open]);
 
-  useEffect(
-    () => () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    },
-    [],
-  );
+  // An open dropdown closes on a click anywhere outside the nav
+  useEffect(() => {
+    if (!menu) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!navRef.current?.contains(e.target as Node)) setMenu(null);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [menu]);
 
-  const cancelClose = () => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-  };
-  const openMenu = (key: string) => {
-    cancelClose();
-    setMenu(key);
-  };
-  const closeMenuNow = () => {
-    cancelClose();
-    setMenu(null);
-  };
-  const closeMenuSoon = () => {
-    cancelClose();
-    closeTimer.current = setTimeout(() => setMenu(null), HOVER_CLOSE_DELAY);
-  };
+  const closeMenu = () => setMenu(null);
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   const linkCls = (active: boolean) =>
@@ -105,7 +91,7 @@ export default function Header() {
           />
         </Link>
 
-        <nav className="hidden lg:block" aria-label="Primary">
+        <nav ref={navRef} className="hidden lg:block" aria-label="Primary">
           <ul className="flex items-center gap-7">
             {NAV.map((l) => {
               const active = isActive(l.href);
@@ -126,29 +112,28 @@ export default function Header() {
                 <li
                   key={l.href}
                   className="relative"
-                  onMouseEnter={() => openMenu(l.href)}
-                  onMouseLeave={closeMenuSoon}
-                  onFocus={() => openMenu(l.href)}
                   onBlur={(e: FocusEvent<HTMLLIElement>) => {
-                    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) closeMenuNow();
+                    // keyboard focus moving out of the menu closes it
+                    if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget as Node)) closeMenu();
                   }}
                   onKeyDown={(e: KeyboardEvent<HTMLLIElement>) => {
                     if (e.key === "Escape") {
                       e.preventDefault();
-                      // focus first: the trigger's onFocus re-opens, so close afterwards
+                      closeMenu();
                       triggerRef.current?.focus();
-                      closeMenuNow();
                     } else if (e.key === "ArrowDown" && e.target === triggerRef.current) {
                       e.preventDefault();
-                      openMenu(l.href);
-                      firstItemRef.current?.focus();
+                      setMenu(l.href);
+                      // the panel is visibility:hidden until the re-render
+                      requestAnimationFrame(() => firstItemRef.current?.focus());
                     }
                   }}
                 >
-                  <Link
+                  <button
                     ref={triggerRef}
-                    href={l.href}
-                    className={linkCls(active)}
+                    type="button"
+                    onClick={() => setMenu(isOpen ? null : l.href)}
+                    className={`${linkCls(active)} cursor-pointer`}
                     aria-haspopup="true"
                     aria-expanded={isOpen}
                     aria-controls={panelId}
@@ -165,9 +150,9 @@ export default function Header() {
                       <path d="M2.5 4.5 6 8l3.5-3.5" />
                     </svg>
                     {underline(active)}
-                  </Link>
+                  </button>
 
-                  {/* pt-3 bridges the gap so the pointer never leaves the hit area */}
+                  {/* pt-3 sets the panel just below the trigger */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
                     <ul
                       id={panelId}
@@ -180,7 +165,7 @@ export default function Header() {
                           <Link
                             ref={i === 0 ? firstItemRef : undefined}
                             href={c.href}
-                            onClick={closeMenuNow}
+                            onClick={closeMenu}
                             className="block rounded-btn px-4 py-2.5 text-[0.72rem] font-medium tracking-[0.16em] text-ink-700 uppercase transition-colors hover:bg-cream-200/70 hover:text-plum-900 focus-visible:bg-cream-200/70 focus-visible:outline-none"
                           >
                             {c.label}
@@ -190,7 +175,7 @@ export default function Header() {
                       <li className="mt-1 border-t border-gold-200/70 pt-1">
                         <Link
                           href={l.href}
-                          onClick={closeMenuNow}
+                          onClick={closeMenu}
                           className="block rounded-btn px-4 py-2.5 text-[0.66rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-colors hover:bg-cream-200/70 hover:text-plum-900 focus-visible:bg-cream-200/70 focus-visible:outline-none"
                         >
                           All services →

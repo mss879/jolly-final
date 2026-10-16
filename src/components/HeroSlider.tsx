@@ -1,19 +1,75 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
-import { HERO_SLIDES } from "@/lib/data";
+import { HERO_SLIDES, type HeroSlide, type PartnerLogo } from "@/lib/data";
 
 /* Slides live in src/lib/data.ts (HERO_SLIDES) — array order is display
    order, so a launch/offer slide can be promoted by moving it to index 0. */
 const SLIDES = HERO_SLIDES;
 const DURATION = 7500;
+/* One <h1> for the page: the first headline slide's. The others are styled
+   the same but are not headings. */
+const H1_SLIDE = SLIDES.findIndex((s) => !s.imageOnly && !("logos" in s));
+
+/* The slide photo. A slide with a mobileImage swaps to its portrait version
+   below 1024px — the same breakpoint where the logo wall changes layout. */
+function SlideImage({ s, preload, className }: { s: HeroSlide; preload: boolean; className: string }) {
+  if (!s.mobileImage) {
+    return <Image src={s.image} alt={s.alt} fill preload={preload} sizes="100vw" className={className} />;
+  }
+  const common = { alt: s.alt, fill: true, sizes: "100vw", loading: preload ? "eager" : undefined } as const;
+  const {
+    props: { srcSet: desktop },
+  } = getImageProps({ ...common, src: s.image });
+  const {
+    props: { srcSet: mobile, ...rest },
+  } = getImageProps({ ...common, src: s.mobileImage });
+  return (
+    <picture>
+      <source media="(min-width: 1024px)" srcSet={desktop} />
+      <img {...rest} srcSet={mobile} alt={s.alt} className={className} />
+    </picture>
+  );
+}
+
+/* "Find Us At": the heading and venue logos in white tiles. Phones and
+   tablets put the heading under the navbar and the logos along the bottom,
+   clear of the cart; desktop stacks both on the right, beside it. */
+function LogoWall({ heading, logos }: { heading: string; logos: PartnerLogo[] }) {
+  return (
+    <div className="container-wide relative flex h-full flex-col justify-between pt-24 pb-24 sm:pt-28 lg:max-w-none lg:items-end lg:justify-center lg:gap-8 lg:pt-20 lg:pb-0 lg:pr-[6vw]">
+      <div className="text-center lg:w-[28rem] xl:w-[34rem] 2xl:w-[38rem]">
+        <h2 className="heading-display text-[2.4rem] sm:text-5xl xl:text-6xl">{heading}</h2>
+        <span aria-hidden className="mx-auto mt-3 block h-px w-44 bg-gold-400/80 sm:w-64 lg:mt-5 lg:w-full" />
+      </div>
+      <ul className="grid grid-cols-4 gap-2 sm:gap-3 lg:w-[28rem] xl:w-[34rem] xl:gap-4 2xl:w-[38rem]">
+        {logos.map((l) => (
+          <li
+            key={l.name}
+            className="flex items-center justify-center rounded-btn bg-white p-1 shadow-card ring-1 ring-gold-200/50 sm:rounded-card sm:p-2"
+          >
+            <Image
+              src={l.src}
+              alt={l.name}
+              width={324}
+              height={272}
+              sizes="(min-width: 1536px) 140px, (min-width: 1280px) 124px, (min-width: 1024px) 104px, 25vw"
+              className="h-auto w-full"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function HeroSlider() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touch = useRef<{ x: number; y: number } | null>(null);
 
   const go = useCallback((i: number) => {
     setActive((i + SLIDES.length) % SLIDES.length);
@@ -32,6 +88,18 @@ export default function HeroSlider() {
       aria-label="Highlights"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      // a sideways swipe changes slide on touch screens
+      onTouchStart={(e) => {
+        touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }}
+      onTouchEnd={(e) => {
+        const start = touch.current;
+        touch.current = null;
+        if (!start) return;
+        const dx = e.changedTouches[0].clientX - start.x;
+        const dy = e.changedTouches[0].clientY - start.y;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) go(active + (dx < 0 ? 1 : -1));
+      }}
     >
       <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden">
         {/* full-bleed banners */}
@@ -44,18 +112,23 @@ export default function HeroSlider() {
               className="absolute inset-0 transition-opacity duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
               style={{ opacity: on ? 1 : 0 }}
             >
-              <Image
-                src={s.image}
-                alt={s.alt}
-                fill
+              <SlideImage
+                s={s}
                 preload={i === 0}
-                sizes="100vw"
                 className={`object-cover ${s.objectPos} ${on && !s.imageOnly ? "animate-kenburns" : ""}`}
               />
               {s.imageOnly ? (
                 // cream veil across the top only, so the logo and navbar read
                 // as clearly as on the other slides
                 <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent" />
+              ) : "logos" in s ? (
+                <>
+                  {/* top veil for the navbar (and the heading, on phones);
+                      on desktop a cream wash behind the heading on the right */}
+                  <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent lg:h-40" />
+                  <div className="absolute inset-y-0 right-0 hidden w-3/5 bg-gradient-to-l from-cream-100/90 from-25% via-cream-100/55 via-60% to-transparent lg:block" />
+                  <LogoWall heading={s.heading} logos={s.logos} />
+                </>
               ) : (
                 <>
                   {/* cream veil for typography */}
@@ -73,8 +146,9 @@ export default function HeroSlider() {
         <div className="container-wide relative flex h-full flex-col justify-center">
           <div className="relative max-w-4xl pt-16">
             {SLIDES.map((s, i) => {
-              if (s.imageOnly) return null;
+              if (s.imageOnly || "logos" in s) return null;
               const on = i === active;
+              const Headline = i === H1_SLIDE ? "h1" : "p";
               return (
                 <div
                   key={s.key}
@@ -92,10 +166,10 @@ export default function HeroSlider() {
                       {s.badge}
                     </span>
                   )}
-                  <h1 className="heading-display text-[2.15rem] leading-[1.06] text-balance sm:text-[3.25rem] lg:text-6xl xl:text-[3.85rem]">
+                  <Headline className="heading-display text-[2.15rem] leading-[1.06] text-balance sm:text-[3.25rem] lg:text-6xl xl:text-[3.85rem]">
                     <span className="block">{s.line1}</span>
                     <span className="mt-2 block italic text-gold-600">{s.line2}</span>
-                  </h1>
+                  </Headline>
                   <p className="mt-6 max-w-xl text-[0.95rem] leading-relaxed text-ink-700 sm:text-base">
                     {s.copy}
                   </p>
@@ -128,7 +202,7 @@ export default function HeroSlider() {
             <span className="mx-2 text-gold-500">/</span>
             {String(SLIDES.length).padStart(2, "0")}
           </p>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col">
             {SLIDES.map((s, i) => (
               <button
                 key={s.key}
@@ -136,18 +210,21 @@ export default function HeroSlider() {
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === active}
                 onClick={() => go(i)}
-                className="group relative h-[3px] w-14 overflow-hidden rounded-full bg-gold-200"
+                // the padding is the tap area; the bar itself stays a hairline
+                className="group block py-[7px]"
               >
-                {i === active && (
-                  <span
-                    key={`bar-${active}-${paused ? "p" : "r"}`}
-                    className="absolute inset-y-0 left-0 bg-plum-900"
-                    style={{
-                      animation: paused ? "none" : `hero-progress ${DURATION}ms linear forwards`,
-                      width: paused ? "100%" : undefined,
-                    }}
-                  />
-                )}
+                <span className="relative block h-[3px] w-14 overflow-hidden rounded-full bg-gold-200">
+                  {i === active && (
+                    <span
+                      key={`bar-${active}-${paused ? "p" : "r"}`}
+                      className="absolute inset-y-0 left-0 bg-plum-900"
+                      style={{
+                        animation: paused ? "none" : `hero-progress ${DURATION}ms linear forwards`,
+                        width: paused ? "100%" : undefined,
+                      }}
+                    />
+                  )}
+                </span>
               </button>
             ))}
           </div>
