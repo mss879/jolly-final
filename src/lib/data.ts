@@ -10,8 +10,8 @@ export const CONTACT = {
   phone2: "+94 705 336 452",
   phone2Href: "tel:+94705336452",
   whatsappHref: "https://wa.me/94707222511",
-  email: "key.account@creamndairy.com",
-  emailHref: "mailto:key.account@creamndairy.com",
+  email: "eventsteam@creamndairy.com",
+  emailHref: "mailto:eventsteam@creamndairy.com",
   facebook: "https://www.facebook.com/Jollyscreamery",
   instagram: "https://www.instagram.com/jollys_creamery/",
   tiktok: "https://www.tiktok.com/@jollyscreamery",
@@ -350,6 +350,7 @@ export type Cart = {
   copy: string;
   occasion: string; // where it suits best, shown beside the colour in the reserve form
   formImage: string; // the reserve form's preview, each cart in a marble hotel lobby
+  formAlt?: string; // when the form photo isn't the usual cart-with-a-bicycle shot
 };
 
 /* Names and photos from the client's brochure. Order = order on the site and
@@ -388,7 +389,10 @@ export const CARTS: Cart[] = [
     alt: "Ferrari Red Jolly's cart with a red bicycle and flower basket in a curtained hotel ballroom",
     copy: "A bold statement piece for galas, festive seasons and grand celebrations.",
     occasion: "Galas and grand celebrations",
-    formImage: "/red-cart.png",
+    // Photo supplied by the client, 16 Oct 2026 (the same shot as the hero's
+    // phone background, kept as its own file)
+    formImage: "/images/carts/form-ferrari-red.webp",
+    formAlt: "Ferrari Red Jolly's cart with three pendant lights in a hotel lobby",
   },
 ];
 

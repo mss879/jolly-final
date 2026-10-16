@@ -6,6 +6,7 @@ import Reveal from "@/components/Reveal";
 import { CONTACT, FIND_US, REASONS } from "@/lib/data";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbs, pageMetadata } from "@/lib/seo";
+import { WhatsAppGlyph } from "@/components/SocialLinks";
 
 export const metadata: Metadata = pageMetadata({
   title: "Reserve Your Event",
@@ -67,7 +68,7 @@ export default function ReservePage() {
                     className="flex items-center justify-center gap-2 rounded-btn border border-gold-400 px-3 py-3 text-[0.72rem] font-semibold tracking-[0.14em] text-plum-900 uppercase"
                   >
                     <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="currentColor" aria-hidden>
-                      <path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3zm0 1.7a7.3 7.3 0 1 1-3.9 13.5l-.3-.2-2.8.7.8-2.7-.2-.3A7.3 7.3 0 0 1 12 4.7zm-2.6 3.2c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.1.9 2.6.7 3 .7.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.5-.3-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.5-.7-2.3-1.4-.6-.6-1-1.2-1.3-1.8-.1-.2 0-.4.1-.5l.6-.7c.1-.2.1-.4 0-.6L9.9 8.3c-.1-.3-.3-.4-.5-.4z" />
+                      <WhatsAppGlyph />
                     </svg>
                     WhatsApp
                   </a>

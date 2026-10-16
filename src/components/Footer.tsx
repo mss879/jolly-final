@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import SocialLinks from "./SocialLinks";
-import { BRAND_BLURB, CONTACT, CTA, FIND_US, FOOTER_LINKS, SMILEY } from "@/lib/data";
+import { BRAND_BLURB, CONTACT, CTA, FOOTER_LINKS, SMILEY } from "@/lib/data";
 
 const columnHeading = "text-[0.68rem] font-semibold tracking-[0.28em] text-gold-300 uppercase";
 const footerLink =
@@ -107,9 +107,6 @@ export default function Footer() {
             >
               {CONTACT.email}
             </a>
-            <p className="mt-6 border-t border-cream-100/10 pt-5 text-[0.8rem] leading-relaxed text-cream-100/55">
-              {FIND_US.line}
-            </p>
           </div>
         </div>
       </div>
@@ -117,8 +114,27 @@ export default function Footer() {
       {/* Legal bar */}
       <div className="bg-plum-950 py-5">
         <div className="container-luxe flex flex-col items-center justify-between gap-2 text-center text-[0.66rem] leading-relaxed tracking-[0.2em] text-cream-100/50 uppercase sm:flex-row sm:text-left">
-          <p>© {new Date().getFullYear()} Jolly&apos;s Creamery · All rights reserved</p>
-          <p>Made in Colombo, Sri Lanka</p>
+          <p>
+            © {new Date().getFullYear()} Jolly&apos;s Creamery · All rights reserved
+            <span className="hidden sm:inline"> · </span>
+            <span className="block sm:inline">Made in Colombo, Sri Lanka</span>
+          </p>
+          {/* Studio credit: a normal (followed) link, so it counts for arcai.agency */}
+          <a
+            href="https://www.arcai.agency"
+            target="_blank"
+            rel="noopener"
+            className="group inline-flex items-center gap-3 transition-colors duration-300 hover:text-cream-100"
+          >
+            Built and designed by
+            <Image
+              src="/images/brand/arc-ai-logo.webp"
+              alt="Arc AI"
+              width={326}
+              height={84}
+              className="h-[22px] w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+            />
+          </a>
         </div>
       </div>
     </footer>

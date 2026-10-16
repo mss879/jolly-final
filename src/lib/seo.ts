@@ -98,6 +98,7 @@ export function siteGraph() {
         name: SITE_NAME,
         inLanguage: "en-GB",
         publisher: { "@id": BUSINESS_ID },
+        creator: { "@type": "Organization", name: "Arc AI", url: "https://www.arcai.agency" },
       },
     ],
   };

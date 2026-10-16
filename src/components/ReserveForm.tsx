@@ -480,7 +480,7 @@ export default function ReserveForm() {
               <Image
                 key={c.key}
                 src={c.formImage}
-                alt={c.key === cart ? `${c.name} Jolly's cart with a bicycle in a marble hotel lobby` : ""}
+                alt={c.key === cart ? (c.formAlt ?? `${c.name} Jolly's cart with a bicycle in a marble hotel lobby`) : ""}
                 fill
                 sizes="(min-width: 1280px) 244px, (min-width: 640px) 192px, 120px"
                 className={`object-cover transition-opacity duration-500 ${c.key === cart ? "opacity-100" : "opacity-0"}`}
@@ -548,8 +548,13 @@ export default function ReserveForm() {
               name="custom_flavour"
               maxLength={200}
               placeholder="Tell us the flavours you have in mind"
+              aria-describedby="custom_flavour_note"
               className={inputCls}
             />
+            <p id="custom_flavour_note" className="mt-2 flex items-center gap-2 text-[0.78rem] text-ink-500">
+              <span aria-hidden className="h-1.5 w-1.5 shrink-0 rotate-45 bg-gold-500" />
+              Custom flavours need a minimum of 500 cups.
+            </p>
           </div>
         )}
       </fieldset>
