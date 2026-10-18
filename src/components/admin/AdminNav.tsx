@@ -7,10 +7,11 @@ import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/admin/actions/auth";
 import Icon, { type IconName } from "./icons";
 
-type Counts = { newInquiries: number; pendingBookings: number };
+type Counts = { newInquiries: number; pendingBookings: number; chatsAttention: number };
 
 const LINKS: { href: string; label: string; icon: IconName; count?: keyof Counts; hint?: string }[] = [
   { href: "/admin", label: "Dashboard", icon: "dashboard" },
+  { href: "/admin/chats", label: "Chats", icon: "chat", count: "chatsAttention", hint: "need you" },
   { href: "/admin/inquiries", label: "Inquiries", icon: "inbox", count: "newInquiries", hint: "new" },
   { href: "/admin/crm", label: "CRM", icon: "board" },
   { href: "/admin/bookings", label: "Bookings", icon: "bookings", count: "pendingBookings", hint: "awaiting confirmation" },

@@ -32,6 +32,9 @@ const PATHS = {
   photo: "M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5M15.5 9h.01",
   upload: "M12 16V4M7 9l5-5 5 5M4 16v4h16v-4",
   star: "M12 4l2.5 5.2 5.5.8-4 3.9 1 5.6-5-2.7-5 2.7 1-5.6-4-3.9 5.5-.8z",
+  chat: "M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4.5 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01",
+  person: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0",
+  send: "M4 12l16-7-6 16-3-6.5zM11 14.5L20 5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

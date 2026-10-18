@@ -35,17 +35,18 @@ export function createPublicClient() {
   return createSupabaseClient<Database>(SUPABASE_URL, SUPABASE_KEY, { auth: NO_SESSION });
 }
 
-/* For the three public form endpoints only (submit_inquiry, track_booking,
-   submit_booking), which migration 20261016120000 closed to the publishable
-   key. Uses the server-only SUPABASE_SECRET_KEY, which bypasses Row Level
-   Security: never use it for anything else. */
+/* For the public endpoints only: the three form functions (submit_inquiry,
+   track_booking, submit_booking), which migration 20261016120000 closed to
+   the publishable key, and the chat_* functions behind /api/chat. Uses the
+   server-only SUPABASE_SECRET_KEY, which bypasses Row Level Security: call
+   those functions with it and never use it for anything else. */
 let warnedNoSecret = false;
 export function createFormsClient() {
   if (!supabaseConfigured) return null;
   const secret = process.env.SUPABASE_SECRET_KEY;
   if (!secret && !warnedNoSecret && process.env.NODE_ENV === "production") {
     warnedNoSecret = true;
-    console.error("[forms] SUPABASE_SECRET_KEY is not set: the contact and reserve forms can't save.");
+    console.error("[forms] SUPABASE_SECRET_KEY is not set: the contact form, reserve form and chat can't save.");
   }
   return createSupabaseClient<Database>(SUPABASE_URL, secret || SUPABASE_KEY, { auth: NO_SESSION });
 }

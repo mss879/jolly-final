@@ -125,7 +125,14 @@ export default function BookingDetailView({ detail }: { detail: BookingDetail })
           </Card>
           <Card title="Where it came from">
             <dl className="flex flex-col gap-4">
-              <Field label="Source">{sourceLabel(b.source)}</Field>
+              <Field label="Source">
+                {sourceLabel(b.source)}
+                {b.source === "AI chat" && (
+                  <Link href={`/admin/chats?id=${b.session_id}`} className="mt-1 flex items-center gap-1 text-[0.78rem] font-semibold text-plum-900 hover:text-gold-700">
+                    Open the conversation <Icon name="arrow" className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </Field>
               <Field label="Device">{b.device ? b.device[0].toUpperCase() + b.device.slice(1) : "Unknown"}</Field>
               {b.landing_path && (
                 <Field label="Landing page">

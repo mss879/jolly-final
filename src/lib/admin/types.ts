@@ -1,4 +1,5 @@
 import type { BookingStatus, LeadSource } from "@/lib/supabase/database.types";
+import type { ChatBlock } from "@/lib/chat/types";
 
 /* Shapes the admin pages pass to their components. Kept separate from the
    row types so client components only ever receive the columns they show. */
@@ -21,6 +22,7 @@ export const LEAD_SOURCE: Record<LeadSource, string> = {
   inquiry: "Inquiry",
   booking: "Booking",
   manual: "Added by hand",
+  chat: "AI chat",
 };
 
 export type Stage = { id: string; name: string; isSystem: boolean };
@@ -39,6 +41,7 @@ export type Lead = {
   source: LeadSource;
   inquiryId: string | null;
   bookingId: string | null;
+  chatSessionId: string | null;
   createdAt: string;
 };
 
@@ -97,5 +100,56 @@ export type FormAnalytics = {
 
 export const ANALYTICS_RANGES = [7, 30, 90] as const;
 export type AnalyticsRange = (typeof ANALYTICS_RANGES)[number];
+
+/* ─── AI chat ─── */
+
+export type ChatSummary = {
+  id: string;
+  mode: "ai" | "human";
+  attention: boolean;
+  handoverReason: string | null;
+  visitorName: string | null;
+  visitorEmail: string | null;
+  visitorPhone: string | null;
+  preview: string | null;
+  lastRole: "user" | "assistant" | "agent" | null;
+  messageCount: number;
+  lastMessageAt: string;
+  visitorSeenAt: string;
+  hasBooking: boolean;
+  hasLead: boolean;
+};
+
+export type ChatDetail = ChatSummary & {
+  firstPage: string | null;
+  lastPage: string | null;
+  device: string | null;
+  createdAt: string;
+  bookingId: string | null;
+  leadId: string | null;
+};
+
+/* A message as the admin sees it: who on the team wrote it, too. */
+export type AdminChatMessage = {
+  id: number;
+  role: "user" | "assistant" | "agent" | "system";
+  content: string;
+  blocks: ChatBlock[];
+  createdAt: string;
+  author: string | null;
+};
+
+/* What the open conversation checks for every few seconds. */
+export type ChatUpdate = {
+  chat: ChatDetail;
+  messages: AdminChatMessage[];
+};
+
+/* Until the AI learns their name, a visitor goes by the start of their chat id. */
+export const visitorLabel = (chat: Pick<ChatSummary, "id" | "visitorName">) =>
+  chat.visitorName ?? `Visitor ${chat.id.slice(0, 4).toUpperCase()}`;
+
+/* A visitor whose widget checked in this recently counts as online. */
+export const ONLINE_WINDOW_MS = 60_000;
 
 export type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };

@@ -169,13 +169,20 @@ export default function LeadDialog({
           <textarea id="lead-notes" name="notes" rows={5} maxLength={10000} defaultValue={lead?.notes ?? ""} className={inputCls} />
         </div>
 
-        {lead && (lead.inquiryId || lead.bookingId) && (
+        {lead && (lead.inquiryId || lead.bookingId || lead.chatSessionId) && (
           <p className="text-[0.8rem] text-ink-500 sm:col-span-2">
             <Link
-              href={lead.inquiryId ? `/admin/inquiries?id=${lead.inquiryId}` : `/admin/bookings/${lead.bookingId}`}
+              href={
+                lead.inquiryId
+                  ? `/admin/inquiries?id=${lead.inquiryId}`
+                  : lead.bookingId
+                    ? `/admin/bookings/${lead.bookingId}`
+                    : `/admin/chats?id=${lead.chatSessionId}`
+              }
               className="inline-flex items-center gap-1 font-semibold text-plum-900 hover:text-gold-700"
             >
-              Open the original {lead.inquiryId ? "inquiry" : "booking"} <Icon name="arrow" className="h-3.5 w-3.5" />
+              Open the original {lead.inquiryId ? "inquiry" : lead.bookingId ? "booking" : "chat"}{" "}
+              <Icon name="arrow" className="h-3.5 w-3.5" />
             </Link>
           </p>
         )}

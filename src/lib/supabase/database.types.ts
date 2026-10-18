@@ -1,4 +1,5 @@
-/* Types for the schema in supabase/migrations (admin backend + recent events).
+/* Types for the schema in supabase/migrations (admin backend, recent events,
+   AI chat).
    Written by hand in the shape `supabase gen types typescript` produces —
    regenerate with the CLI once the project is linked, and keep the
    exported aliases at the bottom. */
@@ -7,7 +8,9 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type InquiryStatus = "new" | "read" | "archived";
 export type BookingStatus = "in_progress" | "pending" | "confirmed" | "declined" | "cancelled";
-export type LeadSource = "inquiry" | "booking" | "manual";
+export type LeadSource = "inquiry" | "booking" | "manual" | "chat";
+export type ChatMode = "ai" | "human";
+export type ChatRole = "user" | "assistant" | "agent" | "system";
 export type Device = "mobile" | "tablet" | "desktop";
 
 export type Database = {
@@ -245,6 +248,7 @@ export type Database = {
           source: LeadSource;
           inquiry_id: string | null;
           booking_id: string | null;
+          chat_session_id: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -264,6 +268,7 @@ export type Database = {
           source?: LeadSource;
           inquiry_id?: string | null;
           booking_id?: string | null;
+          chat_session_id?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -283,6 +288,7 @@ export type Database = {
           source?: LeadSource;
           inquiry_id?: string | null;
           booking_id?: string | null;
+          chat_session_id?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -325,6 +331,92 @@ export type Database = {
           published?: boolean;
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_sessions: {
+        Row: {
+          id: string;
+          mode: ChatMode;
+          attention: boolean;
+          handover_reason: string | null;
+          visitor_name: string | null;
+          visitor_email: string | null;
+          visitor_phone: string | null;
+          booking_draft: Json;
+          first_page: string | null;
+          last_page: string | null;
+          device: Device | null;
+          user_agent: string | null;
+          message_count: number;
+          visitor_message_count: number;
+          last_preview: string | null;
+          last_role: "user" | "assistant" | "agent" | null;
+          last_message_at: string;
+          last_visitor_message_at: string | null;
+          visitor_seen_at: string;
+          taken_over_at: string | null;
+          taken_over_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          mode?: ChatMode;
+          attention?: boolean;
+          handover_reason?: string | null;
+          visitor_name?: string | null;
+          visitor_email?: string | null;
+          visitor_phone?: string | null;
+          booking_draft?: Json;
+          first_page?: string | null;
+          last_page?: string | null;
+          device?: Device | null;
+          user_agent?: string | null;
+          message_count?: number;
+          visitor_message_count?: number;
+          last_message_at?: string;
+          last_visitor_message_at?: string | null;
+          visitor_seen_at?: string;
+          taken_over_at?: string | null;
+          taken_over_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          mode?: ChatMode;
+          attention?: boolean;
+          handover_reason?: string | null;
+          visitor_name?: string | null;
+          visitor_email?: string | null;
+          visitor_phone?: string | null;
+          booking_draft?: Json;
+          last_page?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: number;
+          session_id: string;
+          role: ChatRole;
+          content: string;
+          blocks: Json;
+          author_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          session_id: string;
+          role: ChatRole;
+          content?: string;
+          blocks?: Json;
+          author_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          content?: string;
+          blocks?: Json;
         };
         Relationships: [];
       };
@@ -409,6 +501,30 @@ export type Database = {
           photos: string[];
         }[];
       };
+      chat_append: {
+        Args: { p_session_id: string; p_role: "user" | "assistant" | "system"; p_content: string; p_blocks?: Json; p_context?: Json };
+        Returns: Json;
+      };
+      chat_feed: {
+        Args: { p_session_id: string; p_after?: number; p_limit?: number };
+        Returns: Json;
+      };
+      chat_update: {
+        Args: { p_session_id: string; p_fields: Json };
+        Returns: undefined;
+      };
+      chat_capture_lead: {
+        Args: { p_session_id: string; p_fields: Json };
+        Returns: string;
+      };
+      chat_admin_reply: {
+        Args: { p_session_id: string; p_content: string };
+        Returns: number;
+      };
+      chat_admin_set_mode: {
+        Args: { p_session_id: string; p_mode: ChatMode };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -426,3 +542,5 @@ export type BookingRow = PublicTables["bookings"]["Row"];
 export type StageRow = PublicTables["crm_stages"]["Row"];
 export type LeadRow = PublicTables["crm_leads"]["Row"];
 export type RecentEventRow = PublicTables["recent_events"]["Row"];
+export type ChatSessionRow = PublicTables["chat_sessions"]["Row"];
+export type ChatMessageRow = PublicTables["chat_messages"]["Row"];

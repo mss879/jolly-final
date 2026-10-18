@@ -12,7 +12,7 @@ async function navCounts() {
   } catch (error) {
     unstable_rethrow(error);
     console.error(error);
-    return { newInquiries: 0, pendingBookings: 0 };
+    return { newInquiries: 0, pendingBookings: 0, chatsAttention: 0 };
   }
 }
 

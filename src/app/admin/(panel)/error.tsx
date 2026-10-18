@@ -17,7 +17,7 @@ export default function AdminError({ error, reset }: { error: Error & { digest?:
       </p>
       <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-500">
         {missingSchema
-          ? "Run supabase/migrations/20260917120000_admin_backend.sql in the Supabase SQL editor, then reload."
+          ? "Run the files in supabase/migrations in the Supabase SQL editor, oldest first (the AI chat needs 20261018120000_ai_chat.sql), then reload."
           : "Something went wrong while fetching the data. Try again in a moment."}
       </p>
       <button type="button" onClick={reset} className={`${btnPrimary} mt-6`}>

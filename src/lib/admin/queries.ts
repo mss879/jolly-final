@@ -1,11 +1,17 @@
 import "server-only";
 import type { PostgrestError } from "@supabase/supabase-js";
-import type { BookingRow, InquiryRow, LeadRow, RecentEventRow } from "@/lib/supabase/database.types";
+import type { BookingRow, ChatSessionRow, InquiryRow, LeadRow, RecentEventRow } from "@/lib/supabase/database.types";
+import { isMissingSchema } from "@/lib/supabase/config";
+import { toBlocks } from "@/lib/chat/store";
 import { requireAdmin } from "./auth";
 import { addDays, colomboDay, startOfColomboDay, weekdayIndex } from "./format";
 import type {
+  AdminChatMessage,
   AnalyticsRange,
   BookingSummary,
+  ChatDetail,
+  ChatSummary,
+  ChatUpdate,
   FormAnalytics,
   InquirySummary,
   Lead,
@@ -112,6 +118,7 @@ function toLead(row: LeadRow): Lead {
     source: row.source,
     inquiryId: row.inquiry_id,
     bookingId: row.booking_id,
+    chatSessionId: row.chat_session_id ?? null,
     createdAt: row.created_at,
   };
 }
@@ -120,12 +127,18 @@ function toLead(row: LeadRow): Lead {
 
 export async function getNavCounts() {
   const { supabase, verify } = await requireAdmin();
-  const [, inquiries, bookings] = await Promise.all([
+  const [, inquiries, bookings, chats] = await Promise.all([
     verify(),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "new"),
     supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("chat_sessions").select("id", { count: "exact", head: true }).eq("attention", true),
   ]);
-  return { newInquiries: count(inquiries), pendingBookings: count(bookings) };
+  return {
+    newInquiries: count(inquiries),
+    pendingBookings: count(bookings),
+    // Zero until the AI chat migration has been run.
+    chatsAttention: isMissingSchema(chats.error) ? 0 : count(chats),
+  };
 }
 
 /* ─── Inquiries ─── */
@@ -532,3 +545,147 @@ export async function getDashboard() {
 export type DashboardData = Awaited<ReturnType<typeof getDashboard>>;
 export type CalendarData = Awaited<ReturnType<typeof getCalendarMonth>>;
 export type BookingDetail = NonNullable<Awaited<ReturnType<typeof getBooking>>>;
+
+/* ─── AI chat ─── */
+
+export type ChatView = "all" | "attention" | "human";
+
+const CHAT_COLUMNS =
+  "id, mode, attention, handover_reason, visitor_name, visitor_email, visitor_phone, last_preview, last_role, message_count, last_message_at, visitor_seen_at";
+type ChatPick = Pick<
+  ChatSessionRow,
+  | "id"
+  | "mode"
+  | "attention"
+  | "handover_reason"
+  | "visitor_name"
+  | "visitor_email"
+  | "visitor_phone"
+  | "last_preview"
+  | "last_role"
+  | "message_count"
+  | "last_message_at"
+  | "visitor_seen_at"
+>;
+
+function toChat(row: ChatPick, links: { booking?: string | null; lead?: string | null } = {}): ChatSummary {
+  return {
+    id: row.id,
+    mode: row.mode,
+    attention: row.attention,
+    handoverReason: row.handover_reason,
+    visitorName: row.visitor_name,
+    visitorEmail: row.visitor_email,
+    visitorPhone: row.visitor_phone,
+    preview: row.last_preview,
+    lastRole: row.last_role,
+    messageCount: row.message_count,
+    lastMessageAt: row.last_message_at,
+    visitorSeenAt: row.visitor_seen_at,
+    hasBooking: Boolean(links.booking),
+    hasLead: Boolean(links.lead),
+  };
+}
+
+export async function getChats(view: ChatView, requestedPage: number) {
+  const { supabase, verify } = await requireAdmin();
+  const head = () => supabase.from("chat_sessions").select("id", { count: "exact", head: true });
+  const listFrom = (start: number) => {
+    let q = supabase
+      .from("chat_sessions")
+      .select(CHAT_COLUMNS)
+      .order("last_message_at", { ascending: false })
+      .range(start, start + PAGE_SIZE - 1);
+    if (view === "attention") q = q.eq("attention", true);
+    if (view === "human") q = q.eq("mode", "human");
+    return q;
+  };
+
+  const asked = Math.max(1, requestedPage);
+  const [, all, attention, human, listed] = await Promise.all([
+    verify(),
+    head(),
+    head().eq("attention", true),
+    head().eq("mode", "human"),
+    listFrom((asked - 1) * PAGE_SIZE),
+  ]);
+
+  const counts = { all: count(all), attention: count(attention), human: count(human) };
+  const { page, pages, from } = clampPage(asked, counts[view]);
+  const rows = must(page === asked ? listed : await listFrom(from));
+
+  // A chat's booking shares its id (bookings.session_id); its lead links back to it.
+  const ids = rows.map((r) => r.id);
+  const [bookings, leads] = ids.length
+    ? await Promise.all([
+        supabase.from("bookings").select("id, session_id").in("session_id", ids),
+        supabase.from("crm_leads").select("id, chat_session_id").in("chat_session_id", ids),
+      ])
+    : [null, null];
+  const bookingFor = new Map((bookings ? must(bookings) : []).map((b) => [b.session_id, b.id]));
+  const leadFor = new Map((leads ? must(leads) : []).map((l) => [l.chat_session_id, l.id]));
+
+  return {
+    now: Date.now(),
+    page,
+    pages,
+    counts,
+    chats: rows.map((r) => toChat(r, { booking: bookingFor.get(r.id), lead: leadFor.get(r.id) })),
+  };
+}
+
+const MESSAGE_LIMIT = 500;
+
+/* One conversation, with its messages after `after` (all of them when 0). */
+export async function getChat(id: string, after = 0): Promise<ChatUpdate | null> {
+  const { supabase, verify } = await requireAdmin();
+  const [, found, messages, booking, lead] = await Promise.all([
+    verify(),
+    supabase.from("chat_sessions").select("*").eq("id", id).maybeSingle(),
+    supabase
+      .from("chat_messages")
+      .select("id, role, content, blocks, author_id, created_at")
+      .eq("session_id", id)
+      .gt("id", after)
+      .order("id", { ascending: true })
+      .limit(MESSAGE_LIMIT),
+    supabase.from("bookings").select("id").eq("session_id", id).maybeSingle(),
+    supabase.from("crm_leads").select("id").eq("chat_session_id", id).maybeSingle(),
+  ]);
+  const row = maybe(found);
+  if (!row) return null;
+  const rows = must(messages);
+
+  // Team replies show who wrote them.
+  const authorIds = [...new Set(rows.map((m) => m.author_id).filter((a): a is string => Boolean(a)))];
+  const authors = authorIds.length
+    ? must(await supabase.from("admin_users").select("user_id, email").in("user_id", authorIds))
+    : [];
+  const emailOf = new Map(authors.map((a) => [a.user_id, a.email]));
+
+  const bookingId = maybe(booking)?.id ?? null;
+  const leadId = maybe(lead)?.id ?? null;
+  const chat: ChatDetail = {
+    ...toChat(row, { booking: bookingId, lead: leadId }),
+    firstPage: row.first_page,
+    lastPage: row.last_page,
+    device: row.device,
+    createdAt: row.created_at,
+    bookingId,
+    leadId,
+  };
+
+  return {
+    chat,
+    messages: rows.map(
+      (m): AdminChatMessage => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        blocks: toBlocks(m.blocks),
+        createdAt: m.created_at,
+        author: m.author_id ? (emailOf.get(m.author_id) ?? "A team member") : null,
+      }),
+    ),
+  };
+}
