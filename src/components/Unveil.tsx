@@ -30,6 +30,7 @@ export default function Unveil({
     let ready =
       !afterPreloader ||
       !document.getElementById("preloader") ||
+      document.documentElement.hasAttribute("data-preloaded") ||
       document.documentElement.dataset.preloaderLifted !== undefined;
 
     const play = () => {
@@ -58,8 +59,14 @@ export default function Unveil({
   }, [afterPreloader, threshold]);
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Tag ref={ref as any} className={`unveil ${className}`}>
+    <Tag
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ref={ref as any}
+      className={`unveil ${className}`}
+      data-after-preloader={afterPreloader ? "" : undefined}
+      // the early reveal script (root layout) may already have added is-in
+      suppressHydrationWarning
+    >
       {children}
     </Tag>
   );

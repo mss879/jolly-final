@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import Image from "next/image";
+import ResponsiveImage from "@/components/ResponsiveImage";
 
 /* Full-bleed image band whose background drifts slower than the page —
    the classic luxury parallax strip. Pass `video` to play a muted,
@@ -11,17 +11,23 @@ import Image from "next/image";
    edge, uncropped, when the band has a fixed aspect ratio. */
 export default function ParallaxBanner({
   image,
+  mobileImage,
+  imageClassName = "object-cover",
   alt,
   children,
   heightClass = "min-h-[62vh]",
+  contentClassName = "container-luxe relative py-24 md:py-16",
   overlay = "bg-plum-950/45",
   video,
   parallax = true,
 }: {
   image: string;
+  mobileImage?: string;
+  imageClassName?: string;
   alt: string;
   children: ReactNode;
   heightClass?: string;
+  contentClassName?: string;
   overlay?: string;
   video?: { webm?: string; mp4?: string };
   parallax?: boolean;
@@ -84,7 +90,7 @@ export default function ParallaxBanner({
   return (
     <section ref={wrap} className={`relative flex ${heightClass} items-center overflow-hidden`}>
       <div ref={img} className={`absolute inset-0 ${parallax ? "scale-125 will-change-transform" : ""}`}>
-        <Image src={image} alt={alt} fill sizes="100vw" className="object-cover" />
+        <ResponsiveImage src={image} mobileSrc={mobileImage} alt={alt} loading="eager" className={imageClassName} />
         {hasVideo && (
           <video
             ref={vid}
@@ -107,7 +113,7 @@ export default function ParallaxBanner({
       <div className={`absolute inset-0 ${overlay}`} />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gold-500/50" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gold-500/50" />
-      <div className="container-luxe relative py-24 md:py-16">{children}</div>
+      <div className={contentClassName}>{children}</div>
     </section>
   );
 }

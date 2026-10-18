@@ -13,7 +13,7 @@ const fraunces = Fraunces({
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"], // 300 was unused
 });
 
 /* Defaults for every page. Each public page sets its own title, description,
@@ -45,6 +45,8 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false, email: false, address: false },
 };
 
+const EARLY_REVEALS = `(function(){if(!("IntersectionObserver"in window))return;var d=document.documentElement;function lifted(){return d.hasAttribute("data-preloaded")||d.dataset.preloaderLifted!==undefined||!document.getElementById("preloader")}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var t=e.target;if(t.classList.contains("unveil")){if(t.hasAttribute("data-after-preloader")&&!lifted())return;t.classList.add("is-in")}else t.classList.add("reveal-in");io.unobserve(t)})},{threshold:0.12,rootMargin:"0px 0px -40px 0px"});document.querySelectorAll(".reveal-init,.unveil").forEach(function(el){io.observe(el)})})();`;
+
 export const viewport: Viewport = {
   themeColor: "#FFFBE9",
 };
@@ -53,8 +55,30 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" data-scroll-behavior="smooth" className={`${fraunces.variable} ${poppins.variable}`}>
-      <body className="antialiased">{children}</body>
+    // suppressHydrationWarning: the script below may add data-preloaded first
+    <html
+      lang="en-GB"
+      data-scroll-behavior="smooth"
+      className={`${fraunces.variable} ${poppins.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Runs before the first paint: the brand preloader plays once per
+            visit (see Preloader.tsx), not on every refresh. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem("jolly-preloaded"))document.documentElement.setAttribute("data-preloaded","")}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="antialiased">
+        {children}
+        {/* Starts the scroll reveals (Reveal, Unveil) as soon as the page is
+            parsed, without waiting for React to load: content near the top
+            animates in straight away, which keeps Largest Contentful Paint
+            fast. The components still handle anything rendered later. */}
+        <script dangerouslySetInnerHTML={{ __html: EARLY_REVEALS }} />
+      </body>
     </html>
   );
 }

@@ -104,7 +104,7 @@ export default function ReservePage() {
               <ul className="mt-4 grid gap-3.5 sm:grid-cols-3 sm:gap-6">
                 {REASONS.map((r) => (
                   <li key={r.n} className="flex gap-3">
-                    <span className="font-display text-sm font-semibold text-gold-500">{r.n}</span>
+                    <span className="font-display text-sm font-semibold text-gold-700">{r.n}</span>
                     <span className="text-[0.85rem] leading-snug text-ink-700">{r.t}</span>
                   </li>
                 ))}

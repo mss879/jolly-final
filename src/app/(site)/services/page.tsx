@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import Link from "next/link";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
@@ -47,11 +47,12 @@ export default function ServicesPage() {
               <div className="relative">
                 <div className={`absolute -top-4 hidden h-20 w-20 rounded-card border border-gold-300 sm:block ${i % 2 ? "-right-4" : "-left-4"}`} />
                 <Parallax speed={0.07} className={`relative overflow-hidden rounded-card shadow-soft ${s.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
-                  <Image
+                  <ResponsiveImage
                     src={s.image}
+                    mobileSrc={s.mobileImage}
                     alt={s.title}
-                    fill
-                    sizes="(min-width: 1024px) 46vw, 92vw"
+                    preload={i === 0}
+                    sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, 92vw"
                     className={`scale-110 object-cover ${s.imagePosition ?? ""}`}
                   />
                 </Parallax>
@@ -68,7 +69,7 @@ export default function ServicesPage() {
                     {s.title}
                   </Link>
                 </h2>
-                <p className="mt-3 font-display text-lg text-gold-600 italic">{s.blurb}</p>
+                <p className="mt-3 font-display text-lg text-gold-700 italic">{s.blurb}</p>
                 <p className="mt-5 text-[0.93rem] leading-relaxed text-ink-700">{s.description}</p>
               </Reveal>
               <Reveal delay={140}>
@@ -124,7 +125,7 @@ export default function ServicesPage() {
                   <span className="absolute -top-5 left-7 flex h-10 w-10 items-center justify-center rounded-btn bg-plum-900 font-display text-sm font-semibold text-cream-100 shadow-soft">
                     {i + 1}
                   </span>
-                  <h3 className="font-display text-lg leading-snug font-semibold text-plum-900">{t}</h3>
+                  <h3 className="font-display text-lg leading-snug font-semibold text-plum-900 lg:min-h-[2lh]">{t}</h3>
                   <p className="mt-2.5 text-[0.83rem] leading-relaxed text-ink-500">{c}</p>
                 </div>
               </Reveal>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Parallax from "@/components/Parallax";
@@ -103,10 +104,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 speed={0.07}
                 className={`relative overflow-hidden rounded-card shadow-soft ${service.imagePortrait ? "aspect-[4/5]" : "aspect-[3/2]"}`}
               >
-                <Image
+                <ResponsiveImage
                   src={service.image}
+                  mobileSrc={service.mobileImage}
                   alt={service.title}
-                  fill
                   preload
                   sizes="(min-width: 1024px) 46vw, 92vw"
                   className={`scale-110 object-cover ${service.imagePosition ?? ""}`}
@@ -189,7 +190,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 <span className="absolute -top-5 left-7 flex h-10 w-10 items-center justify-center rounded-btn bg-plum-900 font-display text-sm font-semibold text-cream-100 shadow-soft">
                   {i + 1}
                 </span>
-                <h3 className="font-display text-lg leading-snug font-semibold text-plum-900">{t}</h3>
+                <h3 className="font-display text-lg leading-snug font-semibold text-plum-900 lg:min-h-[2lh]">{t}</h3>
                 <p className="mt-2.5 text-[0.83rem] leading-relaxed text-ink-500">{c}</p>
               </div>
             </Reveal>
@@ -215,10 +216,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 className="group flex h-full flex-col overflow-hidden rounded-card border border-gold-200/70 bg-cream-50 shadow-[0_10px_30px_-18px_rgba(50,0,75,0.18)] transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-card"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
+                  <ResponsiveImage
                     src={s.image}
+                    mobileSrc={s.mobileImage}
                     alt={s.title}
-                    fill
                     sizes="(min-width: 768px) 30vw, 92vw"
                     className={`object-cover ${s.imagePosition ?? ""} transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105`}
                   />
@@ -226,7 +227,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 <div className="flex flex-1 flex-col p-6 lg:px-5">
                   <h3 className="font-display text-lg font-semibold whitespace-nowrap text-plum-900 lg:text-base xl:text-lg">{s.title}</h3>
                   <p className="mt-2 min-h-[4.875em] flex-1 text-pretty text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
-                  <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-transform duration-300 group-hover:translate-x-1">
+                  <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-700 uppercase transition-transform duration-300 group-hover:translate-x-1">
                     Learn more →
                   </span>
                 </div>

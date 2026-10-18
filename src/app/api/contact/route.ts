@@ -1,9 +1,10 @@
-import { createPublicClient } from "@/lib/supabase/server";
+import { createFormsClient } from "@/lib/supabase/server";
 import { formError, readJson, text, unavailable } from "@/lib/public-forms";
-import { overLimit, tooManyRequests } from "@/lib/rate-limit";
+import { fromThisSite, notFromThisSite, overLimit, tooManyRequests } from "@/lib/rate-limit";
 
 /* POST /api/contact — the contact form. Lands in /admin/inquiries. */
 export async function POST(request: Request) {
+  if (!fromThisSite(request)) return notFromThisSite();
   if (overLimit(request, "contact", 6, 10 * 60_000)) return tooManyRequests(600);
   const body = await readJson(request);
   if (!body) return Response.json({ error: "Invalid request." }, { status: 400 });
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   // A field people never see: if it's filled in, a bot sent this.
   if (text(body.website)) return Response.json({ ok: true });
 
-  const supabase = createPublicClient();
+  const supabase = createFormsClient();
   if (!supabase) return unavailable();
 
   const { error } = await supabase.rpc("submit_inquiry", {

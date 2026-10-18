@@ -4,14 +4,26 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SMILEY } from "@/lib/data";
 
-/* Animated brand preloader — "You're about to feel good".
-   Plays on every page load/refresh, lifts away like a curtain. */
+/* Animated brand preloader — "You're about to feel good". Lifts away like a
+   curtain on the first page of a visit; after that (same browser session) the
+   inline script in the root layout marks <html data-preloaded> before the
+   first paint, the CSS hides it, and this lets the page straight in. */
+const SEEN_KEY = "jolly-preloaded";
+
 export default function Preloader() {
   const [phase, setPhase] = useState<"boot" | "play" | "lift" | "done">("boot");
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    if (root.hasAttribute("data-preloaded")) {
+      root.dataset.preloaderLifted = "";
+      window.dispatchEvent(new Event("preloader:lift"));
+      timers.push(setTimeout(() => setPhase("done"), 0));
+      return () => timers.forEach(clearTimeout);
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.documentElement.style.overflow = "hidden";
     const liftAt = reduced ? 900 : 2500;
     const doneAt = liftAt + (reduced ? 300 : 950);
@@ -22,6 +34,11 @@ export default function Preloader() {
         // lets page openings wait for the curtain (Unveil afterPreloader)
         document.documentElement.dataset.preloaderLifted = "";
         window.dispatchEvent(new Event("preloader:lift"));
+        try {
+          sessionStorage.setItem(SEEN_KEY, "1");
+        } catch {
+          // storage blocked: it simply plays again next time
+        }
       }, liftAt),
     );
     timers.push(
@@ -61,8 +78,8 @@ export default function Preloader() {
         <Image
           src="/images/brand/logo.png"
           alt=""
-          width={152}
-          height={216}
+          width={76}
+          height={108}
           preload
           className="h-[84px] w-auto object-contain sm:h-[108px]"
         />

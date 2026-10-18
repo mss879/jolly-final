@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image, { getImageProps } from "next/image";
+import Image from "next/image";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import Link from "next/link";
 import { HERO_SLIDES, type HeroSlide, type PartnerLogo } from "@/lib/data";
 
@@ -13,24 +14,17 @@ const DURATION = 7500;
    the same but are not headings. */
 const H1_SLIDE = SLIDES.findIndex((s) => !s.imageOnly && !("logos" in s));
 
-/* The slide photo. A slide with a mobileImage swaps to its portrait version
-   below 1024px — the same breakpoint where the logo wall changes layout. */
+/* Existing venue art switches at 1024px; new phone variants at 768px. */
 function SlideImage({ s, preload, className }: { s: HeroSlide; preload: boolean; className: string }) {
-  if (!s.mobileImage) {
-    return <Image src={s.image} alt={s.alt} fill preload={preload} sizes="100vw" className={className} />;
-  }
-  const common = { alt: s.alt, fill: true, sizes: "100vw", loading: preload ? "eager" : undefined } as const;
-  const {
-    props: { srcSet: desktop },
-  } = getImageProps({ ...common, src: s.image });
-  const {
-    props: { srcSet: mobile, ...rest },
-  } = getImageProps({ ...common, src: s.mobileImage });
   return (
-    <picture>
-      <source media="(min-width: 1024px)" srcSet={desktop} />
-      <img {...rest} srcSet={mobile} alt={s.alt} className={className} />
-    </picture>
+    <ResponsiveImage
+      src={s.image}
+      mobileSrc={s.mobileImage}
+      mobileBreakpoint={s.mobileBreakpoint ?? 1024}
+      alt={s.alt}
+      preload={preload}
+      className={className}
+    />
   );
 }
 
@@ -55,7 +49,7 @@ function LogoWall({ heading, logos }: { heading: string; logos: PartnerLogo[] })
               alt={l.name}
               width={324}
               height={272}
-              sizes="(min-width: 1536px) 140px, (min-width: 1280px) 124px, (min-width: 1024px) 104px, 25vw"
+              sizes="(min-width: 1536px) 140px, (min-width: 1280px) 124px, (min-width: 1024px) 104px, (min-width: 640px) 22vw, 19vw"
               className="h-auto w-full"
             />
           </li>
@@ -68,11 +62,31 @@ function LogoWall({ heading, logos }: { heading: string; logos: PartnerLogo[] })
 export default function HeroSlider() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Slides after the first load their photos once the page has finished
+  // loading, so they don't compete with the first slide for bandwidth.
+  const [restReady, setRestReady] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
 
   const go = useCallback((i: number) => {
+    setRestReady(true);
     setActive((i + SLIDES.length) % SLIDES.length);
+  }, []);
+
+  useEffect(() => {
+    let idle = 0;
+    const ready = () => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      idle = w.requestIdleCallback ? w.requestIdleCallback(() => setRestReady(true), { timeout: 2500 }) : window.setTimeout(() => setRestReady(true), 600);
+    };
+    if (document.readyState === "complete") ready();
+    else window.addEventListener("load", ready, { once: true });
+    return () => {
+      window.removeEventListener("load", ready);
+      const w = window as Window & { cancelIdleCallback?: (id: number) => void };
+      if (w.cancelIdleCallback) w.cancelIdleCallback(idle);
+      else clearTimeout(idle);
+    };
   }, []);
 
   useEffect(() => {
@@ -112,11 +126,13 @@ export default function HeroSlider() {
               className="absolute inset-0 transition-opacity duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
               style={{ opacity: on ? 1 : 0 }}
             >
-              <SlideImage
-                s={s}
-                preload={i === 0}
-                className={`object-cover ${s.objectPos} ${on && !s.imageOnly ? "animate-kenburns" : ""}`}
-              />
+              {(i === 0 || restReady) && (
+                <SlideImage
+                  s={s}
+                  preload={i === 0}
+                  className={`object-cover ${s.objectPos} ${on && !s.imageOnly ? "animate-kenburns" : ""}`}
+                />
+              )}
               {s.imageOnly ? (
                 // cream veil across the top only, so the logo and navbar read
                 // as clearly as on the other slides
@@ -195,14 +211,14 @@ export default function HeroSlider() {
           </div>
         </div>
 
-        {/* slide index + controls — bottom right */}
-        <div className="absolute right-5 bottom-8 z-10 flex items-center gap-6 sm:right-10">
-          <p className="font-display text-sm tracking-[0.2em] text-plum-900">
-            <span className="text-2xl font-semibold">{String(active + 1).padStart(2, "0")}</span>
-            <span className="mx-2 text-gold-500">/</span>
+        {/* Phones use one compact row; desktop keeps its stacked bars and arrows. */}
+        <div role="group" aria-label="Slide navigation" className="absolute right-4 bottom-4 z-10 flex items-center gap-2 md:right-10 md:bottom-8 md:gap-6">
+          <p className="font-display text-[0.65rem] tracking-[0.12em] text-plum-900 tabular-nums md:text-sm md:tracking-[0.2em]">
+            <span className="text-lg font-semibold md:text-2xl">{String(active + 1).padStart(2, "0")}</span>
+            <span className="mx-1 text-gold-500 md:mx-2">/</span>
             {String(SLIDES.length).padStart(2, "0")}
           </p>
-          <div className="flex flex-col">
+          <div className="flex items-center md:flex-col">
             {SLIDES.map((s, i) => (
               <button
                 key={s.key}
@@ -210,10 +226,10 @@ export default function HeroSlider() {
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === active}
                 onClick={() => go(i)}
-                // the padding is the tap area; the bar itself stays a hairline
-                className="group block py-[7px]"
+                // Small visual marks retain taller touch targets on phones.
+                className="group flex h-11 w-7 items-center justify-center md:block md:h-auto md:w-auto md:py-[10.5px]"
               >
-                <span className="relative block h-[3px] w-14 overflow-hidden rounded-full bg-gold-200">
+                <span className="relative block h-[2px] w-4 overflow-hidden rounded-full bg-gold-200 md:h-[3px] md:w-14">
                   {i === active && (
                     <span
                       key={`bar-${active}-${paused ? "p" : "r"}`}
@@ -228,7 +244,7 @@ export default function HeroSlider() {
               </button>
             ))}
           </div>
-          <div className="hidden items-center gap-4 sm:flex">
+          <div className="hidden items-center gap-4 md:flex">
             <button
               type="button"
               onClick={() => go(active - 1)}

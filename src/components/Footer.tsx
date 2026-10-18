@@ -46,8 +46,8 @@ export default function Footer() {
             <Image
               src="/images/brand/logo.png"
               alt="Jolly's Creamery"
-              width={102}
-              height={144}
+              width={51}
+              height={72}
               className="h-[4.5rem] w-auto object-contain opacity-90 brightness-0 invert"
             />
             <p className="mt-5 font-display text-xl text-cream-100/90 italic">
@@ -130,8 +130,8 @@ export default function Footer() {
             <Image
               src="/images/brand/arc-ai-logo.webp"
               alt="Arc AI"
-              width={326}
-              height={84}
+              width={85}
+              height={22}
               className="h-[22px] w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100"
             />
           </a>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import Link from "next/link";
 import HeroSlider from "@/components/HeroSlider";
 import SectionHeading from "@/components/SectionHeading";
@@ -49,6 +50,7 @@ export default async function HomePage() {
                   alt="Jolly's Vanilla Cream cart dressed with orchids at a candlelit garden wedding at sunset"
                   width={900}
                   height={600}
+                  sizes="(min-width: 1280px) 560px, (min-width: 1024px) 44vw, 92vw"
                   className="h-full w-full scale-110 object-cover"
                 />
               </Parallax>
@@ -111,16 +113,19 @@ export default async function HomePage() {
           video={{ webm: "/video/why-cart.webm", mp4: "/video/why-cart.mp4" }} */}
       <ParallaxBanner
         image="/images/scenes/scene-lobby-queue-wide.webp"
+        mobileImage="/images/scenes/scene-guests-queue.webp"
+        imageClassName="object-cover object-[18%_50%] md:object-center"
         alt="Guests in evening wear queueing at a Jolly's cart in a bright hotel lobby"
         heightClass="min-h-[62vh] md:min-h-0 md:aspect-[3/1] md:items-end"
+        contentClassName="container-luxe relative translate-y-[15.5vh] py-24 md:translate-y-0 md:py-16"
         parallax={false}
         overlay="bg-plum-950/70 md:bg-transparent md:bg-radial-[ellipse_50%_85%_at_50%_100%] md:from-plum-950/85 md:via-plum-950/45 md:via-55% md:to-transparent"
       >
-        {/* One line, centred at the bottom over a soft fade, so the photo
-            stays clear everywhere else. */}
-        <Reveal className="mx-auto max-w-3xl text-center font-display text-2xl leading-snug font-medium text-cream-100 [text-shadow:0_1px_14px_rgb(0_0_0/0.45)] sm:text-3xl sm:leading-snug">
-          <p>
-            Guests visit the coffee bar and the cake table.{" "}
+        {/* Two fixed lines, sized to fit phones. A quarter of the 62vh band
+            moves the caption to 75% without changing its section's size. */}
+        <Reveal className="mx-auto max-w-3xl text-center font-display text-[clamp(0.5rem,3.9vw,1.875rem)] leading-snug font-medium text-cream-100 [text-shadow:0_1px_14px_rgb(0_0_0/0.45)] md:text-3xl">
+          <p className="whitespace-nowrap">
+            <span className="block">Guests visit the coffee bar and the cake table.</span>
             <span className="block text-gold-300">They queue for this one.</span>
           </p>
         </Reveal>
@@ -189,7 +194,7 @@ export default async function HomePage() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {HOME_CARTS.map((c, i) => (
               <Reveal key={c.key} delay={i * 110}>
-                <figure className="group relative overflow-hidden rounded-card shadow-card">
+                <figure className="reveal-zoom group relative overflow-hidden rounded-card shadow-card">
                   {/* 4:5 shows the photos edge to edge — the bicycle and the menu easel stay in frame */}
                   <div className="relative aspect-[4/5] w-full overflow-hidden">
                     <Image
@@ -224,16 +229,20 @@ export default async function HomePage() {
           }
           copy="Hosts now compare a cart with coffee, cocktail and cake stations. Three things only the cart does."
         />
-        <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-8">
+        {/* The three columns share one set of rows (number, heading, copy), so
+            headings and descriptions line up even when a heading wraps. */}
+        <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-x-8 md:gap-y-0">
           {REASONS.map((step, i) => (
-            <Reveal key={step.n} delay={i * 130}>
-              <div className="group border-t border-gold-300/70 pt-8 transition-colors duration-500 hover:border-plum-900">
-                <span className="font-display text-5xl font-medium text-gold-400 transition-colors duration-500 group-hover:text-gold-600">
-                  {step.n}
-                </span>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-plum-900">{step.t}</h3>
-                <p className="mt-3 max-w-xs text-[0.88rem] leading-relaxed text-ink-500">{step.c}</p>
-              </div>
+            <Reveal
+              key={step.n}
+              delay={i * 130}
+              className="group grid content-start border-t border-gold-300/70 pt-8 transition-colors duration-500 hover:border-plum-900 md:row-span-3 md:grid-rows-subgrid"
+            >
+              <span className="font-display text-5xl leading-none font-medium text-gold-400 transition-colors duration-500 group-hover:text-gold-600">
+                {step.n}
+              </span>
+              <h3 className="mt-5 font-display text-2xl leading-snug font-semibold text-balance text-plum-900">{step.t}</h3>
+              <p className="mt-3 max-w-xs text-[0.88rem] leading-relaxed text-ink-500">{step.c}</p>
             </Reveal>
           ))}
         </div>
@@ -284,11 +293,11 @@ export default async function HomePage() {
                   href={serviceHref(s.slug)}
                   className="group flex h-full flex-col overflow-hidden rounded-card border border-gold-200/70 bg-cream-50 shadow-[0_10px_30px_-18px_rgba(50,0,75,0.18)] transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-card"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
+                  <div className="reveal-zoom relative aspect-[4/3] overflow-hidden">
+                    <ResponsiveImage
                       src={s.image}
+                      mobileSrc={s.mobileImage}
                       alt={s.title}
-                      fill
                       sizes="(min-width: 1024px) 24vw, (min-width: 768px) 45vw, 92vw"
                       className={`object-cover ${s.imagePosition ?? ""} transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105`}
                     />
@@ -296,7 +305,7 @@ export default async function HomePage() {
                   <div className="flex flex-1 flex-col p-6 lg:px-5">
                     <h3 className="font-display text-lg font-semibold whitespace-nowrap text-plum-900 lg:text-base xl:text-lg">{s.title}</h3>
                     <p className="mt-2 min-h-[4.875em] flex-1 text-pretty text-[0.82rem] leading-relaxed text-ink-500">{s.blurb}</p>
-                    <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-600 uppercase transition-transform duration-300 group-hover:translate-x-1">
+                    <span className="mt-4 text-[0.68rem] font-semibold tracking-[0.2em] text-gold-700 uppercase transition-transform duration-300 group-hover:translate-x-1">
                       Learn more →
                     </span>
                   </div>

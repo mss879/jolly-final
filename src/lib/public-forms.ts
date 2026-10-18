@@ -10,13 +10,28 @@ export function isObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+const MAX_BODY = 64_000;
+
+/* Reads at most 64 KB, then stops: a request that doesn't declare its length
+   (chunked) can't make the server take in more. */
 export async function readJson(request: Request): Promise<JsonObject | null> {
-  // turn away an oversized body before reading it
-  if (Number(request.headers.get("content-length") ?? 0) > 64_000) return null;
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return null;
   try {
-    const raw = await request.text();
-    if (raw.length > 64_000) return null;
-    const data: unknown = JSON.parse(raw);
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+    const data: unknown = JSON.parse(Buffer.concat(chunks).toString("utf8"));
     return isObject(data) ? data : null;
   } catch {
     return null;

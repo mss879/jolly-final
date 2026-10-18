@@ -75,7 +75,7 @@ function ChapterMark({ n, label, light = false, center = false }: { n: string; l
   return (
     <p
       className={`fade flex items-center gap-4 text-[0.7rem] font-semibold tracking-[0.3em] uppercase ${
-        light ? "text-gold-300" : "text-gold-600"
+        light ? "text-gold-300" : "text-gold-700"
       } ${center ? "justify-center" : ""}`}
     >
       <span className="font-display text-base tracking-normal">{n}</span>
@@ -140,7 +140,7 @@ export default function AboutPage() {
           <div className="lg:col-span-5">
             <div className="relative mx-auto max-w-sm lg:max-w-md">
               <div className="fade absolute inset-0 translate-x-4 translate-y-4 rounded-t-full rounded-b-card border border-gold-300" style={delay(700)} />
-              {/* Real photo from Instagram (The Island Pop Up, 14 Jul 2026), see public/images/social/CREDITS.md */}
+              {/* Real photo from Instagram (The Island Pop Up, 14 Jul 2026), see docs/image-credits.md */}
               <Parallax speed={0.06}>
                 <div className="wipe relative aspect-[4/5] overflow-hidden rounded-t-full rounded-b-card shadow-soft" style={delay(250)}>
                   <Image
@@ -167,7 +167,7 @@ export default function AboutPage() {
                 src="/images/scenes/about-craft.jpg"
                 alt="A gold scoop drawn through fresh vanilla ice cream, split vanilla pods alongside"
                 fill
-                sizes="(min-width: 1024px) 46vw, 92vw"
+                sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, 92vw"
                 className="scale-110 object-cover"
               />
             </div>
@@ -182,7 +182,7 @@ export default function AboutPage() {
               European technique, frangipani folded into hand-churned ice cream.
             </p>
             <div className="fade mt-9 border-l-2 border-gold-400 pl-6" style={delay(520)}>
-              <p className="text-[0.66rem] font-semibold tracking-[0.24em] text-gold-600 uppercase">
+              <p className="text-[0.66rem] font-semibold tracking-[0.24em] text-gold-700 uppercase">
                 One question
               </p>
               <p className="mt-3 font-display text-2xl leading-snug text-plum-900 italic sm:text-[1.75rem]">
@@ -247,7 +247,7 @@ export default function AboutPage() {
                   src="/images/scenes/scene-six-scoops.webp"
                   alt="Six cups of ice cream in different colours on a marble table, each with a gold spoon"
                   fill
-                  sizes="(min-width: 1024px) 46vw, 92vw"
+                  sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, 92vw"
                   className="scale-110 object-cover"
                 />
               </div>
@@ -306,7 +306,9 @@ export default function AboutPage() {
 
       <ParallaxBanner
         image="/images/scenes/hero-cart-banner.jpg"
-        alt="A Jolly's cart waiting in a sunlit hotel lobby"
+        mobileImage="/images/carts/cart-lobby-cream.jpeg"
+        imageClassName="object-contain scale-80 md:scale-100 md:object-cover"
+        alt="A Vanilla Cream Jolly's bicycle cart with its host in a bright hotel lobby"
         heightClass="min-h-[72vh]"
         overlay="bg-plum-950/60 md:bg-transparent md:bg-gradient-to-r md:from-plum-950/85 md:via-plum-950/50 md:via-45% md:to-plum-950/0 md:to-75%"
       >
@@ -347,7 +349,7 @@ export default function AboutPage() {
             {WHAT_WE_MAKE.map((m, i) => (
               <Reveal key={m.t} delay={i * 130} className="h-full">
                 <article className="group h-full rounded-card border border-gold-200/70 bg-cream-100 px-7 pt-7 pb-9 transition-all duration-500 hover:-translate-y-1 hover:shadow-card">
-                  <span className="font-display text-sm text-gold-600">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-display text-sm text-gold-700">{String(i + 1).padStart(2, "0")}</span>
                   <div className="relative mx-auto mt-1 h-40 w-40 animate-float" style={{ animationDelay: `${i * -2.4}s` }}>
                     <Image
                       src={m.image}
@@ -357,7 +359,7 @@ export default function AboutPage() {
                       className="object-contain transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:scale-105 group-hover:-rotate-3"
                     />
                   </div>
-                  <h3 className="mt-6 font-display text-2xl font-semibold text-plum-900">{m.t}</h3>
+                  <h3 className="mt-6 font-display text-2xl leading-snug font-semibold text-plum-900 md:min-h-[2lh] md:text-xl lg:text-2xl xl:min-h-0">{m.t}</h3>
                   <p className="mt-3 text-[0.88rem] leading-relaxed text-ink-500">{m.c}</p>
                 </article>
               </Reveal>
@@ -384,7 +386,7 @@ export default function AboutPage() {
             <blockquote className="font-display text-xl leading-snug text-balance text-ink-700 italic sm:text-2xl">
               &ldquo;The most joyful possibilities lie somewhere in the unknown.&rdquo;
             </blockquote>
-            <figcaption className="mt-3 text-[0.64rem] font-semibold tracking-[0.24em] text-gold-600 uppercase">
+            <figcaption className="mt-3 text-[0.64rem] font-semibold tracking-[0.24em] text-gold-700 uppercase">
               Our vision
             </figcaption>
           </figure>

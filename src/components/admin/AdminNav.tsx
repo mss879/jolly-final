@@ -105,6 +105,7 @@ export default function AdminNav({ email, counts }: { email: Promise<string | nu
         <Link
           href="/"
           target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-3 rounded-btn px-3 py-2 text-[0.8rem] text-cream-100/80 hover:bg-plum-800 hover:text-cream-100"
         >
           <Icon name="external" /> View website

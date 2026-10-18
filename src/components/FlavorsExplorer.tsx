@@ -40,9 +40,11 @@ export default function FlavorsExplorer({ variant = DEFAULT_FLAVOR_VARIANT }: { 
         })}
       </div>
 
+      {/* the cards are h3s; this keeps the page's heading outline in order */}
+      <h2 className="sr-only">{filter === "All" ? "All flavours" : filter}</h2>
       <div className={`mt-12 ${FLAVOR_GRID[variant]}`}>
         {list.map((f, i) => (
-          <FlavorCard key={`${filter}-${f.slug}`} flavor={f} index={i} variant={variant} />
+          <FlavorCard key={`${filter}-${f.slug}`} flavor={f} index={i} variant={variant} priority={filter === "All" && i < 3} />
         ))}
       </div>
       <p className="mt-8 text-[0.72rem] tracking-[0.18em] text-ink-500 uppercase">

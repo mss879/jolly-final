@@ -68,7 +68,7 @@ export default async function ReviewsPage() {
               </a>
             </Reveal>
           </div>
-          {/* Real photo from the client's Instagram (24 Jun 2026) — see public/images/social/CREDITS.md */}
+          {/* Real photo from the client's Instagram (24 Jun 2026) — see docs/image-credits.md */}
           <Reveal delay={160} className="hidden lg:block">
             <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-soft">
               <Image

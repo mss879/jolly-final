@@ -98,7 +98,7 @@ function Viewer({ event, onClose }: { event: PublicEvent; onClose: () => void })
             </button>
           </div>
           {meta(event) && (
-            <p className="mt-2 text-[0.7rem] font-semibold tracking-[0.14em] text-gold-600 uppercase">{meta(event)}</p>
+            <p className="mt-2 text-[0.7rem] font-semibold tracking-[0.14em] text-gold-700 uppercase">{meta(event)}</p>
           )}
           {event.summary && (
             <p className="mt-5 text-[0.9rem] leading-relaxed whitespace-pre-line text-ink-700">{event.summary}</p>
@@ -158,7 +158,7 @@ export default function RecentEvents({ events }: { events: PublicEvent[] }) {
               </span>
               <span className="flex flex-1 flex-col p-6">
                 {meta(e) && (
-                  <span className="text-[0.64rem] font-semibold tracking-[0.16em] text-gold-600 uppercase">{meta(e)}</span>
+                  <span className="text-[0.64rem] font-semibold tracking-[0.16em] text-gold-700 uppercase">{meta(e)}</span>
                 )}
                 <span className="mt-2 font-display text-xl leading-snug font-semibold text-plum-900">{e.title}</span>
                 {e.summary && (

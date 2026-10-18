@@ -24,7 +24,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${supabaseSource}`,
   "font-src 'self' data:",
-  `connect-src 'self' ${supabaseSource}`,
+  "connect-src 'self'", // the browser never talks to Supabase directly
   "media-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
@@ -46,8 +46,14 @@ const nextConfig: NextConfig = {
     /* Event photos are uploaded one per action. The admin shrinks them to
        at most 2000px first, so this is headroom, not the usual size. */
     serverActions: { bodySizeLimit: "6mb" },
+    /* The CSS (Tailwind, about 17 KB compressed) goes inside each page
+       instead of a separate file, so a first visit renders without waiting
+       on one more request. */
+    inlineCss: true,
   },
   images: {
+    // WebP only. AVIF was tried (Oct 2026): it is smaller, but the encoder
+    // hung on some scoop images at some sizes, leaving them blank.
     remotePatterns: [
       ...(supabaseOrigin ? [{ ...supabaseOrigin, pathname: "/storage/v1/object/public/event-photos/**" }] : []),
     ],

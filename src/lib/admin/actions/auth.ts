@@ -1,8 +1,10 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import { overLimit } from "@/lib/rate-limit";
 import { safeAdminPath } from "../validate";
 
 export type SignInState = { error?: string; email?: string };
@@ -12,6 +14,10 @@ export async function signIn(_prev: SignInState, formData: FormData): Promise<Si
   const password = String(formData.get("password") ?? "");
   if (!supabaseConfigured) return { email, error: "Supabase isn't connected yet." };
   if (!email || !password) return { email, error: "Enter your email and password." };
+  // Supabase's own limit sees this server's address, not the visitor's
+  if (overLimit(await headers(), "admin-sign-in", 8, 10 * 60_000)) {
+    return { email, error: "Too many sign-in attempts. Wait a few minutes and try again." };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });

@@ -26,14 +26,26 @@ export async function createClient() {
   });
 }
 
-/* Client for the public form endpoints, which only call the submit_inquiry /
-   track_booking / submit_booking functions. With SUPABASE_SECRET_KEY set (a
-   server-only secret, never NEXT_PUBLIC_) it uses that, so the functions can
-   be closed to direct browser calls (migration 20261016120000); without it,
-   the publishable key. */
+const NO_SESSION = { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false };
+
+/* Anonymous client on the publishable key, for public reads such as the
+   published_events function. Row Level Security applies as for any visitor. */
 export function createPublicClient() {
   if (!supabaseConfigured) return null;
-  return createSupabaseClient<Database>(SUPABASE_URL, process.env.SUPABASE_SECRET_KEY || SUPABASE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  });
+  return createSupabaseClient<Database>(SUPABASE_URL, SUPABASE_KEY, { auth: NO_SESSION });
+}
+
+/* For the three public form endpoints only (submit_inquiry, track_booking,
+   submit_booking), which migration 20261016120000 closed to the publishable
+   key. Uses the server-only SUPABASE_SECRET_KEY, which bypasses Row Level
+   Security: never use it for anything else. */
+let warnedNoSecret = false;
+export function createFormsClient() {
+  if (!supabaseConfigured) return null;
+  const secret = process.env.SUPABASE_SECRET_KEY;
+  if (!secret && !warnedNoSecret && process.env.NODE_ENV === "production") {
+    warnedNoSecret = true;
+    console.error("[forms] SUPABASE_SECRET_KEY is not set: the contact and reserve forms can't save.");
+  }
+  return createSupabaseClient<Database>(SUPABASE_URL, secret || SUPABASE_KEY, { auth: NO_SESSION });
 }

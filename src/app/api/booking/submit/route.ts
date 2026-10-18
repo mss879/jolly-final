@@ -1,11 +1,12 @@
-import { createPublicClient } from "@/lib/supabase/server";
+import { createFormsClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 import { bookingContext, formError, isObject, readJson, text, unavailable, uuid } from "@/lib/public-forms";
-import { overLimit, tooManyRequests } from "@/lib/rate-limit";
+import { fromThisSite, notFromThisSite, overLimit, tooManyRequests } from "@/lib/rate-limit";
 
 /* POST /api/booking/submit — the reserve form's final send. The booking
    becomes "awaiting confirmation" in /admin/bookings. */
 export async function POST(request: Request) {
+  if (!fromThisSite(request)) return notFromThisSite();
   if (overLimit(request, "booking-submit", 6, 10 * 60_000)) return tooManyRequests(600);
   const body = await readJson(request);
   const session = uuid(body?.session);
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
   // A field people never see: if it's filled in, a bot sent this.
   if (text(body.website)) return Response.json({ ok: true });
 
-  const supabase = createPublicClient();
+  const supabase = createFormsClient();
   if (!supabase) return unavailable();
 
   const { error } = await supabase.rpc("submit_booking", {

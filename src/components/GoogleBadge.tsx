@@ -11,7 +11,7 @@ export function GoogleG({ className = "h-5 w-5" }: { className?: string }) {
 
 export function Stars({ n = 5, className = "h-3.5 w-3.5" }: { n?: number; className?: string }) {
   return (
-    <span className="flex gap-0.5 text-[#FBBC05]" aria-label={`${n} out of 5 stars`}>
+    <span role="img" className="flex gap-0.5 text-[#FBBC05]" aria-label={`${n} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <svg key={i} viewBox="0 0 20 20" className={className} fill={i < n ? "currentColor" : "#E8DFC5"} aria-hidden>
           <path d="M10 1.5l2.47 5.32 5.83.63-4.35 3.94 1.18 5.74L10 14.2l-5.13 2.93 1.18-5.74L1.7 7.45l5.83-.63L10 1.5z" />

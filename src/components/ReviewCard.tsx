@@ -48,7 +48,7 @@ export default function ReviewCard({ review, index = 0 }: { review: ShownReview;
             href={review.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 text-[0.66rem] font-semibold tracking-[0.18em] text-gold-600 uppercase transition-colors hover:text-plum-900"
+            className="mt-5 text-[0.66rem] font-semibold tracking-[0.18em] text-gold-700 uppercase transition-colors hover:text-plum-900"
           >
             Read on Google →
           </a>

@@ -48,7 +48,7 @@ const dateCls = "block h-[3.125rem] appearance-none sm:h-[2.875rem]";
 function Step({ n, children }: { n: string; children: ReactNode }) {
   return (
     <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-      <span className="font-display text-[0.8rem] font-semibold tracking-[0.08em] text-gold-500">{n}</span>
+      <span className="font-display text-[0.8rem] font-semibold tracking-[0.08em] text-gold-700">{n}</span>
       {children}
     </span>
   );

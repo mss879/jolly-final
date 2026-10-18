@@ -336,7 +336,7 @@ export default function EventEditor({ event, isNew, justSaved = false }: { event
         </button>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gold-200/60 pt-4">
-          <Link href="/reviews" target="_blank" className="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold text-plum-900 hover:text-gold-700">
+          <Link href="/reviews" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold text-plum-900 hover:text-gold-700">
             <Icon name="external" className="h-3.5 w-3.5" />
             View Reviews page
           </Link>

@@ -199,6 +199,7 @@ export type Service = {
   blurb: string;
   description: string;
   image: string;
+  mobileImage?: string;
   imagePortrait?: boolean; // portrait photo → 4:5 frame on the Services page
   imagePosition?: string; // object-position class for cropped frames, e.g. "object-[50%_35%]"
   points: string[];
@@ -211,7 +212,7 @@ export const SERVICES: Service[] = [
     blurb: "Styled to your palette, the moment guests talk about on the way home.",
     description:
       "Your cart arrives styled to your palette, in Vanilla Cream, Bubblegum Blue or Ferrari Red, and our host scoops live between the vows and the dancing. Guests gather, photos happen, and dessert becomes a moment rather than a course.",
-    // Real photo from the client's Instagram (16 Jun 2026) — see public/images/social/CREDITS.md
+    // Real photo from the client's Instagram (16 Jun 2026) — see docs/image-credits.md
     image: "/images/social/ig-bride-cart.jpg",
     imagePortrait: true,
     points: [
@@ -262,6 +263,7 @@ export const SERVICES: Service[] = [
       "Put your brand on the most photographed corner of the room. We co-brand the cart and can develop a signature or limited-edition flavour. Launches, pop-ups and partner activations, content-ready from the first scoop.",
     // CLIENT PHOTO: replace with the G2 brand-collaboration photo when received
     image: "/images/scenes/hero-scoops.jpg",
+    mobileImage: "/images/scenes/mobile/hero-scoops-mobile.webp",
     points: [
       "Co-branded cart styling and signage",
       "Custom or limited-edition flavour development",
@@ -401,9 +403,10 @@ export const CARTS: Cart[] = [
 export type HeroSlide = {
   key: string;
   image: string;
-  // Portrait version (1080×1920) shown below 1024px. Without one, phones get
-  // the middle of the landscape image.
+  // Portrait art direction. Existing venue art switches at 1024px;
+  // other phone variants opt into 768px to preserve tablet/desktop art.
   mobileImage?: string;
+  mobileBreakpoint?: number;
   alt: string;
   objectPos: string;
 } & (
@@ -439,8 +442,11 @@ export const HERO_SLIDES: HeroSlide[] = [
     // The photo is 4:3, so the file adds a blurred margin on the left — hidden
     // under the cream veil — to seat the cart to the right of the headline.
     image: "/images/scenes/hero-wedding-evening-wide.webp",
+    // Use the existing photograph: cart construction and badge must stay exact.
+    mobileImage: "/images/social/ig-bride-cart.jpg",
+    mobileBreakpoint: 768,
     alt: "A bride at the Vanilla Cream Jolly's cart at night, its host scooping under pendant lights",
-    objectPos: "object-right",
+    objectPos: "object-center md:object-right",
   },
   {
     key: "find-us",
@@ -464,6 +470,8 @@ export const HERO_SLIDES: HeroSlide[] = [
     cta2: { href: "/flavors", label: "Explore Flavours" },
     // Tub visual supplied by the client, 5 Oct 2026
     image: "/images/scenes/hero-tubs-500ml.webp",
+    mobileImage: "/images/scenes/mobile/hero-tubs-500ml-mobile.webp",
+    mobileBreakpoint: 768,
     alt: "Jolly's 500 ml tubs of Double Chocolate and Passion Fruit Sorbet, lids off, on a marble counter",
     objectPos: "object-center",
   },
