@@ -113,21 +113,16 @@ export default function Footer() {
             <span className="hidden sm:inline"> · </span>
             <span className="block sm:inline">Made in Colombo, Sri Lanka</span>
           </p>
-          {/* Studio credit: a normal (followed) link, so it counts for arcai.agency */}
+          {/* Studio credit: a normal (followed) link, so it counts for arcai.agency.
+              The name in letters, not the logo (client, Oct 2026). */}
           <a
             href="https://www.arcai.agency"
             target="_blank"
             rel="noopener"
-            className="group inline-flex items-center gap-3 transition-colors duration-300 hover:text-cream-100"
+            className="inline-flex items-center gap-2 transition-colors duration-300 hover:text-cream-100"
           >
             Built and designed by
-            <Image
-              src="/images/brand/arc-ai-logo.webp"
-              alt="Arc AI"
-              width={85}
-              height={22}
-              className="h-[22px] w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-            />
+            <span className="font-semibold text-cream-100/80">ARC AI</span>
           </a>
         </div>
       </div>
