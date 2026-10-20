@@ -227,7 +227,11 @@ export default function Header() {
           open ? "visible opacity-100 duration-300" : "invisible opacity-0 duration-200"
         }`}
       >
-        <nav className="container-luxe flex h-full flex-col gap-1 overflow-y-auto pt-28 pb-12 sm:pt-32" aria-label="Mobile">
+        {/* Sized to the viewport height (svh units), so the whole menu fits
+            without scrolling on small phones (client, Oct 2026) and spreads
+            out again on tall ones. overflow-y-auto stays as the safety net
+            for landscape phones only. */}
+        <nav className="container-luxe flex h-full flex-col overflow-y-auto pt-[clamp(5rem,14svh,8rem)] pb-[clamp(1rem,4svh,3rem)]" aria-label="Mobile">
           {NAV.map((l, i) => (
             <div
               key={l.href}
@@ -239,18 +243,18 @@ export default function Header() {
               <Link
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block py-4 font-display text-3xl text-plum-900"
+                className="block py-[clamp(0.45rem,1.6svh,1rem)] font-display text-[clamp(1.55rem,4.4svh,1.875rem)] leading-tight text-plum-900"
               >
                 {l.label}
               </Link>
               {l.children && (
-                <ul className="mb-4 grid grid-cols-2 gap-x-4">
+                <ul className="mb-[clamp(0.4rem,1.5svh,1rem)] grid grid-cols-2 gap-x-4">
                   {l.children.map((c) => (
                     <li key={c.href}>
                       <Link
                         href={c.href}
                         onClick={() => setOpen(false)}
-                        className="block py-2 text-[0.7rem] font-semibold tracking-[0.16em] text-ink-700 uppercase"
+                        className="block py-[clamp(0.3rem,1svh,0.5rem)] text-[0.7rem] font-semibold tracking-[0.16em] text-ink-700 uppercase"
                       >
                         {c.label}
                       </Link>
@@ -263,7 +267,7 @@ export default function Header() {
           <Link
             href={CTA.href}
             onClick={() => setOpen(false)}
-            className={`mt-8 inline-flex w-fit items-center rounded-btn bg-plum-900 px-8 py-3.5 text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            className={`mt-[clamp(1rem,3.5svh,2rem)] inline-flex w-fit items-center rounded-btn bg-plum-900 px-8 py-[clamp(0.7rem,1.5svh,0.875rem)] text-[0.8rem] font-semibold tracking-[0.18em] text-cream-100 uppercase transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
             }`}
             style={{ transitionDelay: open ? "240ms" : "0ms" }}

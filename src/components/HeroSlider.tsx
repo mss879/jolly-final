@@ -21,6 +21,7 @@ function SlideImage({ s, preload, className }: { s: HeroSlide; preload: boolean;
       src={s.image}
       mobileSrc={s.mobileImage}
       mobileBreakpoint={s.mobileBreakpoint ?? 1024}
+      desktopOnly={s.desktopOnly}
       alt={s.alt}
       preload={preload}
       className={className}
@@ -29,27 +30,42 @@ function SlideImage({ s, preload, className }: { s: HeroSlide; preload: boolean;
 }
 
 /* "Find Us At": the heading and venue logos in white tiles. Phones and
-   tablets put the heading under the navbar and the logos along the bottom,
-   clear of the cart; desktop stacks both on the right, beside it. */
-function LogoWall({ heading, logos }: { heading: string; logos: PartnerLogo[] }) {
+   tablets get a coded wall (client, Oct 2026: no photo behind the logos
+   there) — cream, a soft gold light and the brand mark as a watermark, with
+   the tiles in rows of three. Desktop keeps the photo and stacks the heading
+   and tiles on the right, beside the cart. */
+function LogoWall({ heading, tagline, logos }: { heading: string; tagline?: string; logos: PartnerLogo[] }) {
   return (
-    <div className="container-wide relative flex h-full flex-col justify-between pt-24 pb-24 sm:pt-28 lg:max-w-none lg:items-end lg:justify-center lg:gap-8 lg:pt-20 lg:pb-0 lg:pr-[6vw]">
+    <div className="container-wide relative flex h-full flex-col justify-center pt-20 pb-14 lg:max-w-none lg:items-end lg:gap-8 lg:pt-20 lg:pb-0 lg:pr-[6vw]">
       <div className="text-center lg:w-[28rem] xl:w-[34rem] 2xl:w-[38rem]">
+        <p className="kicker mb-4 flex items-center justify-center gap-3 lg:hidden">
+          <span aria-hidden className="h-px w-8 bg-gold-400" />
+          Our venue partners
+          <span aria-hidden className="h-px w-8 bg-gold-400" />
+        </p>
         <h2 className="heading-display text-[2.4rem] sm:text-5xl xl:text-6xl">{heading}</h2>
         <span aria-hidden className="mx-auto mt-3 block h-px w-44 bg-gold-400/80 sm:w-64 lg:mt-5 lg:w-full" />
+        {tagline && (
+          <p className="mx-auto mt-4 max-w-[19rem] text-[0.9rem] leading-relaxed text-ink-700 sm:max-w-sm sm:text-base lg:hidden">
+            {tagline}
+          </p>
+        )}
       </div>
-      <ul className="grid grid-cols-4 gap-2 sm:gap-3 lg:w-[28rem] xl:w-[34rem] xl:gap-4 2xl:w-[38rem]">
-        {logos.map((l) => (
+      <ul className="mx-auto mt-9 grid w-full max-w-sm grid-cols-6 gap-3 sm:mt-12 sm:max-w-md sm:gap-4 lg:mx-0 lg:mt-0 lg:w-[28rem] lg:max-w-none lg:grid-cols-4 lg:gap-3 xl:w-[34rem] xl:gap-4 2xl:w-[38rem]">
+        {logos.map((l, i) => (
           <li
             key={l.name}
-            className="flex items-center justify-center rounded-btn bg-white p-1 shadow-card ring-1 ring-gold-200/50 sm:rounded-card sm:p-2"
+            // rows of three below lg: the last pair sits centred (grid of six, each tile two wide)
+            className={`col-span-2 flex items-center justify-center rounded-card bg-white p-2.5 shadow-card ring-1 ring-gold-200/60 sm:p-3 lg:col-span-1 lg:rounded-card lg:p-2 lg:ring-gold-200/50 ${
+              i === 6 ? "col-start-2 lg:col-start-auto" : ""
+            }`}
           >
             <Image
               src={l.src}
               alt={l.name}
               width={324}
               height={272}
-              sizes="(min-width: 1536px) 140px, (min-width: 1280px) 124px, (min-width: 1024px) 104px, (min-width: 640px) 22vw, 19vw"
+              sizes="(min-width: 1536px) 140px, (min-width: 1280px) 124px, (min-width: 1024px) 104px, (min-width: 640px) 136px, 30vw"
               className="h-auto w-full"
             />
           </li>
@@ -133,25 +149,45 @@ export default function HeroSlider() {
                   className={`object-cover ${s.objectPos} ${on && !s.imageOnly ? "animate-kenburns" : ""}`}
                 />
               )}
+              {s.desktopOnly && (
+                // the coded backdrop below lg: brand cream, a warm gold light
+                // top right, a faint plum glow bottom left, the mark as a watermark
+                <div aria-hidden className="absolute inset-0 bg-cream-100 lg:hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(70%_45%_at_88%_6%,rgba(224,198,127,0.42),transparent_70%),radial-gradient(60%_40%_at_8%_96%,rgba(229,214,239,0.7),transparent_70%)]" />
+                  <Image
+                    src="/images/brand/logo.png"
+                    alt=""
+                    width={921}
+                    height={1305}
+                    sizes="320px"
+                    className="absolute right-3 -bottom-8 h-auto w-52 opacity-[0.04] sm:w-64"
+                  />
+                </div>
+              )}
               {s.imageOnly ? (
                 // cream veil across the top only, so the logo and navbar read
                 // as clearly as on the other slides
                 <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent" />
               ) : "logos" in s ? (
                 <>
-                  {/* top veil for the navbar (and the heading, on phones);
-                      on desktop a cream wash behind the heading on the right */}
-                  <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent lg:h-40" />
+                  {/* desktop only (the coded wall below lg is cream already):
+                      a top veil for the navbar and a cream wash behind the
+                      heading on the right */}
+                  <div className="absolute inset-x-0 top-0 hidden h-40 bg-gradient-to-b from-cream-100 from-30% via-cream-100/70 via-60% to-transparent lg:block" />
                   <div className="absolute inset-y-0 right-0 hidden w-3/5 bg-gradient-to-l from-cream-100/90 from-25% via-cream-100/55 via-60% to-transparent lg:block" />
-                  <LogoWall heading={s.heading} logos={s.logos} />
+                  <LogoWall heading={s.heading} tagline={s.tagline} logos={s.logos} />
                 </>
               ) : (
                 <>
-                  {/* cream veil for typography */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cream-100 from-[18%] via-cream-100/72 via-[46%] to-transparent to-[78%]" />
+                  {/* cream veil for typography. Desktop: a left-to-right wash,
+                      the copy sits beside the cart. Below md the portrait photo
+                      shows and the copy sits over it, so the wash runs top to
+                      bottom instead: clear over the host and the bride in the
+                      upper third, solid behind the headline and buttons. */}
+                  <div className="absolute inset-0 hidden bg-gradient-to-r from-cream-100 from-[18%] via-cream-100/72 via-[46%] to-transparent to-[78%] md:block" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-cream-100/10 from-[26%] via-cream-100/85 via-[40%] to-cream-100 md:hidden" />
                   <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-cream-100 via-cream-100/60 to-transparent" />
                   <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream-100/85 to-transparent" />
-                  <div className="absolute inset-0 bg-cream-100/45 sm:bg-transparent" />
                 </>
               )}
             </div>

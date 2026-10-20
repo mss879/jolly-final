@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import SocialLinks from "./SocialLinks";
-import { BRAND_BLURB, CONTACT, CTA, FOOTER_LINKS, SMILEY } from "@/lib/data";
+import { CONTACT, CTA, FOOTER_LINKS } from "@/lib/data";
 
 const columnHeading = "text-[0.68rem] font-semibold tracking-[0.28em] text-gold-300 uppercase";
 const footerLink =
@@ -40,8 +40,8 @@ export default function Footer() {
 
       {/* Columns */}
       <div className="container-luxe py-16 sm:py-20">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1.1fr_1.3fr] lg:gap-x-10">
-          {/* Brand */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-[0.9fr_1fr_1.1fr_1.4fr] lg:gap-x-10">
+          {/* Brand: the logo alone (client, Oct 2026: no tagline or blurb) */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Image
               src="/images/brand/logo.png"
@@ -50,13 +50,6 @@ export default function Footer() {
               height={72}
               className="h-[4.5rem] w-auto object-contain opacity-90 brightness-0 invert"
             />
-            <p className="mt-5 font-display text-xl text-cream-100/90 italic">
-              {CONTACT.tagline} <span aria-hidden className="not-italic">{SMILEY}</span>
-            </p>
-            <p className="mt-4 max-w-xs text-[0.83rem] leading-relaxed text-cream-100/55">
-              {BRAND_BLURB}
-            </p>
-            <SocialLinks className="mt-7" />
           </div>
 
           {/* Link columns */}
@@ -101,9 +94,10 @@ export default function Footer() {
               Message us on WhatsApp
               <span aria-hidden>→</span>
             </a>
+            <SocialLinks className="mt-6" />
             <a
               href={CONTACT.emailHref}
-              className="mt-5 block text-[0.84rem] break-all text-cream-100/70 transition-colors duration-300 hover:text-gold-300"
+              className="mt-6 block text-[0.84rem] break-all text-cream-100/70 transition-colors duration-300 hover:text-gold-300"
             >
               {CONTACT.email}
             </a>

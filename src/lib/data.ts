@@ -233,7 +233,6 @@ export const SERVICES: Service[] = [
     points: [
       "High-volume service without queues",
       "Branded cups and signage on request",
-      "Permanent carts at Shangri-La Colombo and Hilton Colombo",
       "Full set-up, service and pack-down handled",
     ],
   },
@@ -249,7 +248,7 @@ export const SERVICES: Service[] = [
     imagePortrait: true,
     imagePosition: "object-[50%_35%]",
     points: [
-      "Flexible packages for 30–300 guests", // CLIENT: confirm guest range
+      "Flexible packages for 50–500 guests",
       "Children's favourites and dairy-free sorbets",
       "Styled to your theme and venue",
       "Set-up, service and pack-down handled",
@@ -407,6 +406,9 @@ export type HeroSlide = {
   // other phone variants opt into 768px to preserve tablet/desktop art.
   mobileImage?: string;
   mobileBreakpoint?: number;
+  // Only the desktop photo exists: below mobileBreakpoint the slide draws its
+  // own background, and no photo is fetched.
+  desktopOnly?: boolean;
   alt: string;
   objectPos: string;
 } & (
@@ -422,8 +424,9 @@ export type HeroSlide = {
   // A finished banner with its own lettering: shown whole, with no headline,
   // buttons, cream veil or slow zoom over it.
   | { imageOnly: true }
-  // A photo with a heading and venue logos, in white tiles, coded over it.
-  | { imageOnly?: false; heading: string; logos: PartnerLogo[] }
+  // A heading and venue logos in white tiles: over a photo on desktop, on a
+  // coded cream-and-gold backdrop (with the tagline) on phones and tablets.
+  | { imageOnly?: false; heading: string; tagline?: string; logos: PartnerLogo[] }
 );
 
 /* Array order = display order. To promote a launch or an offer, move its
@@ -446,7 +449,8 @@ export const HERO_SLIDES: HeroSlide[] = [
     mobileImage: "/images/social/ig-bride-cart.jpg",
     mobileBreakpoint: 768,
     alt: "A bride at the Vanilla Cream Jolly's cart at night, its host scooping under pendant lights",
-    objectPos: "object-center md:object-right",
+    // phones: a touch left of centre keeps the host in frame beside the bride
+    objectPos: "object-[45%_50%] md:object-right",
   },
   {
     key: "find-us",
@@ -454,8 +458,11 @@ export const HERO_SLIDES: HeroSlide[] = [
     logos: PARTNER_LOGOS,
     // Backgrounds supplied by the client, 15 Oct 2026. The logos and heading
     // are coded on top (they used to be baked into hero-find-us-at.webp).
+    // Phones and tablets (below 1024px) draw the wall in code instead —
+    // cream, gold light and white tiles — so no photo is fetched there.
     image: "/images/scenes/hero-find-us-desktop.webp",
-    mobileImage: "/images/scenes/hero-find-us-mobile.webp",
+    desktopOnly: true,
+    tagline: "Jolly's carts at Colombo's finest hotels and venues, and down the south coast.", // CLIENT: confirm wording
     alt: "A red Jolly's cart with pendant lights beside Café Kai in a hotel lobby",
     objectPos: "object-right",
   },
