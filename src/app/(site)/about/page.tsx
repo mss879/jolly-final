@@ -70,15 +70,15 @@ export default function AboutPage() {
               <span className="draw-x h-px w-8 bg-gold-500" style={delay(150)} />
               Jolly&apos;s Creamery · Est. 2017
             </p>
-            <h1 className="heading-display mt-8 text-[3.5rem] leading-[0.98] sm:text-[5.25rem] xl:text-[6.4rem]">
+            {/* Always two lines (client), at the Home hero headline's sizes */}
+            <h1 className="heading-display mt-8 text-[2.15rem] leading-[1.06] whitespace-nowrap sm:text-[3.25rem] lg:text-6xl xl:text-[3.85rem]">
               <Lines
                 start={150}
                 step={140}
                 lines={[
-                  "You’re about",
-                  "to feel",
+                  "You’re about to",
                   <>
-                    <span className="italic text-gold-600">good.</span>
+                    feel <span className="italic text-gold-600">good.</span>
                     <span
                       aria-hidden
                       className="ml-[0.2em] inline-block align-[0.35em] text-[0.38em] opacity-0 in-[.is-in]:animate-pop in-[.is-in]:[animation-delay:1150ms]"
@@ -92,12 +92,6 @@ export default function AboutPage() {
             <p className="fade mt-8 max-w-md font-display text-xl text-ink-700 italic sm:text-2xl" style={delay(700)}>
               An ice cream story from the heart of Ceylon.
             </p>
-            <div className="fade mt-14 flex items-center gap-4" style={delay(950)}>
-              <span className="relative h-14 w-px overflow-hidden bg-gold-300/60">
-                <span className="absolute inset-x-0 top-0 h-1/2 animate-scroll-cue bg-plum-900" />
-              </span>
-              <span className="text-[0.64rem] font-semibold tracking-[0.32em] text-ink-500 uppercase">Scroll</span>
-            </div>
           </div>
 
           <div className="lg:col-span-5">
@@ -177,10 +171,11 @@ export default function AboutPage() {
 
           <Unveil className="mt-20 grid items-center gap-12 sm:mt-28 lg:grid-cols-2 lg:gap-20">
             <Parallax speed={0.06}>
-              <div className="wipe relative aspect-[3/2] overflow-hidden rounded-card">
+              {/* wide group shot (client, Oct 2026): a 3:2 frame cut the guests at either end */}
+              <div className="wipe relative aspect-[16/9] overflow-hidden rounded-card">
                 <Image
-                  src="/images/scenes/scene-six-scoops.webp"
-                  alt="Six cups of ice cream in different colours on a marble table, each with a gold spoon"
+                  src="/images/scenes/scene-wedding-party-cart.webp"
+                  alt="Wedding guests laughing around a turquoise Jolly's cart as one rides its bicycle and friends push from behind"
                   fill
                   sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, 92vw"
                   className="scale-110 object-cover"

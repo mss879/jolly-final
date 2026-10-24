@@ -4,17 +4,13 @@ import { useState } from "react";
 import FlavorCard, { DEFAULT_FLAVOR_VARIANT, FLAVOR_GRID, type FlavorCardVariant } from "./FlavorCard";
 import { FLAVORS } from "@/lib/data";
 
-/* "Sorbet" and "Dairy Free" returned the same items, so they're one filter. */
-const FILTERS = ["All", "Classic", "Fruity", "Chocolate", "Dairy-Free Sorbets"] as const;
+/* The client's three groups; each filter is a flavour category. */
+const FILTERS = ["All", "Classic", "Speciality", "Dairy Free"] as const;
 
 export default function FlavorsExplorer({ variant = DEFAULT_FLAVOR_VARIANT }: { variant?: FlavorCardVariant }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
 
-  const list = FLAVORS.filter((f) => {
-    if (filter === "All") return true;
-    if (filter === "Dairy-Free Sorbets") return f.dairyFree || f.category === "Sorbet";
-    return f.category === filter;
-  });
+  const list = filter === "All" ? FLAVORS : FLAVORS.filter((f) => f.category === filter);
 
   return (
     <section className="container-luxe pt-10 pb-16">

@@ -83,7 +83,7 @@ function toModelMessages(messages: ChatMessage[]): ModelMessage[] {
   });
 }
 
-const GROUPS = ["all", "dairy-free", "Sorbet", "Fruity", "Classic", "Chocolate", "Seasonal"] as const;
+const GROUPS = ["all", "Classic", "Speciality", "Dairy Free", "Seasonal"] as const;
 const CART_NAMES = CARTS.map((c) => c.name) as [string, ...string[]];
 
 /* "Can I talk to a person?" A visitor asking this always reaches the team,
@@ -144,8 +144,7 @@ export async function runConcierge(turn: ConciergeTurn) {
             const f = matchFlavour(name);
             if (f && !list.includes(f)) list.push(f);
           }
-        } else if (group === "dairy-free") list = FLAVORS.filter((f) => f.dairyFree);
-        else if (group && group !== "all") list = FLAVORS.filter((f) => f.category === group);
+        } else if (group && group !== "all") list = FLAVORS.filter((f) => f.category === group);
         if (!list.length) list = FLAVORS;
         put({ type: "flavours", slugs: list.map((f) => f.slug), pick: Boolean(pick) });
         return { shown: list.map((f) => f.name) };

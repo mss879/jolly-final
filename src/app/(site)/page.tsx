@@ -28,6 +28,12 @@ const HOME_CARTS = (["bubblegum-blue", "cream", "ferrari-red"] as const).flatMap
   (key) => CARTS.find((c) => c.key === key) ?? [],
 );
 
+/* The Home preview keeps its three scoops; FLAVORS follows the menu's
+   Classic → Speciality → Dairy Free order. */
+const HOME_FLAVORS = (["passion-fruit-sorbet", "wild-naarang-sorbet", "jaffna-mango"] as const).flatMap(
+  (slug) => FLAVORS.find((f) => f.slug === slug) ?? [],
+);
+
 /* Rebuilt daily, so the reviews' "2 months ago" stays current. */
 export const revalidate = 86400;
 
@@ -260,7 +266,7 @@ export default async function HomePage() {
           copy="Somewhere between gelato and ice cream: fresh ice creams and dairy-free creamy sorbets, with a menu curated for your occasion."
         />
         <div className={`mt-14 ${FLAVOR_GRID[DEFAULT_FLAVOR_VARIANT]}`}>
-          {FLAVORS.slice(0, 3).map((f, i) => (
+          {HOME_FLAVORS.map((f, i) => (
             <FlavorCard key={f.slug} flavor={f} index={i} />
           ))}
         </div>

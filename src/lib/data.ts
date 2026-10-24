@@ -24,65 +24,15 @@ export type Flavor = {
   name: string;
   description: string;
   image: string;
-  category: "Sorbet" | "Chocolate" | "Fruity" | "Classic" | "Seasonal";
+  category: "Classic" | "Speciality" | "Dairy Free" | "Seasonal";
   dairyFree?: boolean;
 };
 
-/* Order of the client's "Our Flavours" sheet (2026) — the first three also
-   lead the Home flavour preview. Scoop photos are cut from that sheet. */
+/* Grouped and ordered as the client's flavour list (Oct 2026): Classic,
+   Speciality, Dairy Free. Flavour of the Month sits outside the three groups,
+   so it only shows under "All". Scoop photos are cut from the "Our Flavours"
+   sheet; slugs predate the renames and match the image files. */
 export const FLAVORS: Flavor[] = [
-  {
-    // Client: "Passion Fruit" without "Creamy"
-    slug: "passion-fruit-sorbet",
-    name: "Passion Fruit Sorbet",
-    description: "Intensely fruity and refreshing, the passion fruit creamy sorbet is a tropical delight.",
-    image: "/images/flavors/passion-fruit-sorbet.png",
-    category: "Sorbet",
-    dairyFree: true,
-  },
-  {
-    slug: "wild-naarang-sorbet",
-    name: "Wild Naarang Sorbet",
-    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
-    image: "/images/flavors/wild-naarang-sorbet.png",
-    category: "Sorbet",
-    dairyFree: true,
-  },
-  {
-    slug: "jaffna-mango",
-    name: "Jaffna Mango",
-    description: "Floral, tart and sweet Jaffna Karutha Columban treat for the summer days",
-    image: "/images/flavors/jaffna-mango.png",
-    category: "Fruity",
-  },
-  {
-    slug: "strawberry-cheesecake",
-    name: "Strawberry Cheesecake",
-    description: "A creamy and tangy dessert topped with luscious strawberry compote.",
-    image: "/images/flavors/strawberry-cheesecake.png",
-    category: "Fruity",
-  },
-  {
-    slug: "blueberry",
-    name: "Blueberry",
-    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
-    image: "/images/flavors/blueberry.png",
-    category: "Fruity",
-  },
-  {
-    slug: "bubblegum",
-    name: "Bubblegum",
-    description: "As the name says, a flavour that would make you feel like a kid again. It's a promise!",
-    image: "/images/flavors/bubblegum.png",
-    category: "Classic",
-  },
-  {
-    slug: "coconut",
-    name: "Coconut",
-    description: "Versatile coconut milk and dairy, with creaminess and desiccated coconut texture.",
-    image: "/images/flavors/coconut.png",
-    category: "Classic",
-  },
   {
     slug: "french-vanilla",
     name: "French Vanilla",
@@ -91,10 +41,10 @@ export const FLAVORS: Flavor[] = [
     category: "Classic",
   },
   {
-    slug: "cookies-and-cream",
-    name: "Cookies & Cream",
-    description: "Silky smooth vanilla paired with crunchy cookie surprises. Indulgence in every bite.",
-    image: "/images/flavors/cookies-and-cream.png",
+    slug: "swiss-chocolate",
+    name: "Swiss Chocolate",
+    description: "Swiss-inspired chocolate crafted with rich African cocoa and sweet cream",
+    image: "/images/flavors/swiss-chocolate.png",
     category: "Classic",
   },
   {
@@ -102,35 +52,87 @@ export const FLAVORS: Flavor[] = [
     name: "Salted Caramel & Peanuts",
     description: "A burnt sugar ice cream with a rich, velvety blend of creamy notes and a hint of salt",
     image: "/images/flavors/salted-caramel-peanuts.png",
-    category: "Classic",
-  },
-  {
-    slug: "milk-toffee",
-    name: "Milk Toffee",
-    description: "The buttery sweetness of traditional milk toffee with hints of caramelised sugar and condensed milk.",
-    image: "/images/flavors/milk-toffee.png",
-    category: "Classic",
-  },
-  {
-    slug: "amber-coffee-caramel",
-    name: "Amber Coffee & Caramel",
-    description: "Rich caramel and aromatic amber coffee, a delicate yet creamy blend.",
-    image: "/images/flavors/amber-coffee-caramel.png",
-    category: "Classic",
+    category: "Speciality",
   },
   {
     slug: "double-chocolate",
     name: "Double Chocolate",
     description: "A decadent cocoa delight that transforms each scoop into a moment of pure bliss.",
     image: "/images/flavors/double-chocolate.png",
-    category: "Chocolate",
+    category: "Speciality",
   },
   {
-    slug: "swiss-chocolate",
-    name: "Swiss Chocolate",
-    description: "Swiss-inspired chocolate crafted with rich African cocoa and sweet cream",
-    image: "/images/flavors/swiss-chocolate.png",
-    category: "Chocolate",
+    slug: "strawberry-cheesecake",
+    name: "Strawberry Cheesecake",
+    description: "A creamy and tangy dessert topped with luscious strawberry compote.",
+    image: "/images/flavors/strawberry-cheesecake.png",
+    category: "Speciality",
+  },
+  {
+    slug: "blueberry",
+    name: "Blueberry",
+    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
+    image: "/images/flavors/blueberry.png",
+    category: "Speciality",
+  },
+  {
+    slug: "jaffna-mango",
+    name: "Jaffna Mango",
+    description: "Floral, tart and sweet Jaffna Karutha Columban treat for the summer days",
+    image: "/images/flavors/jaffna-mango.png",
+    category: "Speciality",
+  },
+  {
+    slug: "bubblegum",
+    name: "Bubblegum Blue",
+    description: "As the name says, a flavour that would make you feel like a kid again. It's a promise!",
+    image: "/images/flavors/bubblegum.png",
+    category: "Speciality",
+  },
+  {
+    slug: "coconut",
+    name: "Coconut",
+    description: "Versatile coconut milk and dairy, with creaminess and desiccated coconut texture.",
+    image: "/images/flavors/coconut.png",
+    category: "Speciality",
+  },
+  {
+    slug: "amber-coffee-caramel",
+    name: "Amber Coffee & Caramel",
+    description: "Rich caramel and aromatic amber coffee, a delicate yet creamy blend.",
+    image: "/images/flavors/amber-coffee-caramel.png",
+    category: "Speciality",
+  },
+  {
+    slug: "cookies-and-cream",
+    name: "Cookies & Cream",
+    description: "Silky smooth vanilla paired with crunchy cookie surprises. Indulgence in every bite.",
+    image: "/images/flavors/cookies-and-cream.png",
+    category: "Speciality",
+  },
+  {
+    slug: "milk-toffee",
+    name: "Milk Toffee (Kiri Toffee)",
+    description: "The buttery sweetness of traditional milk toffee with hints of caramelised sugar and condensed milk.",
+    image: "/images/flavors/milk-toffee.png",
+    category: "Speciality",
+  },
+  {
+    // Client: "Passion Fruit" without "Creamy"
+    slug: "passion-fruit-sorbet",
+    name: "Passion Fruit Sorbet",
+    description: "Intensely fruity and refreshing, the passion fruit creamy sorbet is a tropical delight.",
+    image: "/images/flavors/passion-fruit-sorbet.png",
+    category: "Dairy Free",
+    dairyFree: true,
+  },
+  {
+    slug: "wild-naarang-sorbet",
+    name: "Wild Naarang Sorbet",
+    description: "A delightful treat that delivers a vibrant burst of citrusy flavor with every spoonful",
+    image: "/images/flavors/wild-naarang-sorbet.png",
+    category: "Dairy Free",
+    dairyFree: true,
   },
   {
     slug: "flavour-of-the-month",
@@ -215,6 +217,7 @@ export const SERVICES: Service[] = [
     // Real photo from the client's Instagram (16 Jun 2026) — see docs/image-credits.md
     image: "/images/social/ig-bride-cart.jpg",
     imagePortrait: true,
+    imagePosition: "object-[50%_25%]", // keep the server's and bride's heads in the 4:3 cards
     points: [
       "Cart styling matched to your wedding palette",
       "Ice creams and dairy-free sorbets, chosen with you",

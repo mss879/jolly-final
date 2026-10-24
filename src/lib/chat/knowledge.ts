@@ -18,7 +18,7 @@ import {
    last, so OpenAI can cache the long prefix between messages. */
 
 const flavourLines = FLAVORS.map(
-  (f) => `- **${f.name}** (${f.category}${f.dairyFree ? ", dairy-free" : ""}): ${f.description}`,
+  (f) => `- **${f.name}** (${f.category}): ${f.description}`,
 ).join("\n");
 
 const cartLines = CARTS.map((c) => `- **${c.name}**: ${c.copy} Best for: ${c.occasion.toLowerCase()}.`).join("\n");

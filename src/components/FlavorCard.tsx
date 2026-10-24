@@ -17,16 +17,6 @@ export const FLAVOR_GRID: Record<FlavorCardVariant, string> = {
 
 const EASE = "ease-[cubic-bezier(0.76,0,0.24,1)]";
 
-function DairyFreePill({ className = "" }: { className?: string }) {
-  return (
-    <span
-      className={`inline-block rounded-btn border border-plum-200 bg-plum-100 px-3 py-1 text-[0.58rem] font-bold tracking-[0.14em] text-plum-900 uppercase ${className}`}
-    >
-      Dairy Free
-    </span>
-  );
-}
-
 export default function FlavorCard({
   flavor,
   index = 0,
@@ -57,12 +47,9 @@ export default function FlavorCard({
         <article className="group grid grid-cols-[6.5rem_1fr] items-center gap-5 border-b border-gold-300/70 py-7 sm:grid-cols-[8rem_1fr] sm:gap-7">
           {scoop("h-24 w-24 sm:h-32 sm:w-32", "group-hover:scale-105 group-hover:-rotate-6")}
           <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[0.6rem] font-semibold tracking-[0.22em] text-gold-700 uppercase">
-                {flavor.category}
-              </span>
-              {flavor.dairyFree && <DairyFreePill />}
-            </div>
+            <span className="text-[0.6rem] font-semibold tracking-[0.22em] text-gold-700 uppercase">
+              {flavor.category}
+            </span>
             <h3 className="mt-2 font-display text-xl leading-tight font-semibold text-plum-900 transition-colors duration-500 group-hover:text-gold-600">
               {flavor.name}
             </h3>
@@ -87,7 +74,6 @@ export default function FlavorCard({
           </span>
           <h3 className="mt-2 font-display text-lg leading-tight font-semibold text-plum-900">{flavor.name}</h3>
           <p className="mt-2.5 max-w-xs text-[0.82rem] leading-relaxed text-ink-500">{flavor.description}</p>
-          {flavor.dairyFree && <DairyFreePill className="mt-3" />}
         </article>
       </Reveal>
     );
@@ -104,7 +90,6 @@ export default function FlavorCard({
         </span>
         <h3 className="mt-2 font-display text-lg leading-tight font-semibold text-plum-900">{flavor.name}</h3>
         <p className="mt-2.5 max-w-xs text-[0.82rem] leading-relaxed text-ink-500">{flavor.description}</p>
-        {flavor.dairyFree && <DairyFreePill className="mt-3" />}
       </article>
     </Reveal>
   );
