@@ -18,8 +18,9 @@ const poppins = Poppins({
 
 /* Defaults for every page. Each public page sets its own title, description,
    canonical URL and link preview through pageMetadata() (src/lib/seo.ts).
-   Icons come from the files beside this layout (favicon.ico, icon.png,
-   apple-icon.png) and the web manifest from manifest.ts. */
+   Icons come from the files beside this layout (favicon.ico, icon1.png,
+   icon2.png, apple-icon.png) and the web manifest from manifest.ts. All of
+   them, and public/icons/, are the full logo on cream (client, Oct 2026). */
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
