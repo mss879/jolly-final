@@ -231,8 +231,9 @@ export const SERVICES: Service[] = [
     blurb: "Launches, galas and conferences. The break everyone looks forward to.",
     description:
       "Between the speeches and the networking, the cart is where people end up. We serve at scale without queues, and every scoop still comes with a word from our host.",
-    // Photo supplied by the client, 13 Oct 2026 (replaces scene-corporate-office.webp)
-    image: "/images/scenes/scene-corporate-cheers.webp",
+    // Photo supplied by the client, 3 Nov 2026 (replaces scene-corporate-cheers.webp)
+    image: "/images/scenes/scene-corporate-showroom.webp",
+    imagePosition: "object-[80%_50%]", // keep the whole cart, on the right, in the 4:3 cards
     points: [
       "High-volume service without queues",
       "Branded cups and signage on request",
@@ -263,9 +264,9 @@ export const SERVICES: Service[] = [
     blurb: "Your brand on the cart and a signature flavour in every scoop served.",
     description:
       "Put your brand on the most photographed corner of the room. We co-brand the cart and can develop a signature or limited-edition flavour. Launches, pop-ups and partner activations, content-ready from the first scoop.",
-    // CLIENT PHOTO: replace with the G2 brand-collaboration photo when received
-    image: "/images/scenes/hero-scoops.jpg",
-    mobileImage: "/images/scenes/mobile/hero-scoops-mobile.webp",
+    // Photo supplied by the client, 3 Nov 2026 (replaces hero-scoops.jpg)
+    image: "/images/scenes/scene-brand-arienti.webp",
+    imagePosition: "object-[20%_50%]", // the cart and the Arienti sign in the 4:3 cards
     points: [
       "Co-branded cart styling and signage",
       "Custom or limited-edition flavour development",
@@ -478,12 +479,14 @@ export const HERO_SLIDES: HeroSlide[] = [
     copy: "The scoops your guests queue for, soon in 500 ml tubs for your own freezer. Fresh, seasonal and ready when you are.",
     cta: { href: "/reserve?type=at-home", label: "Be First to Know" },
     cta2: { href: "/flavors", label: "Explore Flavours" },
-    // Tub visual supplied by the client, 5 Oct 2026
-    image: "/images/scenes/hero-tubs-500ml.webp",
-    mobileImage: "/images/scenes/mobile/hero-tubs-500ml-mobile.webp",
+    // Tub visual supplied by the client, 3 Nov 2026 (replaces hero-tubs-500ml.webp).
+    // The photo centres the tub, so the desktop file adds a blurred margin on
+    // the left — hidden under the cream veil — to seat it right of the copy.
+    image: "/images/scenes/hero-tub-feel-good-wide.webp",
+    mobileImage: "/images/scenes/hero-tub-feel-good.webp",
     mobileBreakpoint: 768,
-    alt: "Jolly's 500 ml tubs of Double Chocolate and Passion Fruit Sorbet, lids off, on a marble counter",
-    objectPos: "object-center",
+    alt: "Two hands with spoons sharing a Jolly's chocolate tub, \"You're about to feel good\" on the side, on a car bonnet at sunset",
+    objectPos: "object-center md:object-right",
   },
 ];
 
