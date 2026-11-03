@@ -235,10 +235,11 @@ export default function AboutPage() {
       </section>
 
       <ParallaxBanner
-        image="/images/scenes/hero-cart-banner.jpg"
-        mobileImage="/images/carts/cart-lobby-cream.jpeg"
-        imageClassName="object-contain scale-80 md:scale-100 md:object-cover"
-        alt="A Vanilla Cream Jolly's bicycle cart with its host in a bright hotel lobby"
+        // Photo supplied by the client, 3 Nov 2026 (replaces hero-cart-banner.jpg).
+        // The cart stands right of centre: narrow frames crop in on it.
+        image="/images/scenes/scene-cart-curtain-banner.webp"
+        imageClassName="object-cover object-[74%_50%]"
+        alt="A white Jolly's bicycle cart with a neon cone sign and flowers, before warm-lit blush curtains"
         heightClass="min-h-[72vh]"
         overlay="bg-plum-950/60 md:bg-transparent md:bg-gradient-to-r md:from-plum-950/85 md:via-plum-950/50 md:via-45% md:to-plum-950/0 md:to-75%"
       >
