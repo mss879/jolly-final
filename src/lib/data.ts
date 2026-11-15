@@ -7,8 +7,8 @@
 export const CONTACT = {
   phone: "+94 707 222 511",
   phoneHref: "tel:+94707222511",
-  phone2: "+94 705 336 452",
-  phone2Href: "tel:+94705336452",
+  phone2: "+94 706 999 000", // client, Nov 2026 (was +94 705 336 452)
+  phone2Href: "tel:+94706999000",
   whatsappHref: "https://wa.me/94707222511",
   email: "eventsteam@creamndairy.com",
   emailHref: "mailto:eventsteam@creamndairy.com",
