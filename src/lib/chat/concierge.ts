@@ -306,7 +306,7 @@ export async function runConcierge(turn: ConciergeTurn) {
         if (!(await askForPerson(reason))) return { ok: false, error: friendlyFailure("Alerting the team") };
         return {
           ok: true,
-          next: `Tell them a team member will reply right here in this chat, and they can also call or WhatsApp ${CONTACT.phone}.`,
+          next: `Tell them a team member will reply right here in this chat, and they can also call ${CONTACT.phone} or WhatsApp ${CONTACT.phone2}.`,
         };
       },
     }),

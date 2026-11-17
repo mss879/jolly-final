@@ -18,7 +18,7 @@ export const metadata: Metadata = pageMetadata({
 const CHANNELS = [
   {
     label: "WhatsApp",
-    value: CONTACT.phone,
+    value: CONTACT.phone2, // the number whatsappHref opens
     href: CONTACT.whatsappHref,
     note: "Quickest reply",
   },
