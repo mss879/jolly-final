@@ -9,7 +9,7 @@ export const CONTACT = {
   phoneHref: "tel:+94707222511",
   phone2: "+94 706 999 000", // client, Nov 2026 (was +94 705 336 452)
   phone2Href: "tel:+94706999000",
-  whatsappHref: "https://wa.me/94707222511",
+  whatsappHref: "https://wa.me/94706999000", // client, Nov 2026: WhatsApp is on phone2
   email: "eventsteam@creamndairy.com",
   emailHref: "mailto:eventsteam@creamndairy.com",
   facebook: "https://www.facebook.com/Jollyscreamery",
